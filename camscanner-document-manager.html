@@ -1169,6 +1169,204 @@ body {
       }
     }
 
+    // =========================
+    // 搜索引擎
+    // =========================
+
+    class SearchEngine {
+      constructor() {
+        this.stopWords = ['的', '了', '在', '是', '我', '有', '和', '就', '不', '人', '都', '一', '一个', '上', '也', '很', '到', '说', '要', '去', '你', '会', '着', '没有', '看', '好', '自己', '这'];
+      }
+
+      // 分词（简单实现）
+      tokenize(text) {
+        if (!text) return [];
+
+        // 移除标点符号
+        const cleaned = text.replace(/[，。！？；：、""''（）【】《》\s]/g, ' ');
+
+        // 按空格分词
+        const tokens = cleaned.split(/\s+/).filter(Boolean);
+
+        // 过滤停用词
+        return tokens.filter(token => !this.stopWords.includes(token));
+      }
+
+      // 计算文本相似度
+      calculateRelevance(query, document) {
+        const queryTokens = this.tokenize(query.toLowerCase());
+        if (queryTokens.length === 0) return 0;
+
+        const searchableText = [
+          document.name || '',
+          document.content || '',
+          (document.tags || []).join(' '),
+          document.type || ''
+        ].join(' ').toLowerCase();
+
+        let score = 0;
+
+        queryTokens.forEach(token => {
+          // 完全匹配
+          if (searchableText.includes(token)) {
+            score += 10;
+          }
+
+          // 标题匹配加权
+          if ((document.name || '').toLowerCase().includes(token)) {
+            score += 20;
+          }
+
+          // 标签匹配加权
+          if ((document.tags || []).some(tag => tag.toLowerCase().includes(token))) {
+            score += 15;
+          }
+        });
+
+        return score;
+      }
+
+      // 搜索文档
+      search(query, documents, options = {}) {
+        if (!query || query.trim() === '') {
+          return documents;
+        }
+
+        // 计算相关度并排序
+        const results = documents
+          .map(doc => ({
+            ...doc,
+            _relevance: this.calculateRelevance(query, doc)
+          }))
+          .filter(doc => doc._relevance > 0)
+          .sort((a, b) => b._relevance - a._relevance);
+
+        // 高亮关键词
+        if (options.highlight) {
+          return results.map(doc => this.highlightKeywords(doc, query));
+        }
+
+        return results;
+      }
+
+      // 高亮关键词
+      highlightKeywords(document, query) {
+        const tokens = this.tokenize(query.toLowerCase());
+        const highlighted = { ...document };
+
+        tokens.forEach(token => {
+          const regex = new RegExp(`(${token})`, 'gi');
+
+          if (highlighted.name) {
+            highlighted.name = highlighted.name.replace(
+              regex,
+              '<mark>$1</mark>'
+            );
+          }
+
+          if (highlighted.content) {
+            highlighted.content = highlighted.content.replace(
+              regex,
+              '<mark>$1</mark>'
+            );
+          }
+        });
+
+        return highlighted;
+      }
+
+      // 筛选文档
+      filter(documents, filters = {}) {
+        let results = [...documents];
+
+        // 按文件夹筛选
+        if (filters.folder) {
+          if (filters.folder === 'all') {
+            // 显示全部
+          } else if (filters.folder === 'favorite') {
+            results = results.filter(doc => doc.favorite);
+          } else if (filters.folder === 'recent') {
+            // 最近查看的文档
+            results = results
+              .filter(doc => doc.viewCount > 0)
+              .sort((a, b) => (b.lastViewed || 0) - (a.lastViewed || 0))
+              .slice(0, 20);
+          } else if (filters.folder === 'uncategorized') {
+            results = results.filter(doc => !doc.folder || doc.folder === 'uncategorized');
+          } else {
+            results = results.filter(doc => doc.folder === filters.folder);
+          }
+        }
+
+        // 按标签筛选
+        if (filters.tags && filters.tags.length > 0) {
+          results = results.filter(doc =>
+            filters.tags.some(tag => (doc.tags || []).includes(tag))
+          );
+        }
+
+        // 按类型筛选
+        if (filters.types && filters.types.length > 0) {
+          results = results.filter(doc =>
+            filters.types.includes(doc.type)
+          );
+        }
+
+        // 按日期范围筛选
+        if (filters.dateRange) {
+          const { start, end } = filters.dateRange;
+          if (start) {
+            results = results.filter(doc => doc.createdAt >= start);
+          }
+          if (end) {
+            results = results.filter(doc => doc.createdAt <= end);
+          }
+        }
+
+        return results;
+      }
+
+      // 排序文档
+      sort(documents, sortBy) {
+        const sorted = [...documents];
+
+        switch (sortBy) {
+          case 'date-desc':
+            return sorted.sort((a, b) => b.createdAt - a.createdAt);
+          case 'date-asc':
+            return sorted.sort((a, b) => a.createdAt - b.createdAt);
+          case 'name-asc':
+            return sorted.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+          case 'name-desc':
+            return sorted.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
+          case 'size-desc':
+            return sorted.sort((a, b) => (b.size || 0) - (a.size || 0));
+          case 'size-asc':
+            return sorted.sort((a, b) => (a.size || 0) - (b.size || 0));
+          default:
+            return sorted;
+        }
+      }
+
+      // 综合搜索（搜索 + 筛选 + 排序）
+      searchAndFilter(query, documents, filters = {}, sortBy = 'date-desc') {
+        let results = documents;
+
+        // 1. 筛选
+        results = this.filter(results, filters);
+
+        // 2. 搜索
+        if (query && query.trim() !== '') {
+          results = this.search(query, results, { highlight: false });
+        }
+
+        // 3. 排序
+        results = this.sort(results, sortBy);
+
+        return results;
+      }
+    }
+
   </script>
 </body>
 </html>
