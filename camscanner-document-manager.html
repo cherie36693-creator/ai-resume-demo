@@ -1561,6 +1561,501 @@ body {
       }
     }
 
+    // =========================
+    // 示例数据生成
+    // =========================
+
+    function generateSampleData() {
+      const samples = [
+        {
+          name: '英语六级证书.jpg',
+          type: 'certificate',
+          content: '全国大学英语六级考试 CET-6 证书 姓名：张三 成绩：550分 等级：优秀',
+          folder: 'uncategorized',
+          tags: ['证书', '保研材料']
+        },
+        {
+          name: '租房合同.pdf',
+          type: 'contract',
+          content: '房屋租赁合同 甲方：张三 乙方：李四 租期：2024年1月1日至2024年12月31日',
+          folder: 'uncategorized',
+          tags: ['合同', '生活']
+        },
+        {
+          name: '身份证复印件.jpg',
+          type: 'id_card',
+          content: '居民身份证 姓名：张三 性别：男 民族：汉 出生：1998年1月1日',
+          folder: 'uncategorized',
+          tags: ['证件', '重要']
+        },
+        {
+          name: '火车票_北京-上海.jpg',
+          type: 'ticket',
+          content: '火车票 G101 北京南 → 上海虹桥 2024-01-15 08:00 二等座 ¥553',
+          folder: 'uncategorized',
+          tags: ['票据', '报销']
+        },
+        {
+          name: '数据结构作业_第三章.pdf',
+          type: 'assignment',
+          content: '数据结构与算法 课程作业 第三章：树与二叉树 姓名：张三 学号：2021001',
+          folder: 'uncategorized',
+          tags: ['作业', '学习']
+        },
+        {
+          name: '团队周会纪要_0115.docx',
+          type: 'meeting',
+          content: '会议纪要 时间：2024年1月15日 参会人员：张三、李四、王五 议题：项目进度讨论',
+          folder: 'uncategorized',
+          tags: ['会议', '工作']
+        }
+      ];
+
+      const dataManager = new DataManager();
+
+      // 清空现有数据
+      dataManager.state.documents = [];
+      dataManager.state.folders = [];
+
+      // 添加示例文件夹
+      const folders = [
+        { name: '证书荣誉', parentId: null, icon: '🏆' },
+        { name: '工作文档', parentId: null, icon: '💼' },
+        { name: '学习资料', parentId: null, icon: '🎓' }
+      ];
+
+      folders.forEach(folder => dataManager.addFolder(folder));
+
+      // 添加示例文档
+      samples.forEach(sample => {
+        dataManager.addDocument(sample);
+      });
+
+      dataManager.updateTagCounts();
+
+      return dataManager;
+    }
+
+    // =========================
+    // 应用主类
+    // =========================
+
+    class App {
+      constructor() {
+        this.dataManager = new DataManager();
+        this.classifier = new DocumentClassifier();
+        this.searchEngine = new SearchEngine();
+        this.renderer = new UIRenderer();
+
+        // 初始化
+        this.init();
+      }
+
+      init() {
+        // 如果是首次使用，生成示例数据
+        if (this.dataManager.getDocuments().length === 0) {
+          this.dataManager = generateSampleData();
+          this.classifier = new DocumentClassifier();
+          this.searchEngine = new SearchEngine();
+        }
+
+        // 绑定事件
+        this.bindEvents();
+
+        // 初始渲染
+        this.render();
+      }
+
+      // 绑定所有事件
+      bindEvents() {
+        // 搜索
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) {
+          searchInput.addEventListener('input', debounce((e) => {
+            this.handleSearch(e.target.value);
+          }, 300));
+        }
+
+        // 视图切换
+        document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            this.handleViewToggle(e.target.dataset.view);
+          });
+        });
+
+        // 快速导航
+        document.querySelectorAll('.nav-item').forEach(item => {
+          item.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.handleFolderChange(e.currentTarget.dataset.folder);
+          });
+        });
+
+        // 排序
+        const sortSelect = document.getElementById('sort-select');
+        if (sortSelect) {
+          sortSelect.addEventListener('change', (e) => {
+            this.handleSortChange(e.target.value);
+          });
+        }
+
+        // 上传文档
+        const btnUpload = document.getElementById('btn-upload');
+        if (btnUpload) {
+          btnUpload.addEventListener('click', () => {
+            this.showUploadDialog();
+          });
+        }
+
+        // 确认上传
+        const btnConfirmUpload = document.getElementById('confirm-upload');
+        if (btnConfirmUpload) {
+          btnConfirmUpload.addEventListener('click', () => {
+            this.handleUpload();
+          });
+        }
+
+        // 取消上传
+        const btnCancelUpload = document.getElementById('cancel-upload');
+        const closeUploadDialog = document.getElementById('close-upload-dialog');
+        [btnCancelUpload, closeUploadDialog].forEach(btn => {
+          if (btn) {
+            btn.addEventListener('click', () => {
+              this.renderer.toggleDialog('upload-dialog', false);
+            });
+          }
+        });
+
+        // 新建文件夹
+        const btnNewFolder = document.getElementById('btn-new-folder');
+        if (btnNewFolder) {
+          btnNewFolder.addEventListener('click', () => {
+            this.showFolderDialog();
+          });
+        }
+
+        // 确认创建文件夹
+        const btnConfirmFolder = document.getElementById('confirm-folder');
+        if (btnConfirmFolder) {
+          btnConfirmFolder.addEventListener('click', () => {
+            this.handleCreateFolder();
+          });
+        }
+
+        // 取消创建文件夹
+        const btnCancelFolder = document.getElementById('cancel-folder');
+        const closeFolderDialog = document.getElementById('close-folder-dialog');
+        [btnCancelFolder, closeFolderDialog].forEach(btn => {
+          if (btn) {
+            btn.addEventListener('click', () => {
+              this.renderer.toggleDialog('folder-dialog', false);
+            });
+          }
+        });
+
+        // 文档列表点击（委托）
+        const docList = document.getElementById('document-list');
+        if (docList) {
+          docList.addEventListener('click', (e) => {
+            const card = e.target.closest('.doc-card');
+            const favorite = e.target.closest('.doc-favorite');
+
+            if (favorite) {
+              e.stopPropagation();
+              this.handleToggleFavorite(favorite.dataset.id);
+            } else if (card) {
+              this.handleDocumentClick(card.dataset.id, e.ctrlKey || e.metaKey);
+            }
+          });
+        }
+
+        // 文件夹树点击（委托）
+        const folderTree = document.getElementById('folder-tree');
+        if (folderTree) {
+          folderTree.addEventListener('click', (e) => {
+            const item = e.target.closest('.folder-item');
+            if (item) {
+              this.handleFolderChange(item.dataset.id);
+            }
+          });
+        }
+
+        // 标签云点击（委托）
+        const tagsCloud = document.getElementById('tags-cloud');
+        if (tagsCloud) {
+          tagsCloud.addEventListener('click', (e) => {
+            const tag = e.target.closest('.tag');
+            if (tag) {
+              this.handleTagClick(tag.dataset.tag);
+            }
+          });
+        }
+      }
+
+      // 渲染整个应用
+      render() {
+        const state = this.dataManager.getState();
+        const documents = this.dataManager.getDocuments();
+        const folders = this.dataManager.getFolders();
+        const tags = this.dataManager.getTags();
+
+        // 应用筛选和排序
+        const filteredDocs = this.searchEngine.searchAndFilter(
+          state.searchQuery,
+          documents,
+          {
+            folder: state.currentFolder,
+            tags: state.filters.tags,
+            types: state.filters.types,
+            dateRange: state.filters.dateRange
+          },
+          'date-desc'
+        );
+
+        // 渲染文档列表
+        this.renderer.renderDocuments(filteredDocs);
+
+        // 渲染文件夹树
+        this.renderer.renderFolderTree(folders);
+
+        // 渲染标签云
+        this.renderer.renderTagsCloud(tags);
+
+        // 更新统计
+        this.updateStats();
+
+        // 高亮当前文件夹
+        this.renderer.highlightActiveNav(state.currentFolder);
+
+        // 更新视图模式
+        this.renderer.updateViewMode(state.currentView);
+
+        // 更新文件夹选择器
+        this.renderer.updateFolderSelect(folders);
+      }
+
+      // 更新统计数据
+      updateStats() {
+        const documents = this.dataManager.getDocuments();
+        const state = this.dataManager.getState();
+
+        const stats = {
+          total: documents.length,
+          selected: state.selectedDocs.length,
+          counts: {
+            all: documents.length,
+            favorite: documents.filter(d => d.favorite).length,
+            recent: documents.filter(d => d.viewCount > 0).length,
+            uncategorized: documents.filter(d => !d.folder || d.folder === 'uncategorized').length
+          }
+        };
+
+        this.renderer.updateStats(stats);
+      }
+
+      // 处理搜索
+      handleSearch(query) {
+        this.dataManager.updateState({ searchQuery: query });
+        this.render();
+      }
+
+      // 处理视图切换
+      handleViewToggle(view) {
+        this.dataManager.updateState({ currentView: view });
+        this.renderer.updateViewMode(view);
+      }
+
+      // 处理文件夹切换
+      handleFolderChange(folderId) {
+        this.dataManager.updateState({ currentFolder: folderId });
+        this.render();
+      }
+
+      // 处理排序
+      handleSortChange(sortBy) {
+        // 排序逻辑已在 render() 中实现
+        this.render();
+      }
+
+      // 处理文档点击
+      handleDocumentClick(docId, multiSelect = false) {
+        const state = this.dataManager.getState();
+        let selectedDocs = [...state.selectedDocs];
+
+        if (multiSelect) {
+          // 多选模式
+          const index = selectedDocs.indexOf(docId);
+          if (index > -1) {
+            selectedDocs.splice(index, 1);
+          } else {
+            selectedDocs.push(docId);
+          }
+        } else {
+          // 单选模式
+          selectedDocs = [docId];
+        }
+
+        this.dataManager.updateState({ selectedDocs });
+        this.renderer.markSelectedDocuments(selectedDocs);
+        this.updateStats();
+
+        // 更新文档查看次数
+        const doc = this.dataManager.getDocuments().find(d => d.id === docId);
+        if (doc) {
+          this.dataManager.updateDocument(docId, {
+            viewCount: (doc.viewCount || 0) + 1,
+            lastViewed: Date.now()
+          });
+        }
+      }
+
+      // 处理收藏切换
+      handleToggleFavorite(docId) {
+        const doc = this.dataManager.getDocuments().find(d => d.id === docId);
+        if (doc) {
+          this.dataManager.updateDocument(docId, {
+            favorite: !doc.favorite
+          });
+          this.render();
+        }
+      }
+
+      // 处理标签点击
+      handleTagClick(tagName) {
+        const state = this.dataManager.getState();
+        const tags = [...state.filters.tags];
+        const index = tags.indexOf(tagName);
+
+        if (index > -1) {
+          tags.splice(index, 1);
+        } else {
+          tags.push(tagName);
+        }
+
+        this.dataManager.updateState({
+          filters: { ...state.filters, tags }
+        });
+        this.render();
+      }
+
+      // 显示上传对话框
+      showUploadDialog() {
+        this.renderer.toggleDialog('upload-dialog', true);
+
+        // 清空表单
+        document.getElementById('upload-filename').value = '';
+        document.getElementById('upload-type').value = 'certificate';
+        document.getElementById('upload-content').value = '';
+        document.getElementById('upload-folder').value = 'uncategorized';
+        document.getElementById('upload-tags').value = '';
+      }
+
+      // 处理上传
+      handleUpload() {
+        const name = document.getElementById('upload-filename').value.trim();
+        const type = document.getElementById('upload-type').value;
+        const content = document.getElementById('upload-content').value.trim();
+        const folder = document.getElementById('upload-folder').value;
+        const tagsInput = document.getElementById('upload-tags').value.trim();
+
+        if (!name) {
+          alert('请输入文件名');
+          return;
+        }
+
+        // 解析标签
+        const tags = tagsInput
+          ? tagsInput.split(/[,，]/).map(t => t.trim()).filter(Boolean)
+          : [];
+
+        // 创建文档
+        const newDoc = {
+          name,
+          type,
+          content,
+          folder,
+          tags
+        };
+
+        // 智能分类
+        const classification = this.classifier.smartClassify(
+          newDoc,
+          this.dataManager.getFolders()
+        );
+
+        // 合并推荐的标签
+        newDoc.tags = [...new Set([...tags, ...classification.tags])];
+
+        // 如果用户没选文件夹，使用推荐的
+        if (folder === 'uncategorized' && classification.folder !== 'uncategorized') {
+          newDoc.folder = classification.folder;
+        }
+
+        // 添加文档
+        this.dataManager.addDocument(newDoc);
+        this.dataManager.updateTagCounts();
+
+        // 关闭对话框并重新渲染
+        this.renderer.toggleDialog('upload-dialog', false);
+        this.render();
+      }
+
+      // 显示文件夹对话框
+      showFolderDialog() {
+        this.renderer.toggleDialog('folder-dialog', true);
+
+        // 清空表单
+        document.getElementById('folder-name').value = '';
+        document.getElementById('folder-parent').value = 'null';
+        document.getElementById('folder-icon').value = '📁';
+
+        // 更新父文件夹选择器
+        const folders = this.dataManager.getFolders();
+        const parentSelect = document.getElementById('folder-parent');
+        if (parentSelect) {
+          const options = [
+            '<option value="null">根目录</option>',
+            ...folders.map(f =>
+              `<option value="${f.id}">${f.icon || '📁'} ${f.name}</option>`
+            )
+          ].join('');
+          parentSelect.innerHTML = options;
+        }
+      }
+
+      // 处理创建文件夹
+      handleCreateFolder() {
+        const name = document.getElementById('folder-name').value.trim();
+        const parentId = document.getElementById('folder-parent').value;
+        const icon = document.getElementById('folder-icon').value;
+
+        if (!name) {
+          alert('请输入文件夹名称');
+          return;
+        }
+
+        // 创建文件夹
+        this.dataManager.addFolder({
+          name,
+          parentId: parentId === 'null' ? null : parentId,
+          icon
+        });
+
+        // 关闭对话框并重新渲染
+        this.renderer.toggleDialog('folder-dialog', false);
+        this.render();
+      }
+    }
+
+    // =========================
+    // 应用启动
+    // =========================
+
+    // 等待 DOM 加载完成
+    document.addEventListener('DOMContentLoaded', () => {
+      window.app = new App();
+    });
+
   </script>
 </body>
 </html>
