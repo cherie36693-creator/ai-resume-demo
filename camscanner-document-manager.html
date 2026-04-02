@@ -1006,6 +1006,169 @@ body {
         this.saveState();
       }
     }
+
+    // =========================
+    // 文档分类器
+    // =========================
+
+    class DocumentClassifier {
+      constructor() {
+        // 文档类型规则库
+        this.typeRules = {
+          certificate: {
+            name: '证书',
+            keywords: ['证书', '获奖', '荣誉', '奖状', '认证', '资格'],
+            icon: '🏆',
+            folder: '证书荣誉'
+          },
+          contract: {
+            name: '合同',
+            keywords: ['合同', '协议', '甲方', '乙方', '签署', '盖章'],
+            icon: '📄',
+            folder: '合同文件'
+          },
+          id_card: {
+            name: '身份证',
+            keywords: ['身份证', '姓名', '性别', '民族', '出生', '住址'],
+            icon: '🪪',
+            folder: '证件照片'
+          },
+          ticket: {
+            name: '票据',
+            keywords: ['发票', '收据', '票据', '金额', '税号', '报销'],
+            icon: '🎫',
+            folder: '财务报销'
+          },
+          assignment: {
+            name: '作业',
+            keywords: ['作业', '课程', '姓名', '学号', '班级', '题目'],
+            icon: '📝',
+            folder: '学习资料'
+          },
+          meeting: {
+            name: '会议',
+            keywords: ['会议', '纪要', '议程', '参会', '讨论', '决议'],
+            icon: '📋',
+            folder: '工作文档'
+          },
+          report: {
+            name: '报告',
+            keywords: ['报告', '总结', '分析', '数据', '结论', '建议'],
+            icon: '📊',
+            folder: '工作文档'
+          }
+        };
+
+        // 标签规则库
+        this.tagRules = [
+          { pattern: /保研|推免|研究生/i, tag: '保研材料' },
+          { pattern: /工作|实习|offer/i, tag: '求职材料' },
+          { pattern: /发票|报销|财务/i, tag: '财务' },
+          { pattern: /驾照|护照|签证/i, tag: '证件' },
+          { pattern: /考试|成绩|证书/i, tag: '考试' },
+          { pattern: /项目|开发|设计/i, tag: '项目' }
+        ];
+      }
+
+      // 识别文档类型
+      classifyType(document) {
+        const content = (document.content || '').toLowerCase();
+        const filename = (document.name || '').toLowerCase();
+        const text = content + ' ' + filename;
+
+        let maxScore = 0;
+        let detectedType = 'other';
+
+        // 计算每种类型的匹配得分
+        for (const [type, rule] of Object.entries(this.typeRules)) {
+          let score = 0;
+          rule.keywords.forEach(keyword => {
+            const regex = new RegExp(keyword, 'gi');
+            const matches = text.match(regex);
+            if (matches) {
+              score += matches.length;
+            }
+          });
+
+          if (score > maxScore) {
+            maxScore = score;
+            detectedType = type;
+          }
+        }
+
+        return {
+          type: detectedType,
+          confidence: Math.min(maxScore / 3, 1), // 归一化到 0-1
+          typeName: this.typeRules[detectedType]?.name || '其他'
+        };
+      }
+
+      // 推荐标签
+      recommendTags(document) {
+        const content = (document.content || '').toLowerCase();
+        const filename = (document.name || '').toLowerCase();
+        const text = content + ' ' + filename;
+
+        const tags = [];
+
+        // 应用标签规则
+        this.tagRules.forEach(rule => {
+          if (rule.pattern.test(text)) {
+            tags.push(rule.tag);
+          }
+        });
+
+        // 从文档类型推荐标签
+        if (document.type && this.typeRules[document.type]) {
+          tags.push(this.typeRules[document.type].name);
+        }
+
+        return [...new Set(tags)]; // 去重
+      }
+
+      // 推荐文件夹
+      recommendFolder(document, folders) {
+        // 如果已经指定了文件夹，保持不变
+        if (document.folder && document.folder !== 'uncategorized') {
+          return document.folder;
+        }
+
+        // 从文档类型推荐
+        if (document.type && this.typeRules[document.type]) {
+          const recommendedName = this.typeRules[document.type].folder;
+
+          // 查找匹配的文件夹
+          const folder = folders.find(f => f.name === recommendedName);
+          if (folder) {
+            return folder.id;
+          }
+        }
+
+        return 'uncategorized';
+      }
+
+      // 智能分类（综合）
+      smartClassify(document, folders = []) {
+        const typeResult = this.classifyType(document);
+        const tags = this.recommendTags(document);
+        const folder = this.recommendFolder(
+          { ...document, type: typeResult.type },
+          folders
+        );
+
+        return {
+          type: typeResult.type,
+          typeConfidence: typeResult.confidence,
+          tags,
+          folder,
+          suggestions: {
+            type: typeResult.typeName,
+            confidence: (typeResult.confidence * 100).toFixed(0) + '%'
+          }
+        };
+      }
+    }
+
   </script>
 </body>
 </html>
