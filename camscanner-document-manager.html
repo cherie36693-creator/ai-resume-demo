@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CamScanner 文档管理系统</title>
+  <style>
+/* =========================
+   CSS 变量系统
+   ========================= */
+:root {
+  /* 主色 */
+  --primary: #1890FF;
+  --primary-hover: #40A9FF;
+  --primary-active: #096DD9;
+
+  /* 功能色 */
+  --success: #52C41A;
+  --warning: #FAAD14;
+  --error: #F5222D;
+  --info: #1890FF;
+
+  /* 中性色 */
+  --text-primary: #262626;
+  --text-secondary: #8C8C8C;
+  --text-disabled: #BFBFBF;
+  --border: #D9D9D9;
+  --background: #F5F5F5;
+  --white: #FFFFFF;
+
+  /* 字体 */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-size-xl: 24px;
+  --font-size-lg: 18px;
+  --font-size-md: 14px;
+  --font-size-sm: 12px;
+
+  /* 间距 */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* 布局 */
+  --sidebar-width: 260px;
+  --header-height: 60px;
+  --statusbar-height: 36px;
+}
+
+/* =========================
+   全局样式
+   ========================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-md);
+  color: var(--text-primary);
+  background-color: var(--background);
+  line-height: 1.6;
+}
+
+/* =========================
+   Header
+   ========================= */
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-height);
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--spacing-lg);
+  z-index: 100;
+}
+
+.header-left {
+  flex-shrink: 0;
+  width: var(--sidebar-width);
+}
+
+.app-logo {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.header-center {
+  flex: 1;
+  max-width: 600px;
+  margin: 0 var(--spacing-lg);
+}
+
+.search-input {
+  width: 100%;
+  height: 36px;
+  padding: 0 var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: var(--font-size-md);
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.header-right {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.view-toggle-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: var(--font-size-lg);
+  transition: all 0.2s;
+}
+
+.view-toggle-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.view-toggle-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--white);
+}
+
+/* =========================
+   Layout
+   ========================= */
+.app-container {
+  display: flex;
+  padding-top: var(--header-height);
+  padding-bottom: var(--statusbar-height);
+  min-height: 100vh;
+}
+
+/* =========================
+   Sidebar
+   ========================= */
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  padding: var(--spacing-lg);
+  overflow-y: auto;
+  position: fixed;
+  top: var(--header-height);
+  bottom: var(--statusbar-height);
+  left: 0;
+}
+
+.sidebar-section {
+  margin-bottom: var(--spacing-xl);
+}
+
+.sidebar-title {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.quick-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 4px;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: background-color 0.2s;
+}
+
+.nav-item:hover {
+  background-color: var(--background);
+}
+
+.nav-item.active {
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+.nav-icon {
+  font-size: var(--font-size-lg);
+  margin-right: var(--spacing-sm);
+}
+
+.nav-label {
+  flex: 1;
+}
+
+.nav-count {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  background: var(--background);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.nav-item.active .nav-count {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--white);
+}
+
+.folder-tree {
+  margin-bottom: var(--spacing-md);
+}
+
+.folder-item {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.folder-item:hover {
+  background-color: var(--background);
+}
+
+.folder-item.active {
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+.tags-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--background);
+  border-radius: 12px;
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tag:hover {
+  background: var(--primary);
+  color: var(--white);
+}
+
+.btn-text {
+  border: none;
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  font-size: var(--font-size-md);
+  padding: var(--spacing-sm) 0;
+}
+
+.btn-text:hover {
+  text-decoration: underline;
+}
+
+/* =========================
+   Main Content
+   ========================= */
+.main-content {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  padding: var(--spacing-lg);
+}
+
+/* =========================
+   Toolbar
+   ========================= */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.toolbar-left,
+.toolbar-right {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 8px 16px;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: 4px;
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
+
+.btn-primary:active {
+  background: var(--primary-active);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 8px 16px;
+  background: var(--white);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-secondary:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.select {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: var(--font-size-md);
+  background: var(--white);
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* =========================
+   Document List
+   ========================= */
+.document-list {
+  display: grid;
+  gap: var(--spacing-md);
+}
+
+.document-list.grid-view {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+.document-list.list-view {
+  grid-template-columns: 1fr;
+}
+
+.doc-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: var(--spacing-md);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.doc-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15);
+}
+
+.doc-card.selected {
+  border-color: var(--primary);
+  background: rgba(24, 144, 255, 0.05);
+}
+
+.doc-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.doc-icon {
+  font-size: 24px;
+}
+
+.doc-name {
+  flex: 1;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.doc-favorite {
+  cursor: pointer;
+}
+
+.doc-meta {
+  display: flex;
+  gap: var(--spacing-md);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.doc-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.doc-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  background: var(--background);
+  border-radius: 10px;
+  font-size: var(--font-size-sm);
+}
+
+/* =========================
+   Empty State
+   ========================= */
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--text-secondary);
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: var(--spacing-lg);
+}
+
+.empty-state h3 {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-primary);
+}
+
+/* =========================
+   Status Bar
+   ========================= */
+.status-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--statusbar-height);
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 var(--spacing-lg);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  z-index: 100;
+}
+
+/* =========================
+   Dialog
+   ========================= */
+.dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialog-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.dialog-content {
+  position: relative;
+  background: var(--white);
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.dialog-header h3 {
+  font-size: var(--font-size-lg);
+}
+
+.dialog-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+.dialog-close:hover {
+  color: var(--text-primary);
+}
+
+.dialog-body {
+  padding: var(--spacing-lg);
+}
+
+.form-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  font-weight: 600;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: var(--font-size-md);
+  font-family: var(--font-family);
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border-top: 1px solid var(--border);
+}
+
+/* =========================
+   响应式设计
+   ========================= */
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 0;
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+
+  .header-left {
+    width: auto;
+  }
+
+  .document-list.grid-view {
+    grid-template-columns: 1fr;
+  }
+}
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <h1 class="app-logo">📄 CamScanner</h1>
+    </div>
+    <div class="header-center">
+      <input type="text" id="search-input" class="search-input" placeholder="搜索文档...">
+    </div>
+    <div class="header-right">
+      <button class="view-toggle-btn" data-view="grid" title="网格视图">⊞</button>
+      <button class="view-toggle-btn active" data-view="list" title="列表视图">☰</button>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">快速访问</h3>
+        <nav class="quick-nav">
+          <a href="#" class="nav-item active" data-folder="all">
+            <span class="nav-icon">📁</span>
+            <span class="nav-label">所有文档</span>
+            <span class="nav-count" id="count-all">0</span>
+          </a>
+          <a href="#" class="nav-item" data-folder="favorite">
+            <span class="nav-icon">🌟</span>
+            <span class="nav-label">收藏夹</span>
+            <span class="nav-count" id="count-favorite">0</span>
+          </a>
+          <a href="#" class="nav-item" data-folder="recent">
+            <span class="nav-icon">🕐</span>
+            <span class="nav-label">最近查看</span>
+            <span class="nav-count" id="count-recent">0</span>
+          </a>
+          <a href="#" class="nav-item" data-folder="uncategorized">
+            <span class="nav-icon">🆕</span>
+            <span class="nav-label">未分类</span>
+            <span class="nav-count" id="count-uncategorized">0</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">我的文件夹</h3>
+        <div id="folder-tree" class="folder-tree">
+          <!-- 动态生成 -->
+        </div>
+        <button class="btn-text" id="btn-new-folder">+ 新建文件夹</button>
+      </div>
+
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">标签</h3>
+        <div id="tags-cloud" class="tags-cloud">
+          <!-- 动态生成 -->
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <button class="btn-primary" id="btn-upload">
+            <span>📤</span> 上传文档
+          </button>
+          <button class="btn-secondary" id="btn-batch-action" disabled>
+            <span>✓</span> 批量操作
+          </button>
+        </div>
+        <div class="toolbar-right">
+          <select id="sort-select" class="select">
+            <option value="date-desc">最新优先</option>
+            <option value="date-asc">最早优先</option>
+            <option value="name-asc">名称 A-Z</option>
+            <option value="name-desc">名称 Z-A</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Document List -->
+      <div id="document-list" class="document-list list-view">
+        <!-- 动态生成 -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="empty-state" style="display: none;">
+        <div class="empty-icon">📭</div>
+        <h3>还没有文档</h3>
+        <p>点击"上传文档"开始添加</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- Status Bar -->
+  <footer class="status-bar">
+    <div class="status-left">
+      <span id="status-total">总计 0 份文档</span>
+    </div>
+    <div class="status-right">
+      <span id="status-selected">已选 0 份</span>
+    </div>
+  </footer>
+
+  <!-- 上传对话框 -->
+  <div id="upload-dialog" class="dialog" style="display: none;">
+    <div class="dialog-backdrop"></div>
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <h3>上传文档</h3>
+        <button class="dialog-close" id="close-upload-dialog">×</button>
+      </div>
+      <div class="dialog-body">
+        <div class="form-group">
+          <label>文件名</label>
+          <input type="text" id="upload-filename" class="input" placeholder="例如：英语六级证书.jpg">
+        </div>
+        <div class="form-group">
+          <label>文档类型</label>
+          <select id="upload-type" class="select">
+            <option value="certificate">🏆 证书</option>
+            <option value="contract">📄 合同</option>
+            <option value="id_card">🪪 身份证</option>
+            <option value="ticket">🎫 票据</option>
+            <option value="assignment">📝 作业</option>
+            <option value="meeting">📋 会议</option>
+            <option value="report">📊 报告</option>
+            <option value="other">📁 其他</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>文档内容（模拟 OCR）</label>
+          <textarea id="upload-content" class="textarea" rows="4" placeholder="输入文档内容用于搜索..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>选择文件夹</label>
+          <select id="upload-folder" class="select">
+            <option value="uncategorized">未分类</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>标签（逗号分隔）</label>
+          <input type="text" id="upload-tags" class="input" placeholder="例如：证书, 保研材料">
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn-secondary" id="cancel-upload">取消</button>
+        <button class="btn-primary" id="confirm-upload">确认上传</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 新建文件夹对话框 -->
+  <div id="folder-dialog" class="dialog" style="display: none;">
+    <div class="dialog-backdrop"></div>
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <h3>新建文件夹</h3>
+        <button class="dialog-close" id="close-folder-dialog">×</button>
+      </div>
+      <div class="dialog-body">
+        <div class="form-group">
+          <label>文件夹名称</label>
+          <input type="text" id="folder-name" class="input" placeholder="例如：证书荣誉">
+        </div>
+        <div class="form-group">
+          <label>父文件夹</label>
+          <select id="folder-parent" class="select">
+            <option value="null">根目录</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>图标</label>
+          <select id="folder-icon" class="select">
+            <option value="📁">📁 默认</option>
+            <option value="🏆">🏆 证书</option>
+            <option value="📄">📄 合同</option>
+            <option value="💼">💼 工作</option>
+            <option value="🎓">🎓 学业</option>
+            <option value="💰">💰 财务</option>
+          </select>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn-secondary" id="cancel-folder">取消</button>
+        <button class="btn-primary" id="confirm-folder">确认创建</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* JavaScript 将在后续任务添加 */
+  </script>
+</body>
+</html>
