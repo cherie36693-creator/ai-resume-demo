@@ -1367,6 +1367,200 @@ body {
       }
     }
 
+    // =========================
+    // UI 渲染器
+    // =========================
+
+    class UIRenderer {
+      constructor() {
+        this.documentIcons = {
+          certificate: '🏆',
+          contract: '📄',
+          id_card: '🪪',
+          ticket: '🎫',
+          assignment: '📝',
+          meeting: '📋',
+          report: '📊',
+          other: '📁'
+        };
+      }
+
+      // 渲染文档列表
+      renderDocuments(documents, containerId = 'document-list') {
+        const container = document.getElementById(containerId);
+        const emptyState = document.getElementById('empty-state');
+
+        if (!container) return;
+
+        if (documents.length === 0) {
+          container.innerHTML = '';
+          if (emptyState) emptyState.style.display = 'block';
+          return;
+        }
+
+        if (emptyState) emptyState.style.display = 'none';
+
+        container.innerHTML = documents.map(doc => this.createDocumentCard(doc)).join('');
+      }
+
+      // 创建文档卡片
+      createDocumentCard(doc) {
+        const icon = this.documentIcons[doc.type] || '📁';
+        const favoriteIcon = doc.favorite ? '⭐' : '☆';
+        const tagsHtml = (doc.tags || [])
+          .map(tag => `<span class="doc-tag">${tag}</span>`)
+          .join('');
+
+        return `
+          <div class="doc-card" data-id="${doc.id}">
+            <div class="doc-card-header">
+              <span class="doc-icon">${icon}</span>
+              <span class="doc-name">${doc.name}</span>
+              <span class="doc-favorite" data-id="${doc.id}">${favoriteIcon}</span>
+            </div>
+            <div class="doc-meta">
+              <span>📅 ${formatDate(doc.createdAt)}</span>
+              <span>👁 ${doc.viewCount || 0}次</span>
+            </div>
+            <div class="doc-tags">${tagsHtml}</div>
+          </div>
+        `;
+      }
+
+      // 渲染文件夹树
+      renderFolderTree(folders, containerId = 'folder-tree') {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        // 构建树形结构
+        const tree = this.buildFolderTree(folders);
+
+        container.innerHTML = tree.map(folder => this.createFolderItem(folder)).join('');
+      }
+
+      // 构建文件夹树形结构
+      buildFolderTree(folders, parentId = null) {
+        return folders
+          .filter(folder => folder.parentId === parentId)
+          .map(folder => ({
+            ...folder,
+            children: this.buildFolderTree(folders, folder.id)
+          }));
+      }
+
+      // 创建文件夹项
+      createFolderItem(folder, level = 0) {
+        const indent = level * 16;
+        const hasChildren = folder.children && folder.children.length > 0;
+        const childrenHtml = hasChildren
+          ? folder.children.map(child => this.createFolderItem(child, level + 1)).join('')
+          : '';
+
+        return `
+          <div class="folder-item" data-id="${folder.id}" style="padding-left: ${indent}px">
+            <span>${folder.icon || '📁'}</span>
+            <span>${folder.name}</span>
+          </div>
+          ${childrenHtml}
+        `;
+      }
+
+      // 渲染标签云
+      renderTagsCloud(tags, containerId = 'tags-cloud') {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        container.innerHTML = tags
+          .map(tag => `<span class="tag" data-tag="${tag.name}">${tag.name} (${tag.count})</span>`)
+          .join('');
+      }
+
+      // 更新统计数据
+      updateStats(stats) {
+        // 更新总计
+        const totalEl = document.getElementById('status-total');
+        if (totalEl) {
+          totalEl.textContent = `总计 ${stats.total || 0} 份文档`;
+        }
+
+        // 更新选中
+        const selectedEl = document.getElementById('status-selected');
+        if (selectedEl) {
+          selectedEl.textContent = `已选 ${stats.selected || 0} 份`;
+        }
+
+        // 更新快速访问计数
+        if (stats.counts) {
+          Object.entries(stats.counts).forEach(([key, count]) => {
+            const el = document.getElementById(`count-${key}`);
+            if (el) el.textContent = count;
+          });
+        }
+      }
+
+      // 更新视图模式
+      updateViewMode(mode) {
+        const container = document.getElementById('document-list');
+        if (!container) return;
+
+        container.className = `document-list ${mode}-view`;
+
+        // 更新按钮状态
+        document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+          if (btn.dataset.view === mode) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        });
+      }
+
+      // 更新文件夹选择器
+      updateFolderSelect(folders, selectId = 'upload-folder') {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+
+        const options = [
+          '<option value="uncategorized">未分类</option>',
+          ...folders.map(folder =>
+            `<option value="${folder.id}">${folder.icon || '📁'} ${folder.name}</option>`
+          )
+        ].join('');
+
+        select.innerHTML = options;
+      }
+
+      // 显示/隐藏对话框
+      toggleDialog(dialogId, show) {
+        const dialog = document.getElementById(dialogId);
+        if (!dialog) return;
+
+        dialog.style.display = show ? 'flex' : 'none';
+      }
+
+      // 高亮激活的导航项
+      highlightActiveNav(folderId) {
+        document.querySelectorAll('.nav-item, .folder-item').forEach(item => {
+          if (item.dataset.folder === folderId || item.dataset.id === folderId) {
+            item.classList.add('active');
+          } else {
+            item.classList.remove('active');
+          }
+        });
+      }
+
+      // 标记选中的文档
+      markSelectedDocuments(selectedIds) {
+        document.querySelectorAll('.doc-card').forEach(card => {
+          if (selectedIds.includes(card.dataset.id)) {
+            card.classList.add('selected');
+          } else {
+            card.classList.remove('selected');
+          }
+        });
+      }
+    }
+
   </script>
 </body>
 </html>
