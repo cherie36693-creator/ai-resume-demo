@@ -812,7 +812,200 @@ body {
   </div>
 
   <script>
-    /* JavaScript 将在后续任务添加 */
+    // =========================
+    // 工具函数
+    // =========================
+
+    // 生成 UUID
+    function generateUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
+    // 格式化日期
+    function formatDate(timestamp) {
+      const date = new Date(timestamp);
+      const now = new Date();
+      const diff = now - date;
+
+      if (diff < 86400000) { // 24小时内
+        const hours = Math.floor(diff / 3600000);
+        if (hours === 0) {
+          const minutes = Math.floor(diff / 60000);
+          return minutes === 0 ? '刚刚' : `${minutes}分钟前`;
+        }
+        return `${hours}小时前`;
+      } else if (diff < 604800000) { // 7天内
+        const days = Math.floor(diff / 86400000);
+        return `${days}天前`;
+      } else {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      }
+    }
+
+    // 防抖函数
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // =========================
+    // 数据管理层
+    // =========================
+
+    class DataManager {
+      constructor() {
+        this.STORAGE_KEY = 'camscanner_state';
+        this.state = this.loadState();
+      }
+
+      // 从 localStorage 加载数据
+      loadState() {
+        try {
+          const saved = localStorage.getItem(this.STORAGE_KEY);
+          if (saved) {
+            return JSON.parse(saved);
+          }
+        } catch (error) {
+          console.error('加载数据失败:', error);
+        }
+
+        // 返回初始状态
+        return {
+          documents: [],
+          folders: [],
+          tags: [],
+          currentView: 'list',
+          currentFolder: 'all',
+          searchQuery: '',
+          selectedDocs: [],
+          filters: {
+            tags: [],
+            types: [],
+            dateRange: { start: null, end: null }
+          }
+        };
+      }
+
+      // 保存数据到 localStorage
+      saveState() {
+        try {
+          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state));
+          return true;
+        } catch (error) {
+          console.error('保存数据失败:', error);
+          return false;
+        }
+      }
+
+      // 获取所有文档
+      getDocuments() {
+        return this.state.documents;
+      }
+
+      // 添加文档
+      addDocument(doc) {
+        const newDoc = {
+          id: generateUUID(),
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+          viewCount: 0,
+          favorite: false,
+          ...doc
+        };
+        this.state.documents.push(newDoc);
+        this.saveState();
+        return newDoc;
+      }
+
+      // 更新文档
+      updateDocument(id, updates) {
+        const index = this.state.documents.findIndex(d => d.id === id);
+        if (index !== -1) {
+          this.state.documents[index] = {
+            ...this.state.documents[index],
+            ...updates,
+            updatedAt: Date.now()
+          };
+          this.saveState();
+          return this.state.documents[index];
+        }
+        return null;
+      }
+
+      // 删除文档
+      deleteDocument(id) {
+        this.state.documents = this.state.documents.filter(d => d.id !== id);
+        this.saveState();
+      }
+
+      // 获取所有文件夹
+      getFolders() {
+        return this.state.folders;
+      }
+
+      // 添加文件夹
+      addFolder(folder) {
+        const newFolder = {
+          id: generateUUID(),
+          createdAt: Date.now(),
+          ...folder
+        };
+        this.state.folders.push(newFolder);
+        this.saveState();
+        return newFolder;
+      }
+
+      // 获取所有标签
+      getTags() {
+        return this.state.tags;
+      }
+
+      // 更新标签统计
+      updateTagCounts() {
+        const tagMap = new Map();
+
+        this.state.documents.forEach(doc => {
+          doc.tags.forEach(tag => {
+            if (tagMap.has(tag)) {
+              tagMap.set(tag, tagMap.get(tag) + 1);
+            } else {
+              tagMap.set(tag, 1);
+            }
+          });
+        });
+
+        this.state.tags = Array.from(tagMap.entries()).map(([name, count]) => ({
+          name,
+          count,
+          category: 'user',
+          color: '#1890FF'
+        }));
+
+        this.saveState();
+      }
+
+      // 获取当前状态
+      getState() {
+        return this.state;
+      }
+
+      // 更新状态
+      updateState(updates) {
+        this.state = { ...this.state, ...updates };
+        this.saveState();
+      }
+    }
   </script>
 </body>
 </html>
