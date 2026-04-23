@@ -248,8 +248,9 @@
 
     /* Homepage Styles */
     .home-header {
-      background: linear-gradient(135deg, #2DB84B 0%, #1A8C35 100%);
-      padding: 44px 16px 16px;
+      background: linear-gradient(180deg, #3EBD5C 0%, #2BA648 100%);
+      padding: 44px 16px 0;
+      padding-bottom: 12px;
       color: #fff;
     }
 
@@ -257,61 +258,70 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-top: 12px;
+      padding-top: 8px;
+      margin-bottom: 12px;
     }
 
     .home-logo {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 18px;
+      gap: 6px;
+      font-size: 17px;
       font-weight: bold;
     }
 
     .home-logo .cs-icon {
       background: rgba(255,255,255,0.25);
-      border-radius: 6px;
-      padding: 2px 6px;
-      font-size: 13px;
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 12px;
       font-weight: bold;
+      letter-spacing: 1px;
     }
 
     .home-avatar {
-      width: 32px;
-      height: 32px;
-      background: rgba(255,255,255,0.3);
+      width: 30px;
+      height: 30px;
+      background: rgba(255,255,255,0.25);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      overflow: hidden;
+    }
+
+    .home-avatar svg {
+      width: 20px;
+      height: 20px;
+      fill: rgba(255,255,255,0.8);
     }
 
     .home-search {
-      margin: 12px 16px;
-      background: var(--white);
+      margin: 0 4px;
+      background: rgba(255,255,255,0.95);
       border-radius: 20px;
-      padding: 10px 16px;
+      padding: 8px 14px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      color: var(--text-light);
-      font-size: 14px;
-      box-shadow: var(--shadow);
+      gap: 6px;
+      color: #AAAAAA;
+      font-size: 13px;
     }
 
-    .home-search .search-icon {
-      font-size: 16px;
-      color: var(--text-secondary);
+    .home-search svg {
+      width: 16px;
+      height: 16px;
+      fill: #AAAAAA;
+      flex-shrink: 0;
     }
 
     .home-tools {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 4px;
-      padding: 8px 16px 16px;
+      gap: 0;
+      padding: 4px 8px 8px;
       background: var(--white);
-      margin: 0 12px;
+      margin: 10px 12px 0;
       border-radius: var(--radius);
       box-shadow: var(--shadow);
     }
@@ -320,7 +330,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 12px 4px;
+      padding: 10px 4px 6px;
       cursor: pointer;
       border-radius: 8px;
     }
@@ -330,14 +340,18 @@
     }
 
     .home-tool-icon {
-      width: 44px;
-      height: 44px;
+      width: 46px;
+      height: 46px;
       border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
       margin-bottom: 6px;
+    }
+
+    .home-tool-icon svg {
+      width: 26px;
+      height: 26px;
     }
 
     .home-tool-label {
@@ -488,12 +502,13 @@
       bottom: 0;
       left: 0;
       right: 0;
-      height: 80px;
+      height: 76px;
       background: var(--white);
-      border-top: 1px solid var(--border);
+      border-top: 1px solid #E8E8E8;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-around;
+      padding-top: 6px;
       padding-bottom: 20px;
       z-index: 100;
     }
@@ -504,35 +519,44 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      color: var(--text-secondary);
+      color: #999;
       font-size: 10px;
       cursor: pointer;
       text-decoration: none;
+      gap: 2px;
     }
 
     .home-tab-item.active {
       color: var(--primary);
     }
 
-    .home-tab-item .icon {
-      font-size: 22px;
-      margin-bottom: 2px;
+    .home-tab-item svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .home-tab-item.active svg {
+      fill: var(--primary);
     }
 
     .home-tab-center {
-      width: 52px;
-      height: 52px;
-      background: var(--primary);
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #3EBD5C, #2BA648);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--white);
-      font-size: 26px;
       cursor: pointer;
       position: relative;
-      top: -18px;
+      top: -16px;
       box-shadow: 0 4px 12px rgba(45, 184, 75, 0.4);
+    }
+
+    .home-tab-center svg {
+      width: 26px;
+      height: 26px;
+      fill: #fff;
     }
 
     .home-footer-text {
@@ -552,55 +576,74 @@
 
     <!-- Homepage: CamScanner Style -->
     <div id="page-home" class="page active">
-      <!-- Green Header -->
+      <!-- Green Header + Search (search sits on green bg) -->
       <div class="home-header">
         <div class="home-header-inner">
           <div class="home-logo">
             <span class="cs-icon">CS</span>
             <span>扫描全能王</span>
           </div>
-          <div class="home-avatar">👤</div>
+          <div class="home-avatar">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M12 14c-6 0-8 3-8 3v1h16v-1s-2-3-8-3z"/></svg>
+          </div>
         </div>
-      </div>
-
-      <!-- Search Bar -->
-      <div class="home-search" onclick="showToast('搜索功能')">
-        <span class="search-icon">🔍</span>
-        <span>试试表格应用，比如"证件"</span>
+        <!-- Search Bar on green -->
+        <div class="home-search" onclick="showToast('搜索功能')">
+          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <span>试试表格应用，比如"证件"</span>
+        </div>
       </div>
 
       <!-- Tool Grid -->
       <div class="home-tools">
+        <!-- Row 1 -->
         <div class="home-tool-item" onclick="showToast('PDF工具')">
-          <div class="home-tool-icon" style="background: #FFF0F0;">📄</div>
+          <div class="home-tool-icon" style="background: #FDEAEA;">
+            <svg viewBox="0 0 24 24" fill="#E05252"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zm-3 9h4v1.5h-2.5V16H13v1.5h-1.5v-2H9V14h1.5v-1z"/></svg>
+          </div>
           <div class="home-tool-label">PDF工具</div>
         </div>
         <div class="home-tool-item" onclick="showToast('扫描证件')">
-          <div class="home-tool-icon" style="background: #F0F0FF;">🪪</div>
+          <div class="home-tool-icon" style="background: #E8EAF6;">
+            <svg viewBox="0 0 24 24" fill="#5C6BC0"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 14H4V6h16v12zM6 10h2v2H6v-2zm0 4h8v1H6v-1zm10-4a2 2 0 11-4 0 2 2 0 014 0zm-2 3c-1.5 0-3 .75-3 1.5V15h6v-.5c0-.75-1.5-1.5-3-1.5z"/></svg>
+          </div>
           <div class="home-tool-label">扫描证件</div>
         </div>
         <div class="home-tool-item" onclick="showToast('文字识别')">
-          <div class="home-tool-icon" style="background: #FFF8E0;">📝</div>
+          <div class="home-tool-icon" style="background: #FFF3E0;">
+            <svg viewBox="0 0 24 24" fill="#FB8C00"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.5 17.5 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 8.92 10.44 11.75 9 14.35 8.07 12.32 7.3 10.16 6.44 8h-2c.73 2.33 1.74 4.58 3 6.74L2.56 19.83l1.46 1.43L9 16.38l3.94 3.94.91-.91-1.87-1.87L12.87 15.07zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
+          </div>
           <div class="home-tool-label">文字识别</div>
         </div>
         <div class="home-tool-item" onclick="showToast('导入图片')">
-          <div class="home-tool-icon" style="background: #E8F5E9;">🖼️</div>
+          <div class="home-tool-icon" style="background: #E8F5E9;">
+            <svg viewBox="0 0 24 24" fill="#43A047"><path d="M21 19V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+          </div>
           <div class="home-tool-label">导入图片</div>
         </div>
+        <!-- Row 2 -->
         <div class="home-tool-item" onclick="showToast('拍证件照')">
-          <div class="home-tool-icon" style="background: #E3F2FD;">📸</div>
+          <div class="home-tool-icon" style="background: #E3F2FD;">
+            <svg viewBox="0 0 24 24" fill="#1E88E5"><circle cx="12" cy="12" r="3.2"/><path d="M9 2L7.17 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2h-3.17L15 2H9zm3 15a5 5 0 110-10 5 5 0 010 10z"/></svg>
+          </div>
           <div class="home-tool-label">拍证件照</div>
         </div>
         <div class="home-tool-item" onclick="showToast('导入文档')">
-          <div class="home-tool-icon" style="background: #F3E5F5;">📂</div>
+          <div class="home-tool-icon" style="background: #F3E5F5;">
+            <svg viewBox="0 0 24 24" fill="#8E24AA"><path d="M10 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2h-8l-2-2z"/></svg>
+          </div>
           <div class="home-tool-label">导入文档</div>
         </div>
         <div class="home-tool-item" onclick="showToast('表格识别')">
-          <div class="home-tool-icon" style="background: #E0F7FA;">📊</div>
+          <div class="home-tool-icon" style="background: #E0F2F1;">
+            <svg viewBox="0 0 24 24" fill="#00897B"><path d="M10 10.02h5V21h-5V10.02zM17 21h3a2 2 0 002-2v-9h-5v11zm-14 0h3V10H2v9a2 2 0 002 2zM20 3H4a2 2 0 00-2 2v3h20V5a2 2 0 00-2-2z"/></svg>
+          </div>
           <div class="home-tool-label">表格识别</div>
         </div>
         <div class="home-tool-item" onclick="showToast('全部工具')">
-          <div class="home-tool-icon" style="background: #F5F5F5;">⚙️</div>
+          <div class="home-tool-icon" style="background: #ECEFF1;">
+            <svg viewBox="0 0 24 24" fill="#78909C"><path d="M19.14 12.94a7.01 7.01 0 000-1.88l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96a7.04 7.04 0 00-1.62-.94l-.36-2.54A.48.48 0 0013.93 2h-3.86a.48.48 0 00-.48.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.71 8.87a.48.48 0 00.12.61l2.03 1.58a7.04 7.04 0 000 1.88l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.41.48.41h3.86c.22 0 .43-.17.48-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.49.49 0 00-.12-.61l-2.03-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.6 3.6 0 0112 15.6z"/></svg>
+          </div>
           <div class="home-tool-label">全部工具</div>
         </div>
       </div>
@@ -614,7 +657,9 @@
       <!-- 库存助手 Banner -->
       <div class="home-banner" onclick="navigateTo('page-workspace')">
         <div class="home-banner-left">
-          <div class="home-banner-icon">📦</div>
+          <div class="home-banner-icon">
+            <svg viewBox="0 0 24 24" fill="#fff" width="28" height="28"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2a3 3 0 006 0h6a3 3 0 006 0h2V12l-3-4zM6 18.5A1.5 1.5 0 117.5 17 1.5 1.5 0 016 18.5zm13.5-9l1.96 2.5H17V9.5h2.5zM18 18.5a1.5 1.5 0 111.5-1.5 1.5 1.5 0 01-1.5 1.5z"/></svg>
+          </div>
           <div class="home-banner-text">
             <div class="home-banner-title">库存助手</div>
             <div class="home-banner-subtitle">AI智能管理出入库，拍单据即入账</div>
@@ -625,26 +670,32 @@
 
       <!-- Recent Documents -->
       <div class="home-doc-item" onclick="showToast('打开文档')">
-        <div class="home-doc-icon" style="background: #E3F2FD;">📘</div>
+        <div class="home-doc-icon" style="background: #E3F2FD;">
+          <svg viewBox="0 0 24 24" fill="#1565C0" width="22" height="22"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM8 17h8v-1H8v1zm0-3h8v-1H8v1zm0-3h5v-1H8v1z"/></svg>
+        </div>
         <div class="home-doc-info">
           <div class="home-doc-name">扫描全能王 2024-08-08 11.33</div>
-          <div class="home-doc-meta">Word · 2023-09-01 14:36 · 📄1</div>
+          <div class="home-doc-meta">Word · 2023-09-01 14:36 · 1页</div>
         </div>
       </div>
 
       <div class="home-doc-item" onclick="showToast('打开文档')">
-        <div class="home-doc-icon" style="background: #FFF0F0;">📕</div>
+        <div class="home-doc-icon" style="background: #FDEAEA;">
+          <svg viewBox="0 0 24 24" fill="#E05252" width="22" height="22"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zm-3 9h4v1.5h-2.5V16H13v1.5h-1.5v-2H9V14h1.5v-1z"/></svg>
+        </div>
         <div class="home-doc-info">
           <div class="home-doc-name">出入库汇总表-4月.pdf</div>
-          <div class="home-doc-meta">PDF · 2026-04-20 09:15 · 📄3</div>
+          <div class="home-doc-meta">PDF · 2026-04-20 09:15 · 3页</div>
         </div>
       </div>
 
       <div class="home-doc-item" onclick="showToast('打开文档')">
-        <div class="home-doc-icon" style="background: #E8F5E9;">📗</div>
+        <div class="home-doc-icon" style="background: #E8F5E9;">
+          <svg viewBox="0 0 24 24" fill="#43A047" width="22" height="22"><path d="M21 19V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+        </div>
         <div class="home-doc-info">
           <div class="home-doc-name">王记五金-送货单-0422.jpg</div>
-          <div class="home-doc-meta">图片 · 2026-04-22 14:30 · 📄1</div>
+          <div class="home-doc-meta">图片 · 2026-04-22 14:30 · 1页</div>
         </div>
       </div>
 
@@ -653,22 +704,22 @@
       <!-- Bottom Tab Bar -->
       <div class="home-tab-bar">
         <div class="home-tab-item active">
-          <div class="icon">🏠</div>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
           <div>首页</div>
         </div>
         <div class="home-tab-item" onclick="showToast('全部文档')">
-          <div class="icon">📁</div>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2h-8l-2-2z"/></svg>
           <div>全部文档</div>
         </div>
         <div class="home-tab-center" onclick="navigateTo('page-scan')">
-          📷
+          <svg viewBox="0 0 24 24"><path d="M12 12m-3.2 0a3.2 3.2 0 106.4 0 3.2 3.2 0 10-6.4 0z"/><path d="M9 2L7.17 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2h-3.17L15 2H9zm3 15a5 5 0 110-10 5 5 0 010 10z"/></svg>
         </div>
         <div class="home-tab-item" onclick="showToast('工具箱')">
-          <div class="icon">🧰</div>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 16v-5c0-.14-.02-.27-.04-.4l1.14-1.01-2-3.46-1.5.67c-.22-.15-.47-.28-.72-.37L14.5 4h-4l-.38 2.43c-.25.09-.5.22-.72.37l-1.5-.67-2 3.46 1.14 1.01c-.02.13-.04.26-.04.4v5H3v2h18v-2h-3zM12.5 14a2 2 0 110-4 2 2 0 010 4z"/></svg>
           <div>工具箱</div>
         </div>
         <div class="home-tab-item" onclick="showToast('我的')">
-          <div class="icon">👤</div>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
           <div>我的</div>
         </div>
       </div>
