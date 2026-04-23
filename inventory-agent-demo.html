@@ -629,6 +629,136 @@
       font-size: 14px;
       cursor: pointer;
     }
+
+    /* Task 6: Ledger Pages Styles */
+    .ledger-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 12px 16px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .ledger-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .doc-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin: 0 16px 10px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+    }
+
+    .doc-card:active {
+      background: var(--primary-light);
+    }
+
+    .doc-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .doc-card-no {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .doc-card-status {
+      font-size: 11px;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .doc-card-title {
+      font-size: 15px;
+      font-weight: bold;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .doc-card-info {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .month-divider {
+      font-size: 14px;
+      font-weight: bold;
+      color: var(--text-secondary);
+      padding: 8px 16px 4px;
+    }
+
+    /* Task 7: Stock Page Styles */
+    .stock-summary {
+      font-size: 14px;
+      color: var(--text-secondary);
+      padding: 12px 16px;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stock-card {
+      background: var(--white);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      margin: 0 16px 8px;
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stock-card-left {
+      flex: 1;
+    }
+
+    .stock-card-name {
+      font-size: 15px;
+      font-weight: bold;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .stock-card-spec {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .stock-card-right {
+      text-align: right;
+    }
+
+    .stock-card-qty {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
+
+    .stock-card-qty.low {
+      color: var(--danger);
+    }
+
+    .stock-card-qty.good {
+      color: var(--success);
+    }
+
+    .stock-card-unit {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .stock-card-bottom {
+      font-size: 11px;
+      color: var(--text-light);
+      margin-top: 6px;
+    }
   </style>
 </head>
 <body>
@@ -801,6 +931,74 @@
           <div class="icon">👤</div>
           <div>我的</div>
         </div>
+      </div>
+    </div>
+
+    <!-- Task 6: Inbound Ledger Page -->
+    <div id="page-inbound" class="page">
+      <div class="top-bar-inner">
+        <div class="back-btn" onclick="goBack()">←</div>
+        <div class="title">入库账本</div>
+        <div class="top-bar-action">筛选 🔽</div>
+      </div>
+
+      <div class="ledger-tabs" id="inbound-tabs">
+        <!-- Populated by JS -->
+      </div>
+
+      <div style="padding-bottom: 100px;">
+        <div id="inbound-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Task 6: Outbound Ledger Page -->
+    <div id="page-outbound" class="page">
+      <div class="top-bar-inner">
+        <div class="back-btn" onclick="goBack()">←</div>
+        <div class="title">出库账本</div>
+        <div class="top-bar-action">筛选 🔽</div>
+      </div>
+
+      <div class="ledger-tabs" id="outbound-tabs">
+        <!-- Populated by JS -->
+      </div>
+
+      <div style="padding-bottom: 100px;">
+        <div id="outbound-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Task 7: Document Detail Page -->
+    <div id="page-detail" class="page">
+      <div class="top-bar-inner">
+        <div class="back-btn" onclick="goBack()">←</div>
+        <div class="title">单据明细</div>
+        <div class="right"></div>
+      </div>
+
+      <div style="padding: 16px; padding-bottom: 100px;" id="detail-content">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- Task 7: Stock Ledger Page -->
+    <div id="page-stock" class="page">
+      <div class="top-bar-inner">
+        <div class="back-btn" onclick="goBack()">←</div>
+        <div class="title">库存总账</div>
+        <div class="right"></div>
+      </div>
+
+      <div class="stock-summary" id="stock-summary">
+        <!-- Populated by JS -->
+      </div>
+
+      <div style="padding: 12px 0 100px;" id="stock-list">
+        <!-- Populated by JS -->
       </div>
     </div>
 
@@ -1343,8 +1541,230 @@
       }).join('');
     }
 
-    function showDocDetail(id) {
-      showToast('查看单据: ' + id);
+    // =============================================
+    // Task 6: Ledger Pages
+    // =============================================
+
+    const INBOUND_SCENES = [
+      { key: 'all', label: '全部' },
+      { key: 'purchase', label: '采购入库' },
+      { key: 'return_in', label: '退货入库' },
+      { key: 'transfer_in', label: '调拨入库' },
+      { key: 'surplus', label: '盘盈入库' },
+    ];
+
+    const OUTBOUND_SCENES = [
+      { key: 'all', label: '全部' },
+      { key: 'sales', label: '销售出库' },
+      { key: 'return_out', label: '退货出库' },
+      { key: 'transfer_out', label: '调拨出库' },
+      { key: 'damage', label: '报损' },
+      { key: 'internal_use', label: '领用' },
+    ];
+
+    let inboundFilter = 'all';
+    let outboundFilter = 'all';
+
+    function renderLedgerTabs(containerId, scenes, activeKey, direction) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = scenes.map(scene => {
+        const isActive = scene.key === activeKey;
+        return `
+          <div class="tag ${isActive ? 'active' : ''}"
+               onclick="${direction === 'IN' ? 'inboundFilter' : 'outboundFilter'} = '${scene.key}'; renderLedger('${direction}')">
+            ${scene.label}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderLedgerList(containerId, docs) {
+      const container = document.getElementById(containerId);
+
+      if (docs.length === 0) {
+        container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-secondary);">暂无数据</div>';
+        return;
+      }
+
+      // Group by month
+      const grouped = {};
+      docs.forEach(doc => {
+        const date = new Date(doc.date);
+        const monthKey = `${date.getFullYear()}年${date.getMonth() + 1}月`;
+        if (!grouped[monthKey]) {
+          grouped[monthKey] = [];
+        }
+        grouped[monthKey].push(doc);
+      });
+
+      // Render
+      let html = '';
+      Object.keys(grouped).forEach(monthKey => {
+        html += `<div class="month-divider">${monthKey}</div>`;
+        grouped[monthKey].forEach(doc => {
+          const firstItem = doc.items[0];
+          const itemInfo = `${firstItem.name} ×${firstItem.qty}${doc.items.length > 1 ? ' 等' + doc.items.length + '项' : ''}`;
+
+          html += `
+            <div class="doc-card" onclick="showDocDetail('${doc.id}')">
+              <div class="doc-card-header">
+                <div class="doc-card-no">${doc.docNo}</div>
+                <div class="doc-card-status">${doc.status}</div>
+              </div>
+              <div class="doc-card-title">${doc.sceneName} · ${itemInfo}</div>
+              <div class="doc-card-info">${doc.counterparty} · ${formatDate(doc.date)}</div>
+              <div class="doc-card-info">${formatAmount(doc.totalAmount)}</div>
+            </div>
+          `;
+        });
+      });
+
+      container.innerHTML = html;
+    }
+
+    function renderLedger(direction) {
+      const isInbound = direction === 'IN';
+      const filter = isInbound ? inboundFilter : outboundFilter;
+      const scenes = isInbound ? INBOUND_SCENES : OUTBOUND_SCENES;
+      const tabsId = isInbound ? 'inbound-tabs' : 'outbound-tabs';
+      const listId = isInbound ? 'inbound-list' : 'outbound-list';
+
+      // Get filtered documents
+      let docs = getDocsByDirection(direction);
+      if (filter !== 'all') {
+        docs = docs.filter(doc => doc.scene === filter);
+      }
+
+      // Render tabs and list
+      renderLedgerTabs(tabsId, scenes, filter, direction);
+      renderLedgerList(listId, docs);
+    }
+
+    // =============================================
+    // Task 7: Document Detail & Stock Ledger Pages
+    // =============================================
+
+    function showDocDetail(docId) {
+      const doc = DOCUMENTS.find(d => d.id === docId) || PURCHASE_ORDERS.find(d => d.id === docId);
+      if (!doc) {
+        showToast('单据未找到');
+        return;
+      }
+
+      const contentEl = document.getElementById('detail-content');
+
+      // Build detail HTML
+      let html = `
+        <div class="card">
+          <div class="extract-field">
+            <div class="extract-label">单据类型</div>
+            <div class="extract-value">${doc.docType || '采购订单'}</div>
+          </div>
+          <div class="extract-field">
+            <div class="extract-label">业务场景</div>
+            <div class="extract-value">${doc.sceneName || '采购入库'}</div>
+          </div>
+          <div class="extract-field">
+            <div class="extract-label">单号</div>
+            <div class="extract-value">${doc.docNo || doc.poNo}</div>
+          </div>
+          <div class="extract-field">
+            <div class="extract-label">日期</div>
+            <div class="extract-value">${doc.date}</div>
+          </div>
+          <div class="extract-field" style="border-bottom: none;">
+            <div class="extract-label">${doc.direction === 'IN' ? '供应商' : '客户'}</div>
+            <div class="extract-value">${doc.counterparty || doc.supplier}</div>
+          </div>
+          ${doc.status ? `
+          <div class="extract-field" style="border-bottom: none;">
+            <div class="extract-label">状态</div>
+            <div class="extract-value">${doc.status}</div>
+          </div>
+          ` : ''}
+        </div>
+
+        <div class="card">
+          <table class="extract-table">
+            <thead>
+              <tr>
+                <th>品名</th>
+                <th>规格</th>
+                <th style="text-align: right;">数量</th>
+                <th style="text-align: right;">金额</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${doc.items.map(item => `
+                <tr>
+                  <td>${item.name}</td>
+                  <td>${item.spec}</td>
+                  <td style="text-align: right;">${item.qty}</td>
+                  <td style="text-align: right;">${formatAmount(item.amount)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <div class="extract-total">合计: ${formatAmount(doc.totalAmount)}</div>
+        </div>
+      `;
+
+      contentEl.innerHTML = html;
+      navigateTo('page-detail');
+    }
+
+    function renderStockPage() {
+      // Calculate totals
+      let totalIn = 0;
+      let totalOut = 0;
+      DOCUMENTS.forEach(doc => {
+        doc.items.forEach(item => {
+          if (doc.direction === 'IN') {
+            totalIn += item.qty;
+          } else if (doc.direction === 'OUT') {
+            totalOut += item.qty;
+          }
+        });
+      });
+
+      // Render summary
+      const summaryEl = document.getElementById('stock-summary');
+      summaryEl.innerHTML = `共 ${STOCK.length} 种商品`;
+
+      // Render stock list
+      const listEl = document.getElementById('stock-list');
+      listEl.innerHTML = STOCK.map(stock => {
+        const qtyClass = stock.qty < 50 ? 'low' : 'good';
+
+        // Calculate cumulative in/out for this SKU
+        let skuIn = 0;
+        let skuOut = 0;
+        DOCUMENTS.forEach(doc => {
+          doc.items.forEach(item => {
+            if (item.skuId === stock.skuId) {
+              if (doc.direction === 'IN') {
+                skuIn += item.qty;
+              } else if (doc.direction === 'OUT') {
+                skuOut += item.qty;
+              }
+            }
+          });
+        });
+
+        return `
+          <div class="stock-card">
+            <div class="stock-card-left">
+              <div class="stock-card-name">${stock.name}</div>
+              <div class="stock-card-spec">${stock.spec} · ${stock.unit}</div>
+              <div class="stock-card-bottom">📥累计入库 ${skuIn} · 📤累计出库 ${skuOut}</div>
+            </div>
+            <div class="stock-card-right">
+              <div class="stock-card-qty ${qtyClass}">${stock.qty}</div>
+              <div class="stock-card-unit">${stock.unit}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     // =============================================
@@ -1365,6 +1785,9 @@
       // Initialize pages
       renderExtractPage();
       renderWorkspace();
+      renderLedger('IN');
+      renderLedger('OUT');
+      renderStockPage();
 
       // Show scan prompt after 1 second
       setTimeout(() => {
