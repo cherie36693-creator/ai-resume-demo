@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>库存管理 Agent - 移动端 Demo</title>
+  <style>
+    /* CSS Variables - CamScanner Brand */
+    :root {
+      --primary: #2DB84B;
+      --primary-dark: #1A8C35;
+      --primary-light: #E8F5E9;
+      --bg: #F5F5F5;
+      --white: #FFFFFF;
+      --text: #333333;
+      --text-secondary: #999999;
+      --text-light: #CCCCCC;
+      --border: #EEEEEE;
+      --warning: #FF9800;
+      --danger: #F44336;
+      --success: #4CAF50;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #E0E0E0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* Phone Frame */
+    #phone {
+      width: 375px;
+      height: 812px;
+      background: var(--white);
+      border-radius: 40px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      position: relative;
+    }
+
+    /* Page System */
+    .page {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+      background: var(--bg);
+    }
+
+    .page.active {
+      display: flex;
+    }
+
+    /* Slide Animation */
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+      }
+      to {
+        transform: translateX(0);
+      }
+    }
+
+    .slide-in-right {
+      animation: slideInRight 0.3s ease-out;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      background: var(--primary-dark);
+      color: var(--white);
+      padding-top: 48px;
+      flex-shrink: 0;
+    }
+
+    .top-bar-inner {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text);
+    }
+
+    .top-bar-inner .back-btn {
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .top-bar-inner .title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .top-bar-inner .right {
+      width: 24px;
+    }
+
+    /* Bottom Tab Bar */
+    .tab-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding-bottom: 20px;
+      z-index: 100;
+    }
+
+    .tab-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      font-size: 12px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .tab-item.active {
+      color: var(--primary);
+    }
+
+    .tab-item .icon {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+
+    .tab-center {
+      width: 56px;
+      height: 56px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-size: 28px;
+      cursor: pointer;
+      position: relative;
+      top: -20px;
+      box-shadow: 0 4px 12px rgba(45, 184, 75, 0.4);
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.75);
+      color: var(--white);
+      padding: 12px 24px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      z-index: 10000;
+      display: none;
+      max-width: 80%;
+      text-align: center;
+    }
+
+    #toast.show {
+      display: block;
+      animation: fadeInOut 2s ease-in-out;
+    }
+
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0; }
+      10%, 90% { opacity: 1; }
+    }
+
+    /* Loading Overlay */
+    #loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    #loading-overlay.show {
+      display: flex;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top-color: var(--white);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Common Components */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+    }
+
+    .btn-primary:active {
+      background: var(--primary-dark);
+    }
+
+    .section-title {
+      font-size: 14px;
+      color: var(--text-secondary);
+      padding: 16px;
+      font-weight: 600;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 12px;
+      background: var(--bg);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .tag.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <div id="phone">
+    <div id="toast"></div>
+    <div id="loading-overlay">
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <script>
+    // =============================================
+    // TASK 2: Mock Data Layer
+    // =============================================
+
+    // Suppliers and Customers
+    const SUPPLIERS = [
+      { id: 's1', name: '王记五金', type: 'supplier' },
+      { id: 's2', name: '李氏钢材', type: 'supplier' },
+      { id: 's3', name: '华南电子', type: 'supplier' },
+    ];
+
+    const CUSTOMERS = [
+      { id: 'c1', name: '张三建材', type: 'customer' },
+      { id: 'c2', name: '城东工地项目部', type: 'customer' },
+    ];
+
+    // SKUs
+    const SKUS = [
+      { id: 'k1', name: 'M8螺丝', spec: '×20', unit: '个', price: 0.50 },
+      { id: 'k2', name: 'M10螺母', spec: '×15', unit: '个', price: 0.60 },
+      { id: 'k3', name: '扳手套装', spec: '8件', unit: '套', price: 120 },
+      { id: 'k4', name: '电钻头', spec: '6mm', unit: '个', price: 2.25 },
+      { id: 'k5', name: '钢管', spec: 'DN25×6m', unit: '根', price: 45 },
+      { id: 'k6', name: '电线', spec: 'BV2.5²', unit: '米', price: 3.20 },
+      { id: 'k7', name: '绝缘胶带', spec: '电工级', unit: '卷', price: 3.00 },
+      { id: 'k8', name: '角磨片', spec: '100mm', unit: '片', price: 5.50 },
+      { id: 'k9', name: 'PVC管', spec: 'DN20', unit: '根', price: 12 },
+      { id: 'k10', name: '水泥', spec: '425#', unit: '袋', price: 28 },
+      { id: 'k11', name: '砂纸', spec: '240目', unit: '张', price: 1.50 },
+      { id: 'k12', name: '膨胀螺栓', spec: 'M10×80', unit: '个', price: 1.80 },
+      { id: 'k13', name: '开关面板', spec: '单开', unit: '个', price: 15 },
+      { id: 'k14', name: '插座面板', spec: '五孔', unit: '个', price: 18 },
+      { id: 'k15', name: '线管卡扣', spec: 'DN20', unit: '个', price: 0.30 },
+    ];
+
+    // Documents
+    const DOCUMENTS = [
+      {
+        id: 'd1',
+        docNo: 'SH-20260422-008',
+        docType: '送货单',
+        direction: 'IN',
+        scene: 'purchase',
+        sceneName: '采购入库',
+        counterparty: '王记五金',
+        date: '2026-04-22 14:30',
+        status: '已确认',
+        items: [
+          { skuId: 'k1', name: 'M8螺丝', spec: '×20', qty: 500, price: 0.50, amount: 250 },
+          { skuId: 'k2', name: 'M10螺母', spec: '×15', qty: 300, price: 0.60, amount: 180 },
+          { skuId: 'k3', name: '扳手套装', spec: '8件', qty: 8, price: 120, amount: 960 },
+          { skuId: 'k4', name: '电钻头', spec: '6mm', qty: 50, price: 2.25, amount: 112.5 },
+          { skuId: 'k7', name: '绝缘胶带', spec: '电工级', qty: 100, price: 3.00, amount: 300 },
+          { skuId: 'k11', name: '砂纸', spec: '240目', qty: 200, price: 1.50, amount: 300 },
+          { skuId: 'k12', name: '膨胀螺栓', spec: 'M10×80', qty: 150, price: 1.80, amount: 270 },
+          { skuId: 'k15', name: '线管卡扣', spec: 'DN20', qty: 600, price: 0.30, amount: 180 },
+        ],
+        totalAmount: 3260
+      },
+      {
+        id: 'd2',
+        docNo: 'SH-20260420-005',
+        docType: '送货单',
+        direction: 'IN',
+        scene: 'purchase',
+        sceneName: '采购入库',
+        counterparty: '李氏钢材',
+        date: '2026-04-20 10:15',
+        status: '已确认',
+        items: [
+          { skuId: 'k5', name: '钢管', spec: 'DN25×6m', qty: 200, price: 45, amount: 9000 },
+          { skuId: 'k9', name: 'PVC管', spec: 'DN20', qty: 150, price: 12, amount: 1800 },
+          { skuId: 'k10', name: '水泥', spec: '425#', qty: 60, price: 28, amount: 1680 },
+        ],
+        totalAmount: 12500
+      },
+      {
+        id: 'd3',
+        docNo: 'CK-20260421-003',
+        docType: '出库单',
+        direction: 'OUT',
+        scene: 'sales',
+        sceneName: '销售出库',
+        counterparty: '张三建材',
+        date: '2026-04-21 16:45',
+        status: '已确认',
+        items: [
+          { skuId: 'k1', name: 'M8螺丝', spec: '×20', qty: 200, price: 0.50, amount: 100 },
+          { skuId: 'k2', name: 'M10螺母', spec: '×15', qty: 150, price: 0.60, amount: 90 },
+          { skuId: 'k8', name: '角磨片', spec: '100mm', qty: 120, price: 5.50, amount: 660 },
+        ],
+        totalAmount: 980
+      },
+      {
+        id: 'd4',
+        docNo: 'FH-20260421-007',
+        docType: '发货单',
+        direction: 'OUT',
+        scene: 'sales',
+        sceneName: '销售出库',
+        counterparty: '城东工地项目部',
+        date: '2026-04-21 09:20',
+        status: '已确认',
+        items: [
+          { skuId: 'k5', name: '钢管', spec: 'DN25×6m', qty: 80, price: 45, amount: 3600 },
+          { skuId: 'k6', name: '电线', spec: 'BV2.5²', qty: 300, price: 3.20, amount: 960 },
+          { skuId: 'k10', name: '水泥', spec: '425#', qty: 20, price: 28, amount: 560 },
+        ],
+        totalAmount: 4960
+      },
+      {
+        id: 'd5',
+        docNo: 'RT-20260418-002',
+        docType: '退货单',
+        direction: 'IN',
+        scene: 'return_in',
+        sceneName: '退货入库',
+        counterparty: '张三建材',
+        date: '2026-04-18 11:30',
+        status: '已确认',
+        items: [
+          { skuId: 'k8', name: '角磨片', spec: '100mm', qty: 20, price: 5.50, amount: 110 },
+        ],
+        totalAmount: 110
+      },
+      {
+        id: 'd6',
+        docNo: 'DB-20260417-001',
+        docType: '调拨单',
+        direction: 'OUT',
+        scene: 'transfer_out',
+        sceneName: '调拨出库',
+        counterparty: '二号仓库',
+        date: '2026-04-17 14:00',
+        status: '已确认',
+        items: [
+          { skuId: 'k3', name: '扳手套装', spec: '8件', qty: 5, price: 120, amount: 600 },
+          { skuId: 'k13', name: '开关面板', spec: '单开', qty: 50, price: 15, amount: 750 },
+          { skuId: 'k14', name: '插座面板', spec: '五孔', qty: 20, price: 18, amount: 360 },
+        ],
+        totalAmount: 1650
+      },
+      {
+        id: 'd7',
+        docNo: 'BS-20260416-001',
+        docType: '报损单',
+        direction: 'OUT',
+        scene: 'damage',
+        sceneName: '报损出库',
+        counterparty: '—',
+        date: '2026-04-16 15:45',
+        status: '已确认',
+        items: [
+          { skuId: 'k6', name: '电线', spec: 'BV2.5²', qty: 50, price: 3.20, amount: 160 },
+        ],
+        totalAmount: 160
+      },
+      {
+        id: 'd8',
+        docNo: 'LY-20260415-003',
+        docType: '领用单',
+        direction: 'OUT',
+        scene: 'internal_use',
+        sceneName: '内部领用',
+        counterparty: '维修组',
+        date: '2026-04-15 10:30',
+        status: '已确认',
+        items: [
+          { skuId: 'k4', name: '电钻头', spec: '6mm', qty: 10, price: 2.25, amount: 22.5 },
+          { skuId: 'k7', name: '绝缘胶带', spec: '电工级', qty: 15, price: 3.00, amount: 45 },
+        ],
+        totalAmount: 67.5
+      },
+      {
+        id: 'd9',
+        docNo: 'YS-20260419-001',
+        docType: '验收单',
+        direction: 'IN',
+        scene: 'purchase',
+        sceneName: '采购入库',
+        counterparty: '华南电子',
+        date: '2026-04-19 13:20',
+        status: '已确认',
+        items: [
+          { skuId: 'k13', name: '开关面板', spec: '单开', qty: 200, price: 15, amount: 3000 },
+          { skuId: 'k14', name: '插座面板', spec: '五孔', qty: 150, price: 18, amount: 2700 },
+          { skuId: 'k6', name: '电线', spec: 'BV2.5²', qty: 200, price: 3.20, amount: 640 },
+          { skuId: 'k15', name: '线管卡扣', spec: 'DN20', qty: 1000, price: 0.30, amount: 300 },
+        ],
+        totalAmount: 6650
+      },
+      {
+        id: 'd10',
+        docNo: 'RK-20260414-002',
+        docType: '入库单',
+        direction: 'IN',
+        scene: 'purchase',
+        sceneName: '采购入库',
+        counterparty: '王记五金',
+        date: '2026-04-14 09:45',
+        status: '已确认',
+        items: [
+          { skuId: 'k8', name: '角磨片', spec: '100mm', qty: 100, price: 5.50, amount: 550 },
+          { skuId: 'k11', name: '砂纸', spec: '240目', qty: 150, price: 1.50, amount: 225 },
+        ],
+        totalAmount: 800
+      },
+      {
+        id: 'd11',
+        docNo: 'SH-20260325-012',
+        docType: '送货单',
+        direction: 'IN',
+        scene: 'purchase',
+        sceneName: '采购入库',
+        counterparty: '王记五金',
+        date: '2026-03-25 14:20',
+        status: '已确认',
+        items: [
+          { skuId: 'k1', name: 'M8螺丝', spec: '×20', qty: 1000, price: 0.50, amount: 500 },
+          { skuId: 'k2', name: 'M10螺母', spec: '×15', qty: 800, price: 0.60, amount: 480 },
+          { skuId: 'k3', name: '扳手套装', spec: '8件', qty: 15, price: 120, amount: 1800 },
+          { skuId: 'k4', name: '电钻头', spec: '6mm', qty: 200, price: 2.25, amount: 450 },
+          { skuId: 'k7', name: '绝缘胶带', spec: '电工级', qty: 300, price: 3.00, amount: 900 },
+        ],
+        totalAmount: 4140
+      },
+      {
+        id: 'd12',
+        docNo: 'SH-20260318-008',
+        docType: '送货单',
+        direction: 'IN',
+        scene: 'purchase',
+        sceneName: '采购入库',
+        counterparty: '王记五金',
+        date: '2026-03-18 11:10',
+        status: '已确认',
+        items: [
+          { skuId: 'k11', name: '砂纸', spec: '240目', qty: 500, price: 1.50, amount: 750 },
+          { skuId: 'k12', name: '膨胀螺栓', spec: 'M10×80', qty: 400, price: 1.80, amount: 720 },
+          { skuId: 'k15', name: '线管卡扣', spec: 'DN20', qty: 2500, price: 0.30, amount: 750 },
+        ],
+        totalAmount: 2235
+      },
+      {
+        id: 'd13',
+        docNo: 'SH-20260312-003',
+        docType: '送货单',
+        direction: 'IN',
+        scene: 'purchase',
+        sceneName: '采购入库',
+        counterparty: '王记五金',
+        date: '2026-03-12 15:30',
+        status: '已确认',
+        items: [
+          { skuId: 'k5', name: '钢管', spec: 'DN25×6m', qty: 50, price: 45, amount: 2250 },
+          { skuId: 'k9', name: 'PVC管', spec: 'DN20', qty: 30, price: 12, amount: 360 },
+        ],
+        totalAmount: 2550
+      },
+    ];
+
+    // Purchase Orders
+    const PURCHASE_ORDERS = [
+      {
+        id: 'po1',
+        poNo: 'PO-20260422-003',
+        supplier: '王记五金',
+        date: '2026-04-22 09:00',
+        status: '已下单',
+        items: [
+          { skuId: 'k1', name: 'M8螺丝', spec: '×20', qty: 500, price: 0.50, amount: 250 },
+          { skuId: 'k2', name: 'M10螺母', spec: '×15', qty: 300, price: 0.60, amount: 180 },
+          { skuId: 'k3', name: '扳手套装', spec: '8件', qty: 8, price: 120, amount: 960 },
+          { skuId: 'k4', name: '电钻头', spec: '6mm', qty: 50, price: 2.50, amount: 125 },
+          { skuId: 'k7', name: '绝缘胶带', spec: '电工级', qty: 100, price: 3.00, amount: 300 },
+          { skuId: 'k11', name: '砂纸', spec: '240目', qty: 200, price: 1.50, amount: 300 },
+          { skuId: 'k12', name: '膨胀螺栓', spec: 'M10×80', qty: 150, price: 1.80, amount: 270 },
+          { skuId: 'k15', name: '线管卡扣', spec: 'DN20', qty: 600, price: 0.30, amount: 180 },
+        ],
+        totalAmount: 3310
+      },
+    ];
+
+    // Helper Functions
+    function calcStock() {
+      const stockMap = {};
+
+      // Initialize all SKUs with 0 quantity
+      SKUS.forEach(sku => {
+        stockMap[sku.id] = {
+          skuId: sku.id,
+          name: sku.name,
+          spec: sku.spec,
+          unit: sku.unit,
+          price: sku.price,
+          qty: 0
+        };
+      });
+
+      // Process all documents
+      DOCUMENTS.forEach(doc => {
+        doc.items.forEach(item => {
+          if (stockMap[item.skuId]) {
+            if (doc.direction === 'IN') {
+              stockMap[item.skuId].qty += item.qty;
+            } else if (doc.direction === 'OUT') {
+              stockMap[item.skuId].qty -= item.qty;
+            }
+          }
+        });
+      });
+
+      // Convert to array and sort by quantity descending
+      return Object.values(stockMap).sort((a, b) => b.qty - a.qty);
+    }
+
+    const STOCK = calcStock();
+
+    function getDocsByDirection(direction) {
+      return DOCUMENTS
+        .filter(doc => doc.direction === direction)
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+
+    function getDocsByScene(scene) {
+      return DOCUMENTS
+        .filter(doc => doc.scene === scene)
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+
+    function formatAmount(amount) {
+      return '¥' + amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${month}/${day} ${hours}:${minutes}`;
+    }
+
+    // =============================================
+    // Router System
+    // =============================================
+
+    let pageHistory = [];
+
+    function navigateTo(pageId, skipAnimation = false) {
+      const currentPage = document.querySelector('.page.active');
+      const targetPage = document.getElementById(pageId);
+
+      if (!targetPage) {
+        console.error('Page not found:', pageId);
+        return;
+      }
+
+      // Remove active from current page
+      if (currentPage) {
+        currentPage.classList.remove('active');
+      }
+
+      // Add to history
+      pageHistory.push(pageId);
+
+      // Activate target page
+      targetPage.classList.add('active');
+
+      // Add animation if not skipped
+      if (!skipAnimation) {
+        targetPage.classList.add('slide-in-right');
+        setTimeout(() => {
+          targetPage.classList.remove('slide-in-right');
+        }, 300);
+      }
+
+      // Scroll to top
+      targetPage.scrollTop = 0;
+    }
+
+    function goBack() {
+      if (pageHistory.length <= 1) {
+        return;
+      }
+
+      // Remove current page from history
+      pageHistory.pop();
+
+      // Get previous page
+      const previousPageId = pageHistory[pageHistory.length - 1];
+      const currentPage = document.querySelector('.page.active');
+      const previousPage = document.getElementById(previousPageId);
+
+      if (!previousPage) {
+        console.error('Previous page not found:', previousPageId);
+        return;
+      }
+
+      // Remove active from current page
+      if (currentPage) {
+        currentPage.classList.remove('active');
+      }
+
+      // Remove last item from history since navigateTo will add it back
+      pageHistory.pop();
+
+      // Navigate to previous page
+      navigateTo(previousPageId, true);
+    }
+
+    // =============================================
+    // UI Utilities
+    // =============================================
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
+    function showLoading(text = '加载中...') {
+      const overlay = document.getElementById('loading-overlay');
+      overlay.classList.add('show');
+    }
+
+    function hideLoading() {
+      const overlay = document.getElementById('loading-overlay');
+      overlay.classList.remove('show');
+    }
+
+    // =============================================
+    // Initialize
+    // =============================================
+
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('Inventory Agent Demo - Ready');
+      console.log('Mock data loaded:', {
+        suppliers: SUPPLIERS.length,
+        customers: CUSTOMERS.length,
+        skus: SKUS.length,
+        documents: DOCUMENTS.length,
+        purchaseOrders: PURCHASE_ORDERS.length,
+        stock: STOCK.length
+      });
+    });
+  </script>
+</body>
+</html>
