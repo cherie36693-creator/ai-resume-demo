@@ -759,6 +759,110 @@
       color: var(--text-light);
       margin-top: 6px;
     }
+
+    /* Task 8: Smart Matching Page Styles */
+    .match-doc-select {
+      background: var(--white);
+      border-radius: var(--radius);
+      border: 2px dashed var(--border);
+      cursor: pointer;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .match-doc-select.selected {
+      border: 2px solid var(--primary);
+      background: var(--primary-light);
+    }
+
+    .match-item {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .match-item-header {
+      display: flex;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .match-item-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .match-diff {
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .match-diff.warning {
+      color: var(--warning);
+    }
+
+    .match-diff.ok {
+      color: var(--success);
+    }
+
+    .match-summary {
+      background: #FFF8E1;
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      margin-top: 16px;
+    }
+
+    /* Task 9: Smart Search Page Styles */
+    .search-box {
+      display: flex;
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 0 12px;
+      margin: 12px 16px;
+      align-items: center;
+    }
+
+    .search-box input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 14px 8px;
+      font-size: 14px;
+    }
+
+    .search-box .search-btn {
+      background: var(--primary);
+      color: var(--white);
+      border-radius: var(--radius-sm);
+      padding: 8px 16px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .search-suggestion {
+      padding: 10px 16px;
+      font-size: 13px;
+      color: var(--primary);
+      background: var(--white);
+      cursor: pointer;
+      margin-bottom: 4px;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow);
+    }
+
+    .search-suggestion:first-of-type {
+      border-radius: var(--radius-sm);
+    }
+
+    .search-suggestion:last-of-type {
+      border-radius: var(--radius-sm);
+    }
   </style>
 </head>
 <body>
@@ -999,6 +1103,75 @@
 
       <div style="padding: 12px 0 100px;" id="stock-list">
         <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- Task 8: Smart Matching - Select Documents -->
+    <div id="page-match-select" class="page">
+      <div class="top-bar-inner">
+        <div class="back-btn" onclick="goBack()">←</div>
+        <div class="title">智能核对</div>
+        <div class="right"></div>
+      </div>
+
+      <div style="padding: 16px; padding-bottom: 100px;">
+        <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 12px;">选择要核对的两张单据：</div>
+
+        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">单据 A</div>
+        <div class="match-doc-select selected">
+          <div style="font-size: 15px; font-weight: bold; margin-bottom: 4px;">📋 采购单 PO-20260422-003</div>
+          <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 2px;">王记五金 · 8项 · ¥3,310</div>
+          <div style="font-size: 12px; color: var(--primary); margin-top: 8px;">已选择 ✓</div>
+        </div>
+
+        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; margin-top: 16px;">单据 B</div>
+        <div class="match-doc-select selected">
+          <div style="font-size: 15px; font-weight: bold; margin-bottom: 4px;">📋 送货单 SH-20260422-008</div>
+          <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 2px;">王记五金 · 8项 · ¥3,260</div>
+          <div style="font-size: 12px; color: var(--primary); margin-top: 8px;">已选择 ✓</div>
+        </div>
+
+        <button class="btn-primary" style="margin-top: 24px;" onclick="startMatch()">开始核对</button>
+      </div>
+    </div>
+
+    <!-- Task 8: Smart Matching - Result -->
+    <div id="page-match-result" class="page">
+      <div class="top-bar-inner">
+        <div class="back-btn" onclick="goBack()">←</div>
+        <div class="title">核对结果</div>
+        <div class="top-bar-action" style="color: var(--primary);" onclick="showToast('导出报告功能')">导出报告</div>
+      </div>
+
+      <div style="padding: 16px; padding-bottom: 100px;" id="match-result">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- Task 9: Smart Search Page -->
+    <div id="page-search" class="page">
+      <div class="top-bar-inner">
+        <div class="back-btn" onclick="goBack()">←</div>
+        <div class="title">智能搜索</div>
+        <div class="right"></div>
+      </div>
+
+      <div class="search-box">
+        <span style="font-size: 18px; margin-right: 4px;">🔍</span>
+        <input type="text" id="search-input" placeholder="试试"上个月从王记五金进了多少货"" />
+        <button class="search-btn" onclick="doSearch()">搜索</button>
+      </div>
+
+      <div id="search-results" style="padding: 0 16px; padding-bottom: 100px;">
+        <!-- Results populated by JS -->
+      </div>
+
+      <div id="search-suggestions" style="padding: 0 16px; padding-bottom: 100px;">
+        <div class="section-title">常用搜索</div>
+        <div class="search-suggestion" onclick="quickSearch('上个月从王记五金进了多少货')">上个月从王记五金进了多少货</div>
+        <div class="search-suggestion" onclick="quickSearch('本月出库最多的商品')">本月出库最多的商品</div>
+        <div class="search-suggestion" onclick="quickSearch('库存低于50的商品')">库存低于50的商品</div>
+        <div class="search-suggestion" onclick="quickSearch('最近和李氏钢材的往来')">最近和李氏钢材的往来</div>
       </div>
     </div>
 
@@ -1765,6 +1938,330 @@
           </div>
         `;
       }).join('');
+    }
+
+    // =============================================
+    // Task 8: Smart Matching Functions
+    // =============================================
+
+    function startMatch() {
+      showLoading('AI 核对分析中...');
+      setTimeout(() => {
+        hideLoading();
+        renderMatchResult();
+        navigateTo('page-match-result');
+      }, 1500);
+    }
+
+    function renderMatchResult() {
+      const po = PURCHASE_ORDERS[0]; // PO-20260422-003
+      const dn = DOCUMENTS[0]; // SH-20260422-008 (delivery note)
+
+      const resultEl = document.getElementById('match-result');
+
+      // Compare items
+      const matchItems = [];
+      const diffItems = [];
+
+      po.items.forEach(poItem => {
+        const dnItem = dn.items.find(item => item.skuId === poItem.skuId);
+        if (dnItem) {
+          // Compare qty and price
+          const qtyMatch = poItem.qty === dnItem.qty;
+          const priceMatch = poItem.price === dnItem.price;
+          const amountMatch = poItem.amount === dnItem.amount;
+
+          if (qtyMatch && priceMatch && amountMatch) {
+            matchItems.push({ poItem, dnItem });
+          } else {
+            diffItems.push({ poItem, dnItem, qtyMatch, priceMatch, amountMatch });
+          }
+        }
+      });
+
+      const matchCount = matchItems.length;
+      const diffCount = diffItems.length;
+      const totalDiff = po.totalAmount - dn.totalAmount;
+      const diffPercent = ((totalDiff / po.totalAmount) * 100).toFixed(1);
+
+      let html = `
+        <div class="card">
+          <div style="font-size: 16px; font-weight: bold; margin-bottom: 12px;">采购单 vs 送货单</div>
+          <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">王记五金 · 2026-04-22</div>
+          <div style="font-size: 14px; margin-top: 12px;">
+            匹配: ${matchCount}项 ✅  差异: ${diffCount}项 ⚠️
+          </div>
+        </div>
+      `;
+
+      // Diff items section
+      if (diffItems.length > 0) {
+        html += `
+          <div class="card">
+            <div style="font-size: 15px; font-weight: bold; margin-bottom: 12px; color: var(--warning);">⚠️ 差异项 (${diffCount})</div>
+        `;
+
+        diffItems.forEach(({ poItem, dnItem, qtyMatch, priceMatch }) => {
+          html += `
+            <div class="match-item">
+              <div class="match-item-header">
+                <span>${poItem.name}</span>
+                <span>${poItem.spec}</span>
+              </div>
+          `;
+
+          if (!qtyMatch) {
+            html += `
+              <div class="match-item-row">
+                <span>数量</span>
+                <span><span class="match-diff warning">PO: ${poItem.qty}</span> vs <span class="match-diff warning">DN: ${dnItem.qty}</span></span>
+              </div>
+            `;
+          }
+
+          if (!priceMatch) {
+            html += `
+              <div class="match-item-row">
+                <span>单价</span>
+                <span><span class="match-diff warning">PO: ¥${poItem.price.toFixed(2)}</span> vs <span class="match-diff warning">DN: ¥${dnItem.price.toFixed(2)}</span></span>
+              </div>
+            `;
+          }
+
+          html += `
+              <div class="match-item-row">
+                <span>金额</span>
+                <span><span class="match-diff warning">PO: ¥${poItem.amount.toFixed(2)}</span> vs <span class="match-diff warning">DN: ¥${dnItem.amount.toFixed(2)}</span></span>
+              </div>
+            </div>
+          `;
+        });
+
+        html += `</div>`;
+      }
+
+      // Match items section
+      if (matchItems.length > 0) {
+        html += `
+          <div class="card">
+            <div style="font-size: 15px; font-weight: bold; margin-bottom: 12px; color: var(--success);">✅ 匹配项 (${matchCount})</div>
+        `;
+
+        matchItems.forEach(({ poItem }) => {
+          html += `
+            <div class="match-item">
+              <div class="match-item-header">
+                <span>${poItem.name}</span>
+                <span>${poItem.spec}</span>
+              </div>
+              <div class="match-item-row">
+                <span>数量 ${poItem.qty}</span>
+                <span class="match-diff ok">${formatAmount(poItem.amount)}</span>
+              </div>
+            </div>
+          `;
+        });
+
+        html += `</div>`;
+      }
+
+      // Summary
+      html += `
+        <div class="match-summary">
+          <div style="font-size: 16px; font-weight: bold; margin-bottom: 8px;">总差异: ${formatAmount(Math.abs(totalDiff))} (${diffPercent}%)</div>
+          <div style="font-size: 13px; color: var(--text-secondary);">建议与供应商确认差异项</div>
+        </div>
+      `;
+
+      resultEl.innerHTML = html;
+    }
+
+    // =============================================
+    // Task 9: Smart Search Functions
+    // =============================================
+
+    function quickSearch(query) {
+      document.getElementById('search-input').value = query;
+      doSearch();
+    }
+
+    function doSearch() {
+      const query = document.getElementById('search-input').value.trim();
+      if (!query) {
+        showToast('请输入搜索内容');
+        return;
+      }
+
+      const suggestionsEl = document.getElementById('search-suggestions');
+      const resultsEl = document.getElementById('search-results');
+
+      // Hide suggestions
+      suggestionsEl.style.display = 'none';
+
+      showLoading('智能搜索中...');
+
+      setTimeout(() => {
+        hideLoading();
+
+        let html = '';
+
+        // Query 1: 王记五金 + (上个月 or 3月)
+        if (query.includes('王记五金') && (query.includes('上个月') || query.includes('3月'))) {
+          const marchDocs = DOCUMENTS.filter(doc =>
+            doc.counterparty === '王记五金' && doc.date.startsWith('2026-03')
+          );
+
+          const totalAmount = marchDocs.reduce((sum, doc) => sum + doc.totalAmount, 0);
+          const totalItems = marchDocs.reduce((sum, doc) => sum + doc.items.length, 0);
+
+          html += `
+            <div class="card" style="margin-bottom: 16px;">
+              <div style="font-size: 16px; font-weight: bold; margin-bottom: 8px;">3月 · 王记五金 · 入库</div>
+              <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">共 ${marchDocs.length} 笔 · ${totalItems} 种商品</div>
+              <div style="font-size: 20px; font-weight: bold; color: var(--primary-dark); margin-top: 12px;">${formatAmount(totalAmount)}</div>
+            </div>
+
+            <div class="section-title">相关单据</div>
+          `;
+
+          marchDocs.forEach(doc => {
+            const firstItem = doc.items[0];
+            const itemInfo = `${firstItem.name} ×${firstItem.qty}${doc.items.length > 1 ? ' 等' + doc.items.length + '项' : ''}`;
+
+            html += `
+              <div class="doc-card" onclick="showDocDetail('${doc.id}')">
+                <div class="doc-card-header">
+                  <div class="doc-card-no">${doc.docNo}</div>
+                  <div class="doc-card-status">${doc.status}</div>
+                </div>
+                <div class="doc-card-title">${doc.sceneName} · ${itemInfo}</div>
+                <div class="doc-card-info">${doc.counterparty} · ${formatDate(doc.date)}</div>
+                <div class="doc-card-info">${formatAmount(doc.totalAmount)}</div>
+              </div>
+            `;
+          });
+        }
+        // Query 2: 出库最多
+        else if (query.includes('出库最多') || query.includes('本月出库')) {
+          const aprilOut = DOCUMENTS.filter(doc =>
+            doc.direction === 'OUT' && doc.date.startsWith('2026-04')
+          );
+
+          // Aggregate by SKU
+          const skuMap = {};
+          aprilOut.forEach(doc => {
+            doc.items.forEach(item => {
+              if (!skuMap[item.skuId]) {
+                skuMap[item.skuId] = {
+                  name: item.name,
+                  spec: item.spec,
+                  qty: 0
+                };
+              }
+              skuMap[item.skuId].qty += item.qty;
+            });
+          });
+
+          const ranked = Object.values(skuMap).sort((a, b) => b.qty - a.qty).slice(0, 5);
+
+          html += `
+            <div class="card">
+              <div style="font-size: 16px; font-weight: bold; margin-bottom: 16px;">4月出库量排名</div>
+          `;
+
+          ranked.forEach((item, index) => {
+            html += `
+              <div class="match-item">
+                <div class="match-item-header">
+                  <span>${index + 1}.</span>
+                  <span>${item.name}</span>
+                  <span>${item.spec}</span>
+                </div>
+                <div class="match-item-row">
+                  <span>出库量</span>
+                  <span class="match-diff ok">${item.qty}</span>
+                </div>
+              </div>
+            `;
+          });
+
+          html += `</div>`;
+        }
+        // Query 3: 库存低于 / 库存不足
+        else if (query.includes('库存低于') || query.includes('库存不足')) {
+          // Parse threshold
+          const match = query.match(/\d+/);
+          const threshold = match ? parseInt(match[0]) : 50;
+
+          const lowStock = STOCK.filter(stock => stock.qty < threshold && stock.qty > 0);
+
+          html += `
+            <div class="card">
+              <div style="font-size: 16px; font-weight: bold; margin-bottom: 8px; color: var(--danger);">⚠️ 库存低于 ${threshold} 的商品 (${lowStock.length}种)</div>
+          `;
+
+          lowStock.forEach(stock => {
+            html += `
+              <div class="match-item">
+                <div class="match-item-header">
+                  <span>${stock.name}</span>
+                  <span>${stock.spec}</span>
+                </div>
+                <div class="match-item-row">
+                  <span>当前库存</span>
+                  <span class="match-diff warning">${stock.qty} ${stock.unit}</span>
+                </div>
+              </div>
+            `;
+          });
+
+          html += `</div>`;
+        }
+        // Query 4: 李氏钢材
+        else if (query.includes('李氏钢材')) {
+          const liDocs = DOCUMENTS.filter(doc => doc.counterparty === '李氏钢材');
+          const totalAmount = liDocs.reduce((sum, doc) => sum + doc.totalAmount, 0);
+
+          html += `
+            <div class="card" style="margin-bottom: 16px;">
+              <div style="font-size: 16px; font-weight: bold; margin-bottom: 8px;">李氏钢材 · 往来记录</div>
+              <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">共 ${liDocs.length} 笔往来</div>
+              <div style="font-size: 20px; font-weight: bold; color: var(--primary-dark); margin-top: 12px;">${formatAmount(totalAmount)}</div>
+            </div>
+
+            <div class="section-title">相关单据</div>
+          `;
+
+          liDocs.forEach(doc => {
+            const firstItem = doc.items[0];
+            const itemInfo = `${firstItem.name} ×${firstItem.qty}${doc.items.length > 1 ? ' 等' + doc.items.length + '项' : ''}`;
+
+            html += `
+              <div class="doc-card" onclick="showDocDetail('${doc.id}')">
+                <div class="doc-card-header">
+                  <div class="doc-card-no">${doc.docNo}</div>
+                  <div class="doc-card-status">${doc.status}</div>
+                </div>
+                <div class="doc-card-title">${doc.sceneName} · ${itemInfo}</div>
+                <div class="doc-card-info">${doc.counterparty} · ${formatDate(doc.date)}</div>
+                <div class="doc-card-info">${formatAmount(doc.totalAmount)}</div>
+              </div>
+            `;
+          });
+        }
+        // Default: not found
+        else {
+          html = `
+            <div style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">
+              <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
+              <div style="font-size: 16px;">未找到相关结果</div>
+              <div style="font-size: 13px; margin-top: 8px;">试试其他搜索词</div>
+            </div>
+          `;
+        }
+
+        resultsEl.innerHTML = html;
+      }, 1200);
     }
 
     // =============================================
