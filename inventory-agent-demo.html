@@ -63,10 +63,10 @@
       justify-content: space-between;
       align-items: center;
       padding: 0 20px;
-      color: var(--white);
+      color: #333;
       font-size: 14px;
       font-weight: 500;
-      z-index: 10000;
+      z-index: 10;
       pointer-events: none;
     }
 
@@ -114,7 +114,7 @@
     .top-bar {
       background: linear-gradient(180deg, var(--primary-dark) 0%, #156829 100%);
       color: var(--white);
-      padding-top: 48px;
+      padding-top: 60px;
       flex-shrink: 0;
     }
 
@@ -122,6 +122,7 @@
       background: var(--white);
       border-bottom: 1px solid var(--border);
       padding: 12px 16px;
+      padding-top: 56px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -678,8 +679,10 @@
       display: flex;
       gap: 8px;
       padding: 12px 16px;
+      padding-top: 16px;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
+      background: var(--bg);
     }
 
     .ledger-tabs::-webkit-scrollbar {
@@ -1207,7 +1210,7 @@
 
       <div class="search-box">
         <span style="font-size: 18px; margin-right: 4px;">🔍</span>
-        <input type="text" id="search-input" placeholder="试试"上个月从王记五金进了多少货"" onkeydown="if(event.key==='Enter')doSearch()" />
+        <input type="text" id="search-input" placeholder="搜索库存、单据、供应商..." onkeydown="if(event.key==='Enter')doSearch()" />
         <button class="search-btn" onclick="doSearch()">搜索</button>
       </div>
 
@@ -1322,11 +1325,11 @@
         date: '2026-04-21 16:45',
         status: '已确认',
         items: [
-          { skuId: 'k1', name: 'M8螺丝', spec: '×20', qty: 200, price: 0.50, amount: 100 },
-          { skuId: 'k2', name: 'M10螺母', spec: '×15', qty: 150, price: 0.60, amount: 90 },
+          { skuId: 'k1', name: 'M8螺丝', spec: '×20', qty: 500, price: 0.50, amount: 250 },
+          { skuId: 'k2', name: 'M10螺母', spec: '×15', qty: 300, price: 0.60, amount: 180 },
           { skuId: 'k8', name: '角磨片', spec: '100mm', qty: 120, price: 5.50, amount: 660 },
         ],
-        totalAmount: 980
+        totalAmount: 1090
       },
       {
         id: 'd4',
@@ -1339,11 +1342,11 @@
         date: '2026-04-21 09:20',
         status: '已确认',
         items: [
-          { skuId: 'k5', name: '钢管', spec: 'DN25×6m', qty: 80, price: 45, amount: 3600 },
-          { skuId: 'k6', name: '电线', spec: 'BV2.5²', qty: 300, price: 3.20, amount: 960 },
-          { skuId: 'k10', name: '水泥', spec: '425#', qty: 20, price: 28, amount: 560 },
+          { skuId: 'k5', name: '钢管', spec: 'DN25×6m', qty: 150, price: 45, amount: 6750 },
+          { skuId: 'k6', name: '电线', spec: 'BV2.5²', qty: 400, price: 3.20, amount: 1280 },
+          { skuId: 'k10', name: '水泥', spec: '425#', qty: 50, price: 28, amount: 1400 },
         ],
-        totalAmount: 4960
+        totalAmount: 9430
       },
       {
         id: 'd5',
@@ -1388,9 +1391,10 @@
         date: '2026-04-16 15:45',
         status: '已确认',
         items: [
-          { skuId: 'k6', name: '电线', spec: 'BV2.5²', qty: 50, price: 3.20, amount: 160 },
+          { skuId: 'k6', name: '电线', spec: 'BV2.5²', qty: 200, price: 3.20, amount: 640 },
+          { skuId: 'k4', name: '电钻头', spec: '6mm', qty: 150, price: 2.25, amount: 337.5 },
         ],
-        totalAmount: 160
+        totalAmount: 977.5
       },
       {
         id: 'd8',
@@ -1403,10 +1407,11 @@
         date: '2026-04-15 10:30',
         status: '已确认',
         items: [
-          { skuId: 'k4', name: '电钻头', spec: '6mm', qty: 10, price: 2.25, amount: 22.5 },
-          { skuId: 'k7', name: '绝缘胶带', spec: '电工级', qty: 15, price: 3.00, amount: 45 },
+          { skuId: 'k4', name: '电钻头', spec: '6mm', qty: 80, price: 2.25, amount: 180 },
+          { skuId: 'k7', name: '绝缘胶带', spec: '电工级', qty: 180, price: 3.00, amount: 540 },
+          { skuId: 'k12', name: '膨胀螺栓', spec: 'M10×80', qty: 350, price: 1.80, amount: 630 },
         ],
-        totalAmount: 67.5
+        totalAmount: 1350
       },
       {
         id: 'd9',
