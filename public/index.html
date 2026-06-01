@@ -2908,35 +2908,37 @@
         }
 
         function setAsPrimary(idx) {
-            // 收集所有简历（同renderResumeList逻辑）
-            const allResumes = [];
-            if (resumeData.markdown) {
-                let name = resumeData.fileName || '简历';
-                name = name.replace(/\.(pdf|docx?)$/i, '');
-                const nameMatch = resumeData.markdown.match(/^#\s*(.+)/m);
-                if (nameMatch && nameMatch[1].trim().length <= 8) name = nameMatch[1].trim() + '-简历';
-                allResumes.push({ name, markdown: resumeData.markdown, template: null, time: '当前', isPrimary: true });
-            }
+            // 直接从localStorage读取versions
             let versions = [];
             try { versions = JSON.parse(localStorage.getItem('resume_versions') || '[]'); } catch(e) {}
-            versions.forEach(v => allResumes.push({ name: v.name, markdown: v.markdown, template: v.template, time: v.time, isPrimary: false }));
 
-            const item = allResumes[idx];
-            if (!item || item.isPrimary) return;
+            // idx在allResumes中的位置：0=主简历，1,2,3...=versions[0,1,2...]
+            const vIdx = idx - (resumeData.markdown ? 1 : 0);
+            if (vIdx < 0 || vIdx >= versions.length) return;
 
-            // 将当前主简历降为版本
-            const oldPrimary = { name: resumeData.fileName || '简历', markdown: resumeData.markdown, template: null, time: new Date().toLocaleString('zh-CN') };
-            // 从versions中移除选中项
-            const vIdx = idx - 1; // versions索引 = allResumes索引 - 1（因为主简历占第0位）
-            if (vIdx >= 0 && vIdx < versions.length) {
+            const targetVersion = versions[vIdx];
+            if (!targetVersion || !targetVersion.markdown) {
+                showToast('该简历数据异常');
+                return;
+            }
+
+            // 将当前主简历降为版本（插入到versions中替代被提升的那个）
+            if (resumeData.markdown) {
+                const oldPrimary = {
+                    name: resumeData.fileName || '简历',
+                    markdown: resumeData.markdown,
+                    template: null,
+                    time: new Date().toLocaleString('zh-CN')
+                };
+                // 移除被提升的版本，在同位置插入旧主简历
+                versions.splice(vIdx, 1, oldPrimary);
+            } else {
                 versions.splice(vIdx, 1);
             }
-            // 旧主简历加入versions
-            if (oldPrimary.markdown) versions.unshift(oldPrimary);
 
             // 设置新主简历
-            resumeData.markdown = item.markdown;
-            resumeData.fileName = item.name;
+            resumeData.markdown = targetVersion.markdown;
+            resumeData.fileName = targetVersion.name;
             saveResumeData();
             try { localStorage.setItem('resume_versions', JSON.stringify(versions)); } catch(e) {}
 
