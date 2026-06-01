@@ -1665,14 +1665,15 @@
     // Add a new doc to 最近文档 grid (with localStorage persistence)
     function addRecentDoc(name, type, markdown) {
         let recentDocs = JSON.parse(localStorage.getItem('pc_recent_docs') || '[]');
-        recentDocs = recentDocs.filter(d => d.name !== name);
+        // 只去重最近5分钟内的同名文件，避免短时间重复
         const now = new Date();
         const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+        recentDocs = recentDocs.filter(d => !(d.name === name && d.time === time));
         // 存储前10行预览文本
         const md = markdown || resumeData.markdown || '';
         const preview = md.split('\n').filter(l => l.trim()).slice(0, 12).join('\n');
         recentDocs.unshift({ name, type, time, preview });
-        if (recentDocs.length > 8) recentDocs = recentDocs.slice(0, 8);
+        if (recentDocs.length > 12) recentDocs = recentDocs.slice(0, 12);
         localStorage.setItem('pc_recent_docs', JSON.stringify(recentDocs));
         renderRecentDocs();
     }
@@ -2200,8 +2201,9 @@
             renderDocDetailContent(resumeData.markdown);
             addResumeToLibrary(resumeData.fileName.replace(/\.(pdf|docx?|png|jpe?g)$/i, ''), resumeData.markdown);
             addRecentDoc(resumeData.fileName.replace(/\.(pdf|docx?|png|jpe?g)$/i, ''), 'resume', resumeData.markdown);
-            renderRecentDocs();
             generateAiSuggestions();
+            // 确保首页最近文档刷新
+            setTimeout(renderRecentDocs, 50);
             showToast('✓ 导入成功');
         } catch(err) {
             if (overlay) overlay.style.display = 'none';
@@ -2265,8 +2267,8 @@
             renderDocDetailContent(resumeData.markdown);
             addResumeToLibrary(resumeData.fileName.replace(/\.(pdf|docx?|png|jpe?g)$/i, ''), resumeData.markdown);
             addRecentDoc(resumeData.fileName.replace(/\.(pdf|docx?|png|jpe?g)$/i, ''), 'resume', resumeData.markdown);
-            renderRecentDocs();
             generateAiSuggestions();
+            setTimeout(renderRecentDocs, 50);
             showToast('✓ 导入成功');
         } catch(err) {
             if (overlay) overlay.style.display = 'none';
