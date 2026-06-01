@@ -5302,7 +5302,13 @@
                 let aiNotesHtml = '';
                 if (aiNotes) {
                     const notesRendered = renderResumeMarkdown(aiNotes).replace(/==([^=]+)==/g, '<span class="ai-modified">$1</span>');
-                    aiNotesHtml = `<div class="bg-blue-50 border border-blue-100 rounded-xl p-3 mb-3"><p class="text-[11px] font-medium text-blue-700 mb-1">📝 AI改动说明</p><div class="text-[11px] text-blue-600 leading-relaxed">${notesRendered}</div></div>`;
+                    aiNotesHtml = `<div class="bg-blue-50 border border-blue-100 rounded-xl p-3 mb-3">
+                        <div class="flex items-center justify-between cursor-pointer" onclick="const b=this.nextElementSibling;const a=this.querySelector('.ai-note-arrow');if(b.style.display==='none'){b.style.display='';a.style.transform='';}else{b.style.display='none';a.style.transform='rotate(-90deg)';}">
+                            <p class="text-[11px] font-medium text-blue-700">📝 AI改动说明</p>
+                            <svg class="w-3.5 h-3.5 text-blue-400 transition-transform ai-note-arrow" style="transform:rotate(-90deg);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </div>
+                        <div class="text-[11px] text-blue-600 leading-relaxed mt-2" style="display:none;">${notesRendered}</div>
+                    </div>`;
                 }
 
                 // 提取姓名和技能用于互联网风头部
