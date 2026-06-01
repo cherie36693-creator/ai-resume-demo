@@ -3839,7 +3839,10 @@
             const data = { name: '', subtitle: '', skills: [], sections: [] };
             // 提取姓名（第一个一级标题，但排除非人名内容）
             const notNameKeywords = ['求职','总结','简历','概述','个人概要','profile','summary','resume','objective','求职意向',
-                '教育','经历','经验','技能','工作','项目','实习','背景','证书','奖项','评价','介绍','自我','活动','社团','培训','荣誉','基本信息','个人信息','联系方式'];
+                '教育','经历','经验','技能','工作','项目','实习','背景','证书','奖项','评价','介绍','自我','活动','社团','培训','荣誉','基本信息','个人信息','联系方式',
+                'optimized','customized','tailored','translated','优化后','定制'];
+            // 预处理：去掉AI生成的非简历标题行
+            md = md.replace(/^#\s*(?:优化后简历|定制简历|优化简历|Optimized Resume|Customized Resume|Tailored Resume|Translated Resume)[^\n]*\n?/mi, '');
             const nameMatch = md.match(/^#\s*(.+)/m);
             if (nameMatch) {
                 const heading = nameMatch[1].trim().replace(/[■●◆▪▸►☆★]/g, '').trim();
@@ -5416,8 +5419,8 @@
                     resumeBody = customResume.substring(0, noteMatch.index).trim();
                     aiNotes = noteMatch[1].trim();
                 }
-                // 去掉AI生成的非人名标题行（如"优化后简历（xxx行业）"）
-                resumeBody = resumeBody.replace(/^#\s*(?:优化后简历|定制简历|优化简历|岗位定制简历)[^\n]*\n?/m, '');
+                // 去掉AI生成的非人名标题行（如"优化后简历（xxx行业）"、"Optimized Resume (xxx)"）
+                resumeBody = resumeBody.replace(/^#\s*(?:优化后简历|定制简历|优化简历|岗位定制简历|Optimized Resume|Customized Resume|Tailored Resume)[^\n]*\n?/mi, '');
                 // 同步清理缓存版本
                 window._lastCustomResume = resumeBody.replace(/==([^=]+)==/g, '$1');
                 // 渲染简历正文
