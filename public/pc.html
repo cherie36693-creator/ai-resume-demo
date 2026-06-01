@@ -1266,10 +1266,11 @@
         if (resumeData.fileDataUrl && md.includes('杨雪靖') && !resumeData.fileName.includes('杨雪靖')) {
             return; // markdown 和实际文档不匹配，不显示错误的建议
         }
-        // 提取可优化的段落（长度>30字的正文行）
+        // 提取可优化的段落（长度>30字的正文行，排除图片标记）
         const lines = md.split('\n').filter(l => {
             const t = l.trim();
             if (!t || t.startsWith('#') || t === '---') return false;
+            if (/^!\[/.test(t) || /https?:\/\/.*\.(jpg|png|jpeg|gif)/i.test(t)) return false;
             if (t.length < 30) return false;
             if (/^[-*•]/.test(t)) return t.length > 35;
             return true;
@@ -1297,6 +1298,7 @@
         const lines = md.split('\n').filter(l => {
             const t = l.trim();
             if (!t || t.startsWith('#') || t === '---') return false;
+            if (/^!\[/.test(t) || /https?:\/\/.*\.(jpg|png|jpeg|gif)/i.test(t)) return false;
             if (t.length < 30) return false;
             if (/^[-*•]/.test(t)) return t.length > 35;
             return true;
@@ -3780,6 +3782,8 @@
 
     function parseResumeForTemplate(md) {
         if (!md) return null;
+        // 移除 OCR 返回的图片标记（如 ![](https://...jpg)）
+        md = md.replace(/!\[[^\]]*\]\([^)]+\)/g, '').replace(/\n{3,}/g, '\n\n');
         const lines = md.split('\n');
         const data = { name: '', subtitle: '', skills: [], sections: [] };
         const notNameKeywords = ['求职','总结','简历','概述','个人概要','profile','summary','resume','objective','求职意向'];
@@ -3944,6 +3948,8 @@
 
     function renderTemplateByStyle(markdown, templateId) {
         if (!markdown) return '<p class="text-gray-400 text-sm text-center py-8">暂无内容</p>';
+        // 移除 OCR 图片标记
+        markdown = markdown.replace(/!\[[^\]]*\]\([^)]+\)/g, '').replace(/\n{3,}/g, '\n\n');
         const data = parseResumeForTemplate(markdown);
         if (!data) return '<p class="text-gray-400 text-sm text-center py-8">解析失败</p>';
         window._currentRenderName = data.name || '';
