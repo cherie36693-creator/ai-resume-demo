@@ -3033,6 +3033,7 @@
             saveData();
             updateUIHasResume();
             addResumeToLibrary(pendingResumeName + '-AI简历', result);
+            addRecentDoc(pendingResumeName + '-AI简历', 'ai', result);
             // 展示模板预览
             const templateHtml = renderTemplateByStyle(result, selectedTemplate);
             container.innerHTML = `<div class="w-full py-6 px-8">
