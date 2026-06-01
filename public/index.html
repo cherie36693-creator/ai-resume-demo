@@ -1779,7 +1779,7 @@
                     <span class="text-[11px] text-blue-500 font-medium cursor-pointer" onclick="hideExportSheet(); setTimeout(()=>goTo('page-templates'), 300)">更换 ›</span>
                 </div>
                 <div class="space-y-2.5">
-                    <button class="w-full flex items-center gap-3 p-3.5 bg-gray-50 border border-gray-100 rounded-xl" onclick="hideExportSheet()">
+                    <button class="w-full flex items-center gap-3 p-3.5 bg-gray-50 border border-gray-100 rounded-xl" onclick="exportAsPDF()">
                         <div class="w-9 h-9 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
                             <span class="text-[11px] font-bold text-red-600">PDF</span>
                         </div>
@@ -1788,7 +1788,7 @@
                             <p class="text-[11px] text-gray-400">适合投递和打印</p>
                         </div>
                     </button>
-                    <button class="w-full flex items-center gap-3 p-3.5 bg-gray-50 border border-gray-100 rounded-xl" onclick="hideExportSheet()">
+                    <button class="w-full flex items-center gap-3 p-3.5 bg-gray-50 border border-gray-100 rounded-xl" onclick="exportAsWord()">
                         <div class="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                             <span class="text-[10px] font-bold text-blue-600">DOC</span>
                         </div>
@@ -1797,7 +1797,7 @@
                             <p class="text-[11px] text-gray-400">方便继续编辑</p>
                         </div>
                     </button>
-                    <button class="w-full flex items-center gap-3 p-3.5 bg-gray-50 border border-gray-100 rounded-xl" onclick="hideExportSheet()">
+                    <button class="w-full flex items-center gap-3 p-3.5 bg-gray-50 border border-gray-100 rounded-xl" onclick="exportAsImage()">
                         <div class="w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
                             <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         </div>
@@ -3085,6 +3085,157 @@
             document.getElementById('export-sheet').style.transform = 'translateY(100%)';
             setTimeout(() => {
                 document.getElementById('export-overlay').classList.add('hidden');
+            }, 300);
+        }
+
+        // ==================== 导出功能 ====================
+        function getExportFileName() {
+            const base = (resumeData.fileName || '简历').replace(/\.(pdf|docx?|png|jpe?g)$/i, '');
+            return base;
+        }
+
+        function getResumeHTMLForExport() {
+            // 获取当前显示的模板内容
+            const detailContent = document.getElementById('detail-content');
+            if (detailContent && !detailContent.classList.contains('hidden')) {
+                const activeTpl = detailContent.querySelector('.resume-tpl:not(.hidden)');
+                if (activeTpl && activeTpl.innerHTML.trim()) return activeTpl.innerHTML;
+            }
+            // fallback: 用markdown渲染
+            if (!resumeData.markdown) return '<p>暂无简历内容</p>';
+            return markdownToHTML(resumeData.markdown);
+        }
+
+        function exportAsPDF() {
+            hideExportSheet();
+            showToast('正在生成PDF...');
+            setTimeout(() => {
+                const content = getResumeHTMLForExport();
+                const printWin = window.open('', '_blank');
+                printWin.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${getExportFileName()}</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; padding: 40px; font-size: 14px; line-height: 1.6; color: #333; }
+h1 { font-size: 22px; margin-bottom: 8px; }
+h2 { font-size: 16px; margin: 16px 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e5e7eb; color: #1a1a1a; }
+h3 { font-size: 14px; margin: 12px 0 4px; }
+p { margin: 4px 0; }
+ul, ol { padding-left: 20px; margin: 4px 0; }
+li { margin: 2px 0; }
+table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+th, td { border: 1px solid #e5e7eb; padding: 6px 8px; text-align: left; font-size: 13px; }
+th { background: #f9fafb; }
+@media print { body { padding: 20px; } }
+</style></head><body>${content}</body></html>`);
+                printWin.document.close();
+                setTimeout(() => { printWin.print(); }, 500);
+            }, 300);
+        }
+
+        function exportAsWord() {
+            hideExportSheet();
+            showToast('正在生成Word...');
+            setTimeout(() => {
+                const content = getResumeHTMLForExport();
+                const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8"><title>${getExportFileName()}</title>
+<style>
+body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 12pt; line-height: 1.6; }
+h1 { font-size: 18pt; }
+h2 { font-size: 14pt; margin-top: 12pt; border-bottom: 1px solid #ccc; padding-bottom: 3pt; }
+h3 { font-size: 12pt; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid #ccc; padding: 4pt 6pt; }
+</style></head><body>${content}</body></html>`;
+                const blob = new Blob([html], { type: 'application/msword' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = getExportFileName() + '.doc';
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('Word文件已下载');
+            }, 300);
+        }
+
+        function exportAsImage() {
+            hideExportSheet();
+            showToast('正在生成图片...');
+            setTimeout(() => {
+                const content = getResumeHTMLForExport();
+                // 创建一个离屏容器渲染简历
+                const container = document.createElement('div');
+                container.style.cssText = 'position:fixed;left:-9999px;top:0;width:800px;padding:40px;background:white;font-family:-apple-system,PingFang SC,sans-serif;font-size:14px;line-height:1.6;color:#333;';
+                container.innerHTML = `<style>h1{font-size:22px;margin-bottom:8px;}h2{font-size:16px;margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid #e5e7eb;}h3{font-size:14px;margin:12px 0 4px;}p{margin:4px 0;}ul,ol{padding-left:20px;margin:4px 0;}li{margin:2px 0;}table{width:100%;border-collapse:collapse;margin:8px 0;}th,td{border:1px solid #e5e7eb;padding:6px 8px;text-align:left;font-size:13px;}th{background:#f9fafb;}</style>${content}`;
+                document.body.appendChild(container);
+
+                // 使用 html2canvas 如果可用，否则用 SVG foreignObject 方案
+                const width = container.offsetWidth;
+                const height = container.offsetHeight;
+
+                const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+                    <foreignObject width="100%" height="100%">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="font-family:-apple-system,PingFang SC,sans-serif;font-size:14px;line-height:1.6;color:#333;padding:40px;">${content.replace(/</g,'<').replace(/>/g,'>') ? content : content}</div>
+                    </foreignObject>
+                </svg>`;
+
+                // 简单方案：直接用canvas绘制文本区域截图
+                // 更可靠的方案：把markdown导出为纯文本格式的图片
+                const canvas = document.createElement('canvas');
+                const scale = 2;
+                canvas.width = width * scale;
+                canvas.height = Math.min(height * scale, 8000);
+                const ctx = canvas.getContext('2d');
+                ctx.scale(scale, scale);
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, width, height);
+
+                // 用img加载SVG
+                const img = new Image();
+                const svgBlob = new Blob([`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml">${container.innerHTML}</div></foreignObject></svg>`], {type: 'image/svg+xml'});
+                const svgUrl = URL.createObjectURL(svgBlob);
+
+                img.onload = function() {
+                    ctx.drawImage(img, 0, 0);
+                    URL.revokeObjectURL(svgUrl);
+                    document.body.removeChild(container);
+                    canvas.toBlob(function(blob) {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = getExportFileName() + '.png';
+                        a.click();
+                        URL.revokeObjectURL(url);
+                        showToast('图片已下载');
+                    }, 'image/png');
+                };
+                img.onerror = function() {
+                    // SVG foreignObject 方案失败，fallback到纯文本图片
+                    document.body.removeChild(container);
+                    ctx.font = '14px PingFang SC, sans-serif';
+                    ctx.fillStyle = '#333';
+                    const lines = (resumeData.markdown || '').split('\n');
+                    let y = 30;
+                    lines.forEach(line => {
+                        const clean = line.replace(/[#*_\-|]/g, '').trim();
+                        if (clean) {
+                            if (line.startsWith('#')) { ctx.font = 'bold 18px PingFang SC, sans-serif'; }
+                            else { ctx.font = '14px PingFang SC, sans-serif'; }
+                            ctx.fillText(clean, 20, y);
+                            y += 22;
+                        }
+                    });
+                    canvas.toBlob(function(blob) {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = getExportFileName() + '.png';
+                        a.click();
+                        URL.revokeObjectURL(url);
+                        showToast('图片已下载');
+                    }, 'image/png');
+                };
+                img.src = svgUrl;
             }, 300);
         }
 
