@@ -3442,10 +3442,8 @@
                     html += '<div class="h-2"></div>';
                     continue;
                 }
-                // 图片 ![alt](url)
-                const imgMatch = trimmed.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
-                if (imgMatch) {
-                    html += `<img src="${imgMatch[2]}" alt="${imgMatch[1]}" class="w-full rounded my-2" />`;
+                // 图片 ![alt](url) — 简历中跳过所有图片（OCR可能提取出图标/logo等干扰元素）
+                if (/^!\[([^\]]*)\]\(([^)]+)\)$/.test(trimmed)) {
                     continue;
                 }
                 // HTML注释（跳过）
@@ -3481,8 +3479,9 @@
                     html += `<p class="text-[11px] text-gray-600 leading-relaxed pl-3 py-0.5">${trimmed.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`;
                     continue;
                 }
-                // 普通段落
-                html += `<p class="text-[11px] text-gray-600 leading-relaxed py-0.5">${trimmed.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`;
+                // 普通段落（移除行内图片引用）
+                const cleanLine = trimmed.replace(/!\[[^\]]*\]\([^)]+\)/g, '').trim();
+                if (cleanLine) html += `<p class="text-[11px] text-gray-600 leading-relaxed py-0.5">${cleanLine.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`;
             }
             if (inTable) flushTable();
             return html;
@@ -3796,7 +3795,10 @@
                     // 跳过图片行和分隔线
                     if (/^!\[.*\]\(.*\)$/.test(trimmed)) continue;
                     if (/^-{3,}$/.test(trimmed) || /^\*{3,}$/.test(trimmed)) continue;
-                    currentSection.content.push({ type: 'line', text: trimmed });
+                    // 移除行内图片引用
+                    const cleanText = trimmed.replace(/!\[[^\]]*\]\([^)]+\)/g, '').trim();
+                    if (!cleanText) continue;
+                    currentSection.content.push({ type: 'line', text: cleanText });
                 }
             }
             if (currentSection) data.sections.push(currentSection);
