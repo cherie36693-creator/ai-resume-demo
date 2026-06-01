@@ -2945,28 +2945,30 @@
             const md = resumeData.markdown;
             if (!md) return;
             const items = [];
-            // 基于简历内容智能判断诊断项
-            const hasQuantified = /\d+%|\d+万|\d+倍|\d+个|提升.*\d|增长.*\d|降低.*\d/.test(md);
-            const hasProject = /##\s*项目|###\s*项目|项目经历|项目经验/.test(md);
-            const hasSelfEval = /##\s*自我评价|##\s*个人总结|##\s*自我介绍/.test(md);
-            const hasSkills = /##\s*专业技能|##\s*技能|##\s*技术栈/.test(md);
+            // 基于简历内容智能判断诊断项（宽松匹配，避免误判）
+            const hasQuantified = /\d+[\.\d]*\s*[%％万亿倍个人次篇条项]|\d+[\.\d]*w|提升.*\d|增长.*\d|降低.*\d|完成.*\d|负责.*\d|管理.*\d|超过.*\d/.test(md);
+            const hasProject = /##\s*(?:项目|工作|实习|实践|经[历验]|活动|社[团会]|志愿|兼职)|项目经[历验]|工作经[历验]|实习经[历验]|社会实践|校园活动|社团经[历验]/.test(md);
+            const hasSelfEval = /##\s*(?:自我评价|个人总结|自我介绍|个人评价|自我描述|个人简介|关于我|About)/i.test(md);
+            const hasSkills = /##\s*(?:专业技能|技能|技术栈|个人技能|核心技能|技术能力|技能特长)|熟[练悉](?:掌握|使用|运用)|精通/.test(md);
+            const hasWorkExp = /##\s*(?:工作|实习|职业)|公司|有限公司|集团|(?:20\d{2})\s*[-~–—至到]\s*(?:20\d{2}|至今|今|现在)/.test(md);
             const wordCount = md.length;
 
             if (!hasQuantified) {
                 items.push({level: 'red', tag: '必改', text: '工作/项目经历缺少量化数据，建议补充具体业绩指标'});
             }
-            if (!hasProject) {
-                items.push({level: 'red', tag: '必改', text: '缺少项目经历模块，建议补充核心项目及个人贡献'});
-            } else if (wordCount < 800) {
-                items.push({level: 'yellow', tag: '建议', text: '项目经历描述较简略，建议用STAR法则展开'});
+            if (!hasProject && !hasWorkExp) {
+                items.push({level: 'red', tag: '必改', text: '缺少项目/工作经历模块，建议补充核心项目及个人贡献'});
+            } else if (wordCount < 500) {
+                items.push({level: 'yellow', tag: '建议', text: '经历描述较简略，建议用STAR法则展开关键成果'});
             }
-            if (hasSelfEval) {
-                items.push({level: 'yellow', tag: '建议', text: '自我评价建议结合目标岗位针对性优化，避免通用化'});
-            } else {
+            if (!hasSelfEval) {
                 items.push({level: 'yellow', tag: '建议', text: '缺少自我评价/个人总结，建议添加差异化亮点'});
             }
-            if (!hasSkills) {
+            if (!hasSkills && wordCount > 300) {
                 items.push({level: 'yellow', tag: '建议', text: '建议添加专业技能模块，突出核心竞争力'});
+            }
+            if (hasQuantified && hasProject && hasSelfEval && hasSkills) {
+                items.push({level: 'green', tag: '良好', text: '简历结构完整，建议进一步针对目标岗位优化关键词'});
             }
             // 最多显示3条
             const showItems = items.slice(0, 3);
