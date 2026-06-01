@@ -3640,7 +3640,7 @@
                 markdown_details: '1',
             });
             const buffer = await file.arrayBuffer();
-            const resp = await fetch(`${API_CONFIG.TEXTIN_PARSE_URL}?${params}`, {
+            const fetchOpts = {
                 method: 'POST',
                 headers: {
                     'x-ti-app-id': API_CONFIG.TEXTIN_APP_ID,
@@ -3648,7 +3648,16 @@
                     'Content-Type': 'application/octet-stream',
                 },
                 body: buffer,
-            });
+            };
+            const url = `${API_CONFIG.TEXTIN_PARSE_URL}?${params}`;
+            let resp;
+            try {
+                resp = await fetch(url, fetchOpts);
+            } catch(e) {
+                // 首次失败可能是服务冷启动，等2秒重试一次
+                await new Promise(r => setTimeout(r, 2000));
+                resp = await fetch(url, fetchOpts);
+            }
             const result = await resp.json();
             if (result.code !== 200) throw new Error(result.message || '文档解析失败');
             // 提取图片数据：TextIn 返回 image_list 中包含 base64 图片
