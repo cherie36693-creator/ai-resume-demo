@@ -4709,6 +4709,18 @@
                 });
 
                 const annCount = sections.length;
+                // 同步首页诊断计数和建议内容
+                const countEl = document.getElementById('home-diag-count');
+                if (countEl) countEl.textContent = annCount + '处待优化';
+                const diagItemsEl = document.getElementById('home-diag-items');
+                if (diagItemsEl && sections.length > 0) {
+                    diagItemsEl.innerHTML = sections.map(s => {
+                        const tag = s.level === 'critical' ? '<span class="tag tag-red mt-0.5">必改</span>' : '<span class="tag tag-yellow mt-0.5">建议</span>';
+                        const text = s.hint || s.title || '';
+                        return `<div class="flex items-start gap-1.5">${tag}<p class="text-[11px] text-gray-600 leading-relaxed">${text}</p></div>`;
+                    }).join('');
+                }
+
                 contentArea.innerHTML = `
                     <!-- 多维评分雷达图 - 可折叠 -->
                     <div class="bg-white rounded-2xl border border-gray-200 mb-3 shadow-sm p-4">
