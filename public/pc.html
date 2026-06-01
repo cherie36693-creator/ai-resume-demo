@@ -3950,10 +3950,14 @@
         if (!markdown) return '<p class="text-gray-400 text-sm text-center py-8">暂无内容</p>';
         // 移除 OCR 图片标记
         markdown = markdown.replace(/!\[[^\]]*\]\([^)]+\)/g, '').replace(/\n{3,}/g, '\n\n');
+        // 检测是否为非中文内容（翻译版简历）
+        const chineseChars = (markdown.match(/[\u4e00-\u9fa5]/g) || []).length;
+        const isTranslated = chineseChars < markdown.length * 0.1;
         const data = parseResumeForTemplate(markdown);
         if (!data) return '<p class="text-gray-400 text-sm text-center py-8">解析失败</p>';
         window._currentRenderName = data.name || '';
-        const info = extractPersonalInfo(markdown);
+        window._isTranslatedResume = isTranslated;
+        const info = isTranslated ? {} : extractPersonalInfo(markdown);
 
         switch (templateId) {
             case 'spring2024': return renderTplSpring2024(data, info);
@@ -3971,15 +3975,17 @@
     // 模板1: 蓝色经典 - 单栏，左上姓名+右上照片，蓝色横线，图标段标题
     function renderTplSpring2024(data, info) {
         const md = resumeData.markdown || '';
-        // 提取个人信息字段
+        // 提取个人信息字段（翻译版跳过）
         const fields = [];
-        const pats = [[/性\s*别[：:\s]*([\u4e00-\u9fa5]+)/,'性别'],[/电\s*话[：:\s]*([\d\-*]+)/,'电话'],[/户\s*籍[：:\s]*([^\n,，|]+)/,'户籍'],[/邮\s*箱[：:\s]*([\w.\-]+@[\w.\-]+)/,'邮箱'],[/政治面貌[：:\s]*([^\n,，|]+)/,'政治面貌'],[/民\s*族[：:\s]*([^\n,，|]+)/,'民族'],[/年\s*龄[：:\s]*(\d+)/,'年龄'],[/出生年月[：:\s]*([^\n,，|]+)/,'出生年月'],[/学\s*历[：:\s]*([^\n,，|]+)/,'学历']];
-        for (const [pat, label] of pats) {
-            const m = md.match(pat);
-            if (m) fields.push([label, m[1].trim()]);
+        if (!window._isTranslatedResume) {
+            const pats = [[/性\s*别[：:\s]*([\u4e00-\u9fa5]+)/,'性别'],[/电\s*话[：:\s]*([\d\-*]+)/,'电话'],[/户\s*籍[：:\s]*([^\n,，|]+)/,'户籍'],[/邮\s*箱[：:\s]*([\w.\-]+@[\w.\-]+)/,'邮箱'],[/政治面貌[：:\s]*([^\n,，|]+)/,'政治面貌'],[/民\s*族[：:\s]*([^\n,，|]+)/,'民族'],[/年\s*龄[：:\s]*(\d+)/,'年龄'],[/出生年月[：:\s]*([^\n,，|]+)/,'出生年月'],[/学\s*历[：:\s]*([^\n,，|]+)/,'学历']];
+            for (const [pat, label] of pats) {
+                const m = md.match(pat);
+                if (m) fields.push([label, m[1].trim()]);
+            }
+            if (!fields.find(f=>f[0]==='电话') && info['电话']) fields.push(['电话', info['电话']]);
+            if (!fields.find(f=>f[0]==='邮箱') && info['邮箱']) fields.push(['邮箱', info['邮箱']]);
         }
-        if (!fields.find(f=>f[0]==='电话') && info['电话']) fields.push(['电话', info['电话']]);
-        if (!fields.find(f=>f[0]==='邮箱') && info['邮箱']) fields.push(['邮箱', info['邮箱']]);
 
         // 个人信息网格（三列）
         let infoHtml = '';
