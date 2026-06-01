@@ -2470,25 +2470,56 @@
                 // 核心：将改写内容替换到 resumeData.markdown 中
                 const data = (window._diagReport && window._diagReport.sections) ? window._diagReport.sections[idx] : null;
                 if (data && data.original && resumeData.markdown) {
-                    // 用改写内容替换原文
                     const originalText = data.original.trim();
-                    if (resumeData.markdown.includes(originalText)) {
-                        resumeData.markdown = resumeData.markdown.replace(originalText, editedText.trim());
-                    } else {
-                        // 模糊匹配：取原文前30字符匹配
-                        const shortOrig = originalText.slice(0, 30);
-                        const lines = resumeData.markdown.split('\n');
+                    const lines = resumeData.markdown.split('\n');
+                    let replaced = false;
+
+                    // 策略1：精确包含 - 找到包含original片段的那一行，整行替换
+                    if (!replaced) {
                         for (let i = 0; i < lines.length; i++) {
-                            if (lines[i].includes(shortOrig) || shortOrig.includes(lines[i].trim().slice(0, 25))) {
+                            if (lines[i].includes(originalText)) {
                                 lines[i] = editedText.trim();
+                                replaced = true;
                                 break;
                             }
                         }
+                    }
+
+                    // 策略2：分段匹配 - original可能跨行或被截断，用前15字符找到起始行
+                    if (!replaced && originalText.length >= 8) {
+                        const searchKey = originalText.slice(0, 15);
+                        for (let i = 0; i < lines.length; i++) {
+                            if (lines[i].includes(searchKey)) {
+                                lines[i] = editedText.trim();
+                                replaced = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    // 策略3：反向匹配 - 用行内容的前15字符在original中查找
+                    if (!replaced && originalText.length >= 8) {
+                        for (let i = 0; i < lines.length; i++) {
+                            const lineContent = lines[i].trim().replace(/^[-•*]\s*/, '');
+                            if (lineContent.length >= 10 && originalText.includes(lineContent.slice(0, 15))) {
+                                lines[i] = editedText.trim();
+                                replaced = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (replaced) {
                         resumeData.markdown = lines.join('\n');
+                    } else {
+                        // 最后手段：直接在markdown末尾追加改写内容
+                        resumeData.markdown += '\n' + editedText.trim();
                     }
                     saveResumeData();
                     updateHomeResumeCard();
                     updateHomeDiagnosis();
+                    // 同步更新详情页渲染
+                    updateResumeDetailPage(resumeData.markdown);
                 }
 
                 // UI更新：查找诊断结果中对应的可点击区域并替换为采纳后高亮状态
