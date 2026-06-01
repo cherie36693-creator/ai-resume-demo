@@ -3718,17 +3718,29 @@
             const lines = md.split('\n');
             const data = { name: '', subtitle: '', skills: [], sections: [] };
             // 提取姓名（第一个一级标题，但排除非人名内容）
-            const notNameKeywords = ['求职','总结','简历','概述','个人概要','profile','summary','resume','objective','求职意向'];
+            const notNameKeywords = ['求职','总结','简历','概述','个人概要','profile','summary','resume','objective','求职意向',
+                '教育','经历','经验','技能','工作','项目','实习','背景','证书','奖项','评价','介绍','自我','活动','社团','培训','荣誉','基本信息','个人信息','联系方式'];
             const nameMatch = md.match(/^#\s*(.+)/m);
             if (nameMatch) {
-                const heading = nameMatch[1].trim();
-                const isNotName = notNameKeywords.some(k => heading.toLowerCase().includes(k)) || heading.length > 8;
+                const heading = nameMatch[1].trim().replace(/[■●◆▪▸►☆★]/g, '').trim();
+                const isNotName = notNameKeywords.some(k => heading.toLowerCase().includes(k)) || heading.length > 6;
                 if (!isNotName) {
                     data.name = heading;
                 } else {
-                    // 尝试从内容中找真实姓名（通常在"姓名："后面）
+                    // 尝试从内容中找真实姓名（通常在"姓名："后面，或第一行短文本）
                     const realName = md.match(/姓名[：:]\s*(.{2,4})/);
-                    if (realName) data.name = realName[1].trim();
+                    if (realName) {
+                        data.name = realName[1].trim();
+                    } else {
+                        // 尝试从前几行找2-4字的中文名
+                        for (const line of lines.slice(0, 10)) {
+                            const t = line.trim().replace(/^#+\s*/, '').replace(/[■●◆▪▸►☆★]/g, '').trim();
+                            if (/^[\u4e00-\u9fa5]{2,4}$/.test(t) && !notNameKeywords.some(k => t.includes(k))) {
+                                data.name = t;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
             // 提取副标题信息（优先提取求职意向/联系方式，其次取姓名后首行）
@@ -3775,30 +3787,41 @@
                     if (items) data.skills = items.slice(0, 4).map(s => s.replace(/^[-•*→]\s*/, '').trim().split(/[，,、]/)[0].slice(0, 10));
                 }
             }
-            // 按二级标题分段
+            // 按二级标题分段（一级标题也当作section分隔符）
             let currentSection = null;
+            let passedFirstHeading = false;
             for (const line of lines) {
                 const trimmed = line.trim();
                 if (trimmed.startsWith('## ')) {
                     if (currentSection) data.sections.push(currentSection);
-                    currentSection = { title: trimmed.slice(3).trim(), content: [] };
+                    const title = trimmed.slice(3).replace(/[■●◆▪▸►☆★]/g, '').trim();
+                    currentSection = { title, content: [] };
+                    passedFirstHeading = true;
                 } else if (trimmed.startsWith('### ')) {
-                    if (currentSection) currentSection.content.push({ type: 'subtitle', text: trimmed.slice(4).trim() });
+                    if (!currentSection) currentSection = { title: '概况', content: [] };
+                    currentSection.content.push({ type: 'subtitle', text: trimmed.slice(4).trim() });
                 } else if (trimmed.startsWith('# ') && !trimmed.startsWith('## ')) {
-                    // 如果这个一级标题不是姓名，当作section处理
-                    const h1Text = trimmed.slice(2).trim();
+                    const h1Text = trimmed.slice(2).replace(/[■●◆▪▸►☆★]/g, '').trim();
+                    // 一级标题如果不是姓名，当作section处理
                     if (h1Text !== data.name) {
                         if (currentSection) data.sections.push(currentSection);
                         currentSection = { title: h1Text, content: [] };
                     }
+                    passedFirstHeading = true;
                     continue;
-                } else if (trimmed && currentSection) {
+                } else if (trimmed) {
                     // 跳过图片行和分隔线
                     if (/^!\[.*\]\(.*\)$/.test(trimmed)) continue;
                     if (/^-{3,}$/.test(trimmed) || /^\*{3,}$/.test(trimmed)) continue;
                     // 移除行内图片引用
                     const cleanText = trimmed.replace(/!\[[^\]]*\]\([^)]+\)/g, '').trim();
                     if (!cleanText) continue;
+                    // 如果还没有section，创建一个默认section
+                    if (!currentSection) {
+                        // 跳过姓名行和副标题行（已由上面逻辑提取）
+                        if (!passedFirstHeading) continue;
+                        currentSection = { title: '基本信息', content: [] };
+                    }
                     currentSection.content.push({ type: 'line', text: cleanText });
                 }
             }
