@@ -4894,26 +4894,55 @@
                 const ld = document.getElementById('detail-loading');
                 if (ld) ld.remove();
 
-                // 用AI润色后的结构化内容组织markdown
-                const polishedMarkdown = `# ${resume.name || name}
-${resume.jobIntent || jobIntent} | ${resume.city || city} | ${resume.phone || phone} | ${resume.email || email}
+                // 用AI润色后的结构化内容组织markdown（空模块不展示）
+                let polishedParts = [`# ${resume.name || name}`];
+                const infoLine = [resume.jobIntent||jobIntent, resume.city||city, resume.phone||phone, resume.email||email].filter(Boolean).join(' | ');
+                if (infoLine) polishedParts.push(infoLine);
 
-## 教育经历
-${resume.education?.school || school} · ${resume.education?.major || major} · ${resume.education?.degree || degree} · ${resume.education?.time || eduTime}
+                const eduSchool = resume.education?.school || school;
+                const eduMajor = resume.education?.major || major;
+                const eduDegree = resume.education?.degree || degree;
+                const eduTimeVal = resume.education?.time || eduTime;
+                if (eduSchool || eduMajor) {
+                    polishedParts.push('\n## 教育经历');
+                    polishedParts.push([eduSchool, eduMajor, eduDegree, eduTimeVal].filter(Boolean).join(' · '));
+                }
 
-## 工作经历
-**${resume.work?.company || company}** · ${resume.work?.position || position} · ${resume.work?.time || workTime}
-${resume.work?.desc || workDesc}
+                const workCompany = resume.work?.company || company;
+                const workPos = resume.work?.position || position;
+                const workTimeVal = resume.work?.time || workTime;
+                const workDescVal = resume.work?.desc || workDesc;
+                if (workCompany || workPos || workDescVal) {
+                    polishedParts.push('\n## 工作经历');
+                    const workTitle = [workCompany ? `**${workCompany}**` : '', workPos, workTimeVal].filter(Boolean).join(' · ');
+                    if (workTitle) polishedParts.push(workTitle);
+                    if (workDescVal) polishedParts.push(workDescVal);
+                }
 
-## 项目经历
-**${resume.project?.name || projectName}** · ${resume.project?.role || projectRole} · ${resume.project?.time || projectTime}
-${resume.project?.desc || projectDesc}
+                const projName = resume.project?.name || projectName;
+                const projRole = resume.project?.role || projectRole;
+                const projTimeVal = resume.project?.time || projectTime;
+                const projDescVal = resume.project?.desc || projectDesc;
+                if (projName || projRole || projDescVal) {
+                    polishedParts.push('\n## 项目经历');
+                    const projTitle = [projName ? `**${projName}**` : '', projRole, projTimeVal].filter(Boolean).join(' · ');
+                    if (projTitle) polishedParts.push(projTitle);
+                    if (projDescVal) polishedParts.push(projDescVal);
+                }
 
-## 技能清单
-${(resume.skills || skills).join(' / ')}
+                const skillList = resume.skills || skills;
+                if (skillList.length > 0) {
+                    polishedParts.push('\n## 技能清单');
+                    polishedParts.push(skillList.join(' / '));
+                }
 
-## 自我评价
-${resume.selfEval || selfEval}`;
+                const selfEvalVal = resume.selfEval || selfEval;
+                if (selfEvalVal) {
+                    polishedParts.push('\n## 自我评价');
+                    polishedParts.push(selfEvalVal);
+                }
+
+                const polishedMarkdown = polishedParts.join('\n');
 
                 resumeData.markdown = polishedMarkdown;
                 resumeData.fileName = `${resume.name || name}-简历.pdf`;
