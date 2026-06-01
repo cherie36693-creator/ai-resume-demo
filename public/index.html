@@ -4467,6 +4467,18 @@
                 let usedSections = new Set();
                 let currentModule = '';
 
+                // 去重：如果AI返回了相同rewrite的多个section，只保留第一个
+                const seenRewrites = new Set();
+                const dedupedSections = [];
+                sections.forEach((sec, idx) => {
+                    const key = (sec.rewrite || '').slice(0, 30);
+                    if (key && seenRewrites.has(key)) return;
+                    if (key) seenRewrites.add(key);
+                    dedupedSections.push({ ...sec, _origIdx: idx });
+                });
+                // 用去重后的sections替换引用
+                const sectionsDeduped = dedupedSections;
+
                 let _nameSkipped = false;
                 let currentModuleSectionIdx = -1;
                 resumeLines.forEach(line => {
@@ -4482,6 +4494,8 @@
                         const moduleSection = sections.find((s, i) => !usedSections.has(i) && s.title && text.includes(s.title));
                         const moduleSectionIdx = moduleSection ? sections.indexOf(moduleSection) : -1;
                         currentModuleSectionIdx = moduleSectionIdx;
+                        // 标记为已使用，防止在补充建议中重复显示
+                        if (moduleSectionIdx >= 0) usedSections.add(moduleSectionIdx);
                         const moduleGood = goodSections.find(g => text.includes(g.title));
                         let badge = '';
                         let clickAttr = '';
@@ -4492,13 +4506,16 @@
                         else if (moduleGood) badge = '<span class="tag tag-green ml-1.5">良好</span>';
                         inlineHtml += `<div class="mt-3 mb-1.5"${clickAttr}><h4 class="text-[12px] font-bold text-blue-600 flex items-center">${text}${badge}</h4></div>`;
                     } else {
-                        // 检查是否匹配问题
+                        // 检查是否匹配问题（提高匹配精度，避免误匹配）
                         let matchedIdx = -1;
                         sections.forEach((sec, idx) => {
                             if (usedSections.has(idx)) return;
+                            if (matchedIdx >= 0) return; // 只匹配第一个
                             if (sec.original) {
-                                const orig = sec.original.slice(0, 20);
-                                if (trimmed.includes(orig) || orig.includes(trimmed.slice(0, 15))) {
+                                const orig = sec.original.slice(0, 40).trim();
+                                const lineStart = trimmed.slice(0, 40).trim();
+                                // 要求更严格的匹配：至少30字符重叠
+                                if (orig.length >= 10 && (trimmed.includes(orig.slice(0, 30)) || orig.includes(lineStart.slice(0, 30)))) {
                                     matchedIdx = idx;
                                 }
                             }
