@@ -4019,7 +4019,7 @@
         // 模板1: 简历本JLB-116风格 - 单栏，左侧蓝色竖条+蓝色图标段标题，右上角照片
         function renderSpring2024Template(data) {
             if (!data) return '';
-            const info = extractPersonalInfo(resumeData.markdown||'');
+            const info = extractPersonalInfo(window._currentRenderMarkdown||resumeData.markdown||'');
             const photo = getPhotoHtml(48,60,'border-radius:3px;');
             const cp = [];
             if (info['电话']) cp.push(info['电话']);
@@ -4048,7 +4048,7 @@
         // 模板2: 简历本JLB-109风格 - 单栏，彩色圆形图标+段标题，清新简约无照片
         function renderStudentTemplate(data) {
             if (!data) return '';
-            const info = extractPersonalInfo(resumeData.markdown||'');
+            const info = extractPersonalInfo(window._currentRenderMarkdown||resumeData.markdown||'');
             const infoItems = [];
             if (info['电话']) infoItems.push(info['电话']);
             if (info['邮箱']) infoItems.push(info['邮箱']);
@@ -4077,7 +4077,7 @@
         // 模板3: 简历本JLB-117风格 - 双栏，左侧绿色背景(照片+信息)，右侧白色主体
         function renderBluegrayTemplate(data) {
             if (!data) return '';
-            const info = extractPersonalInfo(resumeData.markdown||'');
+            const info = extractPersonalInfo(window._currentRenderMarkdown||resumeData.markdown||'');
             const photo = getPhotoHtml(56,68,'border-radius:4px;border:2px solid rgba(255,255,255,0.5);');
             let leftInfo = '';
             for (const k of ['电话','邮箱','学历','毕业院校','出生年月','所在地']) { if (info[k]) leftInfo+=`<div style="margin-bottom:6px;"><p style="font-size:7px;color:rgba(255,255,255,0.6);margin:0;">${k}</p><p style="font-size:8.5px;color:#fff;margin:1px 0 0;">${info[k]}</p></div>`; }
@@ -4108,7 +4108,7 @@
         // 模板4: 简历本JLB-106风格 - 双栏，左侧蓝色窄栏(图标列表)，右侧白色宽主体
         function renderGreensideTemplate(data) {
             if (!data) return '';
-            const info = extractPersonalInfo(resumeData.markdown||'');
+            const info = extractPersonalInfo(window._currentRenderMarkdown||resumeData.markdown||'');
             const photo = getPhotoHtml(44,54,'border-radius:3px;border:2px solid rgba(255,255,255,0.4);');
             let leftInfo = '';
             const leftItems = [['电话','📞'],['邮箱','✉'],['学历','🎓'],['毕业院校','🏫'],['出生年月','📅'],['所在地','📍']];
@@ -4139,7 +4139,7 @@
         // 模板5: 珊瑚粉渐变 - 圆角卡片式，温暖渐变色，适合创意/市场
         function renderNavybizTemplate(data) {
             if (!data) return '';
-            const info = extractPersonalInfo(resumeData.markdown||'');
+            const info = extractPersonalInfo(window._currentRenderMarkdown||resumeData.markdown||'');
             const photo = getPhotoHtml(50,62,'border:3px solid #fff;border-radius:12px;box-shadow:0 2px 8px rgba(244,63,94,0.3);');
             const cp = [info['电话'],info['邮箱'],info['毕业院校']].filter(Boolean);
             const colors = ['#f43f5e','#ec4899','#a855f7','#6366f1','#0ea5e9','#14b8a6'];
@@ -4164,7 +4164,7 @@
         // 模板6: 暗夜星空 - 深色背景+霓虹渐变高亮，科技感
         function renderTimelineTemplate(data) {
             if (!data) return '';
-            const info = extractPersonalInfo(resumeData.markdown||'');
+            const info = extractPersonalInfo(window._currentRenderMarkdown||resumeData.markdown||'');
             const photo = getPhotoHtml(46,56,'border:2px solid #818cf8;border-radius:50%;');
             const cp = [info['电话'],info['邮箱'],info['学历']].filter(Boolean);
             let secs = '';
@@ -4189,7 +4189,7 @@
         // 模板7: 彩虹侧栏 - 紫色渐变侧栏+技能进度条
         function renderMinimalTemplate(data) {
             if (!data) return '';
-            const info = extractPersonalInfo(resumeData.markdown||'');
+            const info = extractPersonalInfo(window._currentRenderMarkdown||resumeData.markdown||'');
             const photo = getPhotoHtml(52,64,'border:3px solid #fff;border-radius:50%;box-shadow:0 3px 10px rgba(0,0,0,0.2);');
             let leftInfo = '';
             for (const k of ['电话','邮箱','学历','毕业院校','出生年月']) { if (info[k]) leftInfo+=`<div style="margin-bottom:4px;"><p style="font-size:6.5px;color:rgba(255,255,255,0.6);margin:0;">${k}</p><p style="font-size:7.5px;color:#fff;margin:0;font-weight:500;">${info[k]}</p></div>`; }
@@ -4225,7 +4225,7 @@
         // 模板8: 翡翠几何 - 翡翠绿+金色几何装饰，顶部大横幅，卡片式布局
         function renderOrangeTemplate(data) {
             if (!data) return '';
-            const info = extractPersonalInfo(resumeData.markdown||'');
+            const info = extractPersonalInfo(window._currentRenderMarkdown||resumeData.markdown||'');
             const photo = getPhotoHtml(52,52,'border:3px solid #fbbf24;border-radius:50%;box-shadow:0 0 0 3px rgba(16,185,129,0.3);');
             let infoHtml = '';
             const infoItems = [];
@@ -4254,7 +4254,9 @@
         function updateResumeDetailPage(markdown) {
             const detailContainer = document.querySelector('#page-detail #detail-content');
             if (!detailContainer) return;
-            const data = parseResumeFromMarkdown(markdown || resumeData.markdown);
+            const md = markdown || resumeData.markdown;
+            window._currentRenderMarkdown = md;
+            const data = parseResumeFromMarkdown(md);
             if (!data) return;
             window._currentRenderName = data.name || '';
             const tplSpring = detailContainer.querySelector('.tpl-spring2024');
