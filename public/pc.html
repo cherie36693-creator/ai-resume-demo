@@ -2033,10 +2033,8 @@
             renderDocDetailContent(resumeData.markdown);
             addResumeToLibrary(resumeData.fileName.replace(/\.(pdf|docx?|png|jpe?g)$/i, ''), resumeData.markdown);
             addRecentDoc(resumeData.fileName.replace(/\.(pdf|docx?|png|jpe?g)$/i, ''), 'resume');
+            renderRecentDocs();
             showToast('简历解析成功！');
-            // 自动跳转到简历助手首页
-            goToMain('main-resume');
-            switchTab('tab-home');
         } catch(err) {
             if (importBody) {
                 importBody.innerHTML = `
