@@ -1513,20 +1513,20 @@
         if (Object.keys(aiSuggestions).length === 0) { showToast('无法提取可优化段落'); return; }
         renderInlineCards();
         // 调用 AI 为每个 suggestion 生成改写
-        const originals = Object.entries(aiSuggestions).map(([idx, s]) => ({ idx, original: s.original, label: s.label }));
-        const prompt = `你是简历优化专家。请对以下简历片段逐条改写优化，要求：量化数据、突出成果、使用STAR法则。每条改写不超过60字。输出纯JSON数组，格式：[{"idx":1,"rewrite":"改写内容"},...]`;
+        const originals = Object.entries(aiSuggestions).map(([idx, s]) => ({ idx: Number(idx), original: s.original, label: s.label }));
+        const prompt = `你是简历优化专家。请对以下简历片段逐条改写优化，要求：量化数据、突出成果、使用STAR法则。每条改写不超过60字。直接输出JSON对象（不要数组），格式：{"1":"改写内容","2":"改写内容","3":"改写内容"}`;
         const userMsg = originals.map(o => `${o.idx}. [${o.label}] ${o.original}`).join('\n');
         try {
             showToast('AI正在生成改写建议...');
             const raw = await callClaudeAPI(prompt, userMsg, 1024);
             const rewrites = robustJsonParse(raw);
-            if (Array.isArray(rewrites)) {
-                rewrites.forEach(r => {
-                    if (aiSuggestions[r.idx]) {
-                        aiSuggestions[r.idx].rewrite = r.rewrite;
-                        aiSuggestions[r.idx].alts = [r.rewrite];
+            if (rewrites && typeof rewrites === 'object') {
+                for (const [idx, text] of Object.entries(rewrites)) {
+                    if (aiSuggestions[idx] && typeof text === 'string') {
+                        aiSuggestions[idx].rewrite = text;
+                        aiSuggestions[idx].alts = [text];
                     }
-                });
+                }
             }
             renderInlineCards();
             showToast('AI改写建议已生成');
