@@ -2467,8 +2467,31 @@
         function acceptDiagEdit(idx) {
             const editedText = document.getElementById('diagEditArea')?.value;
             if (editedText) {
-                showToast('已采纳改写内容');
-                // 查找诊断结果中对应的可点击区域并替换为采纳后高亮状态
+                // 核心：将改写内容替换到 resumeData.markdown 中
+                const data = (window._diagReport && window._diagReport.sections) ? window._diagReport.sections[idx] : null;
+                if (data && data.original && resumeData.markdown) {
+                    // 用改写内容替换原文
+                    const originalText = data.original.trim();
+                    if (resumeData.markdown.includes(originalText)) {
+                        resumeData.markdown = resumeData.markdown.replace(originalText, editedText.trim());
+                    } else {
+                        // 模糊匹配：取原文前30字符匹配
+                        const shortOrig = originalText.slice(0, 30);
+                        const lines = resumeData.markdown.split('\n');
+                        for (let i = 0; i < lines.length; i++) {
+                            if (lines[i].includes(shortOrig) || shortOrig.includes(lines[i].trim().slice(0, 25))) {
+                                lines[i] = editedText.trim();
+                                break;
+                            }
+                        }
+                        resumeData.markdown = lines.join('\n');
+                    }
+                    saveResumeData();
+                    updateHomeResumeCard();
+                    updateHomeDiagnosis();
+                }
+
+                // UI更新：查找诊断结果中对应的可点击区域并替换为采纳后高亮状态
                 const allCards = document.querySelectorAll('#page-diagnosis .fade-in [onclick*="openDiagDrawer"]');
                 const targetCard = Array.from(allCards).find(el => el.getAttribute('onclick') === `openDiagDrawer(${idx})`);
                 if (targetCard) {
