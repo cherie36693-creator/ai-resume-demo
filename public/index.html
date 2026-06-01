@@ -5643,8 +5643,9 @@
                     <div class="space-y-3 overflow-y-auto pb-4" style="max-height: 520px;">
                         ${questionsHtml}
                     </div>
-                    <div class="pb-4 mt-2">
-                        <button class="w-full py-2.5 bg-gray-100 text-blue-500 text-[12px] font-medium rounded-xl" onclick="interviewGenerated=false; generateRealInterview()">重新生成</button>
+                    <div class="pb-4 mt-2 flex gap-2">
+                        <button class="flex-1 py-2.5 bg-blue-500 text-white text-[12px] font-medium rounded-xl" onclick="generateMoreInterview()">生成更多</button>
+                        <button class="flex-1 py-2.5 bg-gray-100 text-blue-500 text-[12px] font-medium rounded-xl" onclick="interviewGenerated=false; generateRealInterview()">重新生成</button>
                     </div>
                 `;
                 interviewGenerated = true;
@@ -5654,6 +5655,68 @@
                         <p class="text-[13px] text-red-500 mb-3">生成失败: ${err.message}</p>
                         <button class="px-6 py-2.5 bg-blue-500 text-white text-[12px] rounded-xl" onclick="interviewGenerated=false; generateRealInterview()">重试</button>
                     </div>`;
+            }
+        }
+
+        async function generateMoreInterview() {
+            if (!resumeData.markdown) { showToast('请先导入简历'); return; }
+            const listContainer = document.querySelector('#page-interview .fade-in .space-y-3');
+            if (!listContainer) { interviewGenerated = false; generateRealInterview(); return; }
+            const existingCount = listContainer.querySelectorAll('.bg-white').length;
+            // 在列表底部显示loading
+            const loadingEl = document.createElement('div');
+            loadingEl.className = 'flex items-center justify-center py-4';
+            loadingEl.innerHTML = '<div class="w-5 h-5 border-2 border-gray-200 border-t-blue-500 rounded-full" style="border-width:2px;animation:spin2 .8s linear infinite"></div><p class="text-[11px] text-gray-500 ml-2">生成更多问题...</p>';
+            listContainer.appendChild(loadingEl);
+            try {
+                const moreQ = await callClaudeAPI(
+                    `你是资深面试官。基于候选人简历再生成3个面试问题和参考答案（不要与之前重复）。输出严格JSON：
+{"questions":[{"id":1,"category":"分类","question":"问题","intent":"考察意图","answer":"参考答案100-150字"}]}
+- category从"简历深挖""行业认知""方法论""情景模拟""反问准备"中选
+- 字符串中不要有双引号和换行`,
+                    `简历：\n${resumeData.markdown.slice(0, 2000)}`
+                );
+                loadingEl.remove();
+                const data = robustJsonParse(moreQ);
+                if (data && data.questions) {
+                    const categoryColors = {
+                        '简历深挖': 'bg-blue-50 text-blue-600 border-blue-100',
+                        '行业认知': 'bg-emerald-50 text-emerald-600 border-emerald-100',
+                        '方法论': 'bg-purple-50 text-purple-600 border-purple-100',
+                        '情景模拟': 'bg-orange-50 text-orange-600 border-orange-100',
+                        '反问准备': 'bg-pink-50 text-pink-600 border-pink-100',
+                    };
+                    data.questions.forEach((q, i) => {
+                        const catClass = categoryColors[q.category] || 'bg-gray-50 text-gray-600 border-gray-100';
+                        const idx = existingCount + i + 1;
+                        const el = document.createElement('div');
+                        el.className = 'bg-white rounded-xl border border-gray-200 p-4 shadow-sm';
+                        el.innerHTML = `
+                            <div class="flex items-center gap-2 mb-2.5">
+                                <span class="w-6 h-6 rounded-full bg-blue-500 text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">${idx}</span>
+                                <span class="px-2 py-0.5 text-[10px] font-medium rounded-md border ${catClass}">${q.category}</span>
+                            </div>
+                            <p class="text-[13px] font-medium text-gray-900 leading-relaxed mb-2">${q.question}</p>
+                            <div class="bg-amber-50 rounded-lg px-3 py-2 mb-2 border border-amber-100">
+                                <p class="text-[10px] text-amber-700"><span class="font-medium">考察意图：</span>${q.intent}</p>
+                            </div>
+                            <div class="bg-green-50 rounded-lg border border-green-100 overflow-hidden">
+                                <div class="px-3 py-2 flex items-center justify-between cursor-pointer" onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('svg').classList.toggle('rotate-180')">
+                                    <p class="text-[10px] font-medium text-green-700">查看参考答案</p>
+                                    <svg class="w-3 h-3 text-green-500 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                </div>
+                                <div class="px-3 pb-2.5 hidden">
+                                    <p class="text-[11px] text-gray-700 leading-relaxed">${q.answer || '暂无参考答案'}</p>
+                                </div>
+                            </div>`;
+                        listContainer.appendChild(el);
+                    });
+                    // 滚动到新内容
+                    listContainer.parentElement.scrollTop = listContainer.parentElement.scrollHeight;
+                }
+            } catch(err) {
+                loadingEl.remove();
+                showToast('生成失败: ' + err.message);
             }
         }
 
