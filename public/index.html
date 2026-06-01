@@ -2704,7 +2704,6 @@
                 updateResumeDetailPage(resumeData.markdown);
 
                 goTo('page-detail');
-                setTimeout(() => { showToast('✓ 已生成「' + newVersionName + '」'); }, 300);
             }, 800);
         }
 
@@ -5059,7 +5058,6 @@ ${resume.selfEval || selfEval}`;
                 updateResumeDetailPage(resumeData.markdown);
             }
             goTo('page-detail');
-            showToast('已保存为新版本');
         }
 
         // ===== 统一预览模式 =====
@@ -5137,7 +5135,6 @@ ${resume.selfEval || selfEval}`;
             document.getElementById('detail-bar-preview').classList.add('hidden');
             const title = document.getElementById('detail-page-title');
             if (title) title.textContent = '简历详情';
-            showToast('已保存为新简历');
         }
 
         // ===== 多语翻译 - 真实Claude翻译 =====
@@ -5234,7 +5231,6 @@ ${resume.selfEval || selfEval}`;
                 updateResumeDetailPage(resumeData.markdown);
                 updateResumeNameUI();
                 goTo('page-detail');
-                showToast('已保存为新简历');
             }
         }
 
