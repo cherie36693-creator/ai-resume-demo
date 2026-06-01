@@ -4664,24 +4664,26 @@
                 const resumeRaw = `姓名：${name}\n求职意向：${jobIntent}\n电话：${phone}\n邮箱：${email}\n城市：${city}\n\n教育经历：\n${school} · ${major} · ${degree} · ${eduTime}\n\n工作经历：\n${company} · ${position} · ${workTime}\n${workDesc}\n\n项目经历：\n${projectName} · ${projectRole} · ${projectTime}\n${projectDesc}\n\n技能：${skills.join('、')}\n\n自我评价：\n${selfEval}`;
 
                 const polished = await callClaudeAPI(
-                    `你是专业简历撰写专家。请基于用户提供的原始信息，生成一份润色后的简历内容。
-要求：
-1. 保留所有原始信息，不要删除或编造
-2. 工作经历和项目经历用STAR法则改写，使用强动词（主导、搭建、推动、优化）
-3. 补充合理的量化数据（如用户给的信息不足，可适当推断）
-4. 自我评价要具有辨识度，突出核心能力
-5. 输出严格JSON格式（不要其他文字）：
+                    `你是专业简历撰写专家。请基于用户提供的原始信息进行适度润色。
+
+严格要求：
+1. **绝对不要编造任何信息**：不要虚构公司名、学校名、数据指标、经历细节
+2. 只对用户已提供的内容做表达优化（使用更专业的措辞、更清晰的结构）
+3. 工作/项目经历：在用户原文基础上润色表达，可以调整句式使其更专业，但不要添加用户没有提到的成果或数据
+4. 自我评价：在用户原文基础上稍作润色，保持原意，不要大改
+5. 如果某个字段用户没有填写（为空），就保持为空，不要编造
+6. 输出严格JSON格式（不要其他文字）：
 {
-  "name": "姓名",
-  "jobIntent": "求职意向",
-  "phone": "电话",
-  "email": "邮箱",
-  "city": "城市",
-  "education": {"school": "", "major": "", "degree": "", "time": ""},
-  "work": {"company": "", "position": "", "time": "", "desc": "润色后的工作描述（2-4条，每条一行）"},
-  "project": {"name": "", "role": "", "time": "", "desc": "润色后的项目描述（2-4条，每条一行）"},
-  "skills": ["技能1", "技能2", ...],
-  "selfEval": "润色后的自我评价"
+  "name": "姓名（原样保留）",
+  "jobIntent": "求职意向（原样保留）",
+  "phone": "电话（原样保留）",
+  "email": "邮箱（原样保留）",
+  "city": "城市（原样保留）",
+  "education": {"school": "原样", "major": "原样", "degree": "原样", "time": "原样"},
+  "work": {"company": "原样", "position": "原样", "time": "原样", "desc": "基于用户原文润色（不添加虚假数据）"},
+  "project": {"name": "原样", "role": "原样", "time": "原样", "desc": "基于用户原文润色（不添加虚假数据）"},
+  "skills": ["保留用户原有技能，可补充1-2个与求职方向相关的通用技能"],
+  "selfEval": "基于用户原文润色"
 }`,
                     resumeRaw
                 );
