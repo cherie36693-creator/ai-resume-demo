@@ -2864,6 +2864,8 @@
                 const arrowColor = isPrimary ? 'text-blue-300' : 'text-gray-300';
                 const tag = isPrimary ? '<span class="px-1.5 py-0.5 bg-blue-100 text-blue-600 text-[10px] rounded font-medium">主简历</span>' :
                     (item.template ? '<span class="text-[10px] text-gray-400">' + item.template + '</span>' : '<span class="text-[10px] text-gray-400">版本</span>');
+                const setPrimaryBtn = isPrimary ? '' :
+                    '<button class="px-2 py-1 bg-blue-50 text-blue-500 text-[10px] rounded border border-blue-100 flex-shrink-0" onclick="event.stopPropagation(); setAsPrimary(' + idx + ')">设为主简历</button>';
 
                 const card = document.createElement('div');
                 card.className = bgClass + ' border rounded-xl p-4 cursor-pointer hover:bg-gray-50 transition';
@@ -2875,6 +2877,7 @@
                     '<div class="flex-1 min-w-0"><p class="text-[13px] font-medium text-gray-800 truncate">' + item.name + '</p>' +
                     '<p class="text-[11px] text-gray-400 mt-0.5">' + (item.time === '当前' ? '当前使用中' : item.time) + '</p>' +
                     '<div class="flex items-center gap-2 mt-1.5">' + tag + '</div></div>' +
+                    setPrimaryBtn +
                     '<svg class="w-4 h-4 ' + arrowColor + ' flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>';
                 container.appendChild(card);
             });
@@ -2884,21 +2887,57 @@
             const item = allResumes[idx];
             if (!item) return;
             if (item.isPrimary) {
-                // 直接进入详情页
                 goTo('page-detail');
                 return;
             }
-            // 切换为当前简历
             resumeData.markdown = item.markdown;
             resumeData.fileName = item.name;
             if (item.template) {
                 window._showTemplateView = true;
             }
-            // 保存到localStorage
             try { localStorage.setItem('resume_assistant_data', JSON.stringify(resumeData)); } catch(e) {}
             updateResumeDetailPage(resumeData.markdown);
             updateHomeDiagnosis();
             goTo('page-detail');
+        }
+
+        function setAsPrimary(idx) {
+            // 收集所有简历（同renderResumeList逻辑）
+            const allResumes = [];
+            if (resumeData.markdown) {
+                let name = resumeData.fileName || '简历';
+                name = name.replace(/\.(pdf|docx?)$/i, '');
+                const nameMatch = resumeData.markdown.match(/^#\s*(.+)/m);
+                if (nameMatch && nameMatch[1].trim().length <= 8) name = nameMatch[1].trim() + '-简历';
+                allResumes.push({ name, markdown: resumeData.markdown, template: null, time: '当前', isPrimary: true });
+            }
+            let versions = [];
+            try { versions = JSON.parse(localStorage.getItem('resume_versions') || '[]'); } catch(e) {}
+            versions.forEach(v => allResumes.push({ name: v.name, markdown: v.markdown, template: v.template, time: v.time, isPrimary: false }));
+
+            const item = allResumes[idx];
+            if (!item || item.isPrimary) return;
+
+            // 将当前主简历降为版本
+            const oldPrimary = { name: resumeData.fileName || '简历', markdown: resumeData.markdown, template: null, time: new Date().toLocaleString('zh-CN') };
+            // 从versions中移除选中项
+            const vIdx = idx - 1; // versions索引 = allResumes索引 - 1（因为主简历占第0位）
+            if (vIdx >= 0 && vIdx < versions.length) {
+                versions.splice(vIdx, 1);
+            }
+            // 旧主简历加入versions
+            if (oldPrimary.markdown) versions.unshift(oldPrimary);
+
+            // 设置新主简历
+            resumeData.markdown = item.markdown;
+            resumeData.fileName = item.name;
+            saveResumeData();
+            try { localStorage.setItem('resume_versions', JSON.stringify(versions)); } catch(e) {}
+
+            updateHomeResumeCard();
+            updateHomeDiagnosis();
+            renderResumeList();
+            showToast('已设为主简历');
         }
 
         // 导入简历弹窗
