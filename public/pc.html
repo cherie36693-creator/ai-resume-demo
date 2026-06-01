@@ -1322,10 +1322,16 @@
                 // markdown 匹配：切换到模板渲染 + AI 标注
                 renderDocWithTemplate(doc, resumeData.markdown);
                 doc.classList.add('ai-panel-on');
-                if (Object.keys(aiSuggestions).length === 0 && resumeData.markdown) {
+                const needGenerate = Object.keys(aiSuggestions).length === 0 && resumeData.markdown;
+                if (needGenerate) {
                     generateAiSuggestionsForced();
                 }
                 injectAiMarks(doc);
+                // 如果改写内容还是占位符，自动调用AI生成
+                const firstSug = aiSuggestions[Object.keys(aiSuggestions)[0]];
+                if (firstSug && firstSug.rewrite.includes('点击')) {
+                    runAiDiagnosis();
+                }
             } else {
                 // markdown 不匹配（API 未解析）：保持原始文件，清空建议
                 doc.classList.add('ai-panel-on');
@@ -1483,9 +1489,34 @@
         container.innerHTML = html;
     }
 
-    // AI诊断入口（暂用Demo提示）
-    function runAiDiagnosis() {
-        showToast('AI诊断需要连接服务，请部署后使用');
+    // AI诊断入口 - 调用 AI 生成改写建议
+    async function runAiDiagnosis() {
+        if (!resumeData.markdown) { showToast('请先导入简历'); return; }
+        // 重新生成 suggestions
+        generateAiSuggestionsForced();
+        if (Object.keys(aiSuggestions).length === 0) { showToast('无法提取可优化段落'); return; }
+        renderInlineCards();
+        // 调用 AI 为每个 suggestion 生成改写
+        const originals = Object.entries(aiSuggestions).map(([idx, s]) => ({ idx, original: s.original, label: s.label }));
+        const prompt = `你是简历优化专家。请对以下简历片段逐条改写优化，要求：量化数据、突出成果、使用STAR法则。每条改写不超过60字。输出纯JSON数组，格式：[{"idx":1,"rewrite":"改写内容"},...]`;
+        const userMsg = originals.map(o => `${o.idx}. [${o.label}] ${o.original}`).join('\n');
+        try {
+            showToast('AI正在生成改写建议...');
+            const raw = await callClaudeAPI(prompt, userMsg, 1024);
+            const rewrites = robustJsonParse(raw);
+            if (Array.isArray(rewrites)) {
+                rewrites.forEach(r => {
+                    if (aiSuggestions[r.idx]) {
+                        aiSuggestions[r.idx].rewrite = r.rewrite;
+                        aiSuggestions[r.idx].alts = [r.rewrite];
+                    }
+                });
+            }
+            renderInlineCards();
+            showToast('AI改写建议已生成');
+        } catch(e) {
+            showToast('AI生成失败: ' + e.message);
+        }
     }
 
     function focusMark(idx) {
