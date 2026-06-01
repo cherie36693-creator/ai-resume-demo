@@ -1196,7 +1196,7 @@
     }
 
     async function parseFileWithTextIn(file) {
-        const params = new URLSearchParams({ parse_mode: 'auto', apply_document_tree: '1', table_flavor: 'html', get_image: 'none', markdown_details: '1' });
+        const params = new URLSearchParams({ parse_mode: 'auto', apply_document_tree: '1', table_flavor: 'html', get_image: 'objects', markdown_details: '1' });
         const buffer = await file.arrayBuffer();
         try {
             const resp = await fetch(`${API_CONFIG.TEXTIN_PARSE_URL}?${params}`, {
@@ -1206,6 +1206,22 @@
             });
             const result = await resp.json();
             if (result.code !== 200) throw new Error(result.message || '文档解析失败');
+            // 提取头像图片（通常是第一张小图）
+            const images = result.result?.images || result.result?.image_objects || [];
+            if (images.length > 0) {
+                // 找最可能是头像的图片（尺寸较小、偏正方形的）
+                let avatar = images[0];
+                for (const img of images) {
+                    const w = img.width || 100, h = img.height || 100;
+                    const ratio = Math.max(w, h) / Math.min(w, h);
+                    if (ratio < 1.8 && w < 500 && h < 500) { avatar = img; break; }
+                }
+                if (avatar && avatar.data) {
+                    resumeData.avatarDataUrl = `data:image/jpeg;base64,${avatar.data}`;
+                } else if (avatar && avatar.base64) {
+                    resumeData.avatarDataUrl = `data:image/jpeg;base64,${avatar.base64}`;
+                }
+            }
             return result.result?.markdown || '';
         } catch(e) {
             // Demo fallback: 当API不可用时，使用默认简历数据模拟解析成功
@@ -3827,6 +3843,9 @@
     }
 
     function getPhotoHtml(w, h, style) {
+        if (resumeData.avatarDataUrl) {
+            return `<img src="${resumeData.avatarDataUrl}" style="width:${w}px;height:${h}px;object-fit:cover;${style||''}" />`;
+        }
         const ini = (window._currentRenderName || resumeData.fileName || '?')[0];
         return `<div style="width:${w}px;height:${h}px;background:linear-gradient(135deg,#e8edf5,#dce4f0);display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #c8d4e3;${style||''}"><svg width="${Math.floor(w*0.5)}" height="${Math.floor(h*0.4)}" viewBox="0 0 24 24" fill="#8fa4bf"><circle cx="12" cy="8" r="4"/><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/></svg><span style="font-size:${Math.floor(h/6)}px;font-weight:600;color:#6b82a3;margin-top:2px;">${ini}</span></div>`;
     }
@@ -3860,7 +3879,9 @@
 
         // 姓名+照片+个人信息双栏
         const ini = (data.name || '?')[0];
-        const photoHtml = `<div style="width:80px;height:100px;background:#e8edf2;border-radius:4px;display:flex;align-items:center;justify-content:center;border:1px solid #d1d9e0;"><span style="font-size:32px;font-weight:700;color:#6b7fa3;">${ini}</span></div>`;
+        const photoHtml = resumeData.avatarDataUrl
+            ? `<img src="${resumeData.avatarDataUrl}" style="width:80px;height:100px;object-fit:cover;border-radius:4px;border:1px solid #d1d9e0;" />`
+            : `<div style="width:80px;height:100px;background:#e8edf2;border-radius:4px;display:flex;align-items:center;justify-content:center;border:1px solid #d1d9e0;"><span style="font-size:32px;font-weight:700;color:#6b7fa3;">${ini}</span></div>`;
 
         // 收集个人信息字段
         const infoFields = [];
