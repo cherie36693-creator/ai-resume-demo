@@ -1130,19 +1130,19 @@
                             <div class="bg-white rounded-xl border border-gray-200 p-3 space-y-2.5">
                                 <div class="flex items-center gap-2">
                                     <label class="text-[11px] text-gray-500 w-14 flex-shrink-0">公司</label>
-                                    <input type="text" value="基于ARM的4位密码锁" class="flex-1 text-[12px] text-gray-800 bg-gray-50 rounded-lg px-2.5 py-2 border border-gray-150 outline-none focus:border-blue-300">
+                                    <input type="text" placeholder="公司名称" class="flex-1 text-[12px] text-gray-800 bg-gray-50 rounded-lg px-2.5 py-2 border border-gray-150 outline-none focus:border-blue-300">
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <label class="text-[11px] text-gray-500 w-14 flex-shrink-0">职位</label>
-                                    <input type="text" value="产品经理" class="flex-1 text-[12px] text-gray-800 bg-gray-50 rounded-lg px-2.5 py-2 border border-gray-150 outline-none focus:border-blue-300">
+                                    <input type="text" placeholder="你的职位" class="flex-1 text-[12px] text-gray-800 bg-gray-50 rounded-lg px-2.5 py-2 border border-gray-150 outline-none focus:border-blue-300">
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <label class="text-[11px] text-gray-500 w-14 flex-shrink-0">时间</label>
-                                    <input type="text" value="2025.02-2025.06" class="flex-1 text-[12px] text-gray-800 bg-gray-50 rounded-lg px-2.5 py-2 border border-gray-150 outline-none focus:border-blue-300">
+                                    <input type="text" placeholder="如 2023.06-2024.06" class="flex-1 text-[12px] text-gray-800 bg-gray-50 rounded-lg px-2.5 py-2 border border-gray-150 outline-none focus:border-blue-300">
                                 </div>
                                 <div>
                                     <label class="text-[11px] text-gray-500 mb-1 block">工作内容</label>
-                                    <textarea rows="3" class="w-full text-[12px] text-gray-800 bg-gray-50 rounded-lg px-2.5 py-2 border border-gray-150 outline-none focus:border-blue-300 resize-none" placeholder="简要描述你的工作职责和成果">负责公司产品的用户增长工作，参与多个运营项目，协助团队完成KPI目标。</textarea>
+                                    <textarea rows="3" class="w-full text-[12px] text-gray-800 bg-gray-50 rounded-lg px-2.5 py-2 border border-gray-150 outline-none focus:border-blue-300 resize-none" placeholder="简要描述你的工作职责和成果（建议包含量化数据）" oninput="this.dataset.userEdited='1'"></textarea>
                                 </div>
                                 <button class="w-full flex items-center justify-center gap-1.5 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg text-[11px] text-blue-600 font-medium" onclick="showAIOptimize('work')">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
@@ -1160,19 +1160,19 @@
                             <div class="bg-white rounded-xl border border-gray-200 p-3 space-y-2.5">
                                 <div class="flex items-center gap-2">
                                     <label class="text-[11px] text-gray-500 w-14 flex-shrink-0">项目名</label>
-                                    <input type="text" value="基于ARM的4位密码锁" class="flex-1 text-[12px] text-gray-800 bg-gray-50 rounded-lg px-2.5 py-2 border border-gray-150 outline-none focus:border-blue-300">
+                                    <input type="text" placeholder="项目名称" class="flex-1 text-[12px] text-gray-800 bg-gray-50 rounded-lg px-2.5 py-2 border border-gray-150 outline-none focus:border-blue-300">
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <label class="text-[11px] text-gray-500 w-14 flex-shrink-0">角色</label>
-                                    <input type="text" value="产品负责人" class="flex-1 text-[12px] text-gray-800 bg-gray-50 rounded-lg px-2.5 py-2 border border-gray-150 outline-none focus:border-blue-300">
+                                    <input type="text" placeholder="你在项目中的角色" class="flex-1 text-[12px] text-gray-800 bg-gray-50 rounded-lg px-2.5 py-2 border border-gray-150 outline-none focus:border-blue-300">
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <label class="text-[11px] text-gray-500 w-14 flex-shrink-0">时间</label>
-                                    <input type="text" value="2024.03-06" class="flex-1 text-[12px] text-gray-800 bg-gray-50 rounded-lg px-2.5 py-2 border border-gray-150 outline-none focus:border-blue-300">
+                                    <input type="text" placeholder="如 2024.03-06" class="flex-1 text-[12px] text-gray-800 bg-gray-50 rounded-lg px-2.5 py-2 border border-gray-150 outline-none focus:border-blue-300">
                                 </div>
                                 <div>
                                     <label class="text-[11px] text-gray-500 mb-1 block">项目描述</label>
-                                    <textarea rows="3" class="w-full text-[12px] text-gray-800 bg-gray-50 rounded-lg px-2.5 py-2 border border-gray-150 outline-none focus:border-blue-300 resize-none" placeholder="简要描述项目背景、你的角色和成果">参与电商小程序项目，负责产品设计工作。</textarea>
+                                    <textarea rows="3" class="w-full text-[12px] text-gray-800 bg-gray-50 rounded-lg px-2.5 py-2 border border-gray-150 outline-none focus:border-blue-300 resize-none" placeholder="描述项目背景、你的角色和具体贡献" oninput="this.dataset.userEdited='1'"></textarea>
                                 </div>
                                 <button class="w-full flex items-center justify-center gap-1.5 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg text-[11px] text-blue-600 font-medium" onclick="showAIOptimize('project')">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
@@ -4876,6 +4876,20 @@
             '不确定': { title: '通用建议', tip: '每段经历包含：量化成果（数字+对比）、明确角色贡献、使用强动词（主导、搭建、推动）。' },
         };
 
+        const industryPlaceholders = {
+            '技术开发': { work: '负责XX系统后端架构设计与开发，日处理请求量XX万次，优化接口响应时间从XXms降至XXms', project: '独立开发XX模块，使用XX技术栈，支撑XX万用户并发访问' },
+            '产品/运营': { work: '负责XX产品从0到1搭建，主导用户增长策略，DAU从XX提升至XX，转化率提升XX%', project: '策划并执行XX活动，覆盖XX万用户，带来XX万GMV增长' },
+            '设计': { work: '负责XX产品的UI/UX设计，主导设计系统搭建，完成XX个核心页面改版，用户满意度提升XX%', project: '主导XX项目视觉设计，从用户调研到交互原型到视觉落地全流程参与' },
+            '销售/商务': { work: '负责XX区域大客户开拓与维护，年签约金额XX万，完成率XX%，团队排名前X', project: '开拓XX行业客户，签约XX家新客户，客户续约率达XX%' },
+            '教育培训': { work: '担任XX学科教师，周课时XX节，累计带班XX人，学员通过率XX%', project: '开发XX课程体系，学员评分提升XX分，竞赛获奖XX人次' },
+            '医疗/护理': { work: '在XX科室从事临床护理工作，科室XX张床位，日均护理XX人次，独立值班', project: '参与XX专科护理项目，负责PICC/导管维护，零差错完成XX例操作' },
+            '工程建筑': { work: '担任XX项目经理/技术负责人，项目造价XX万，建筑面积XX㎡，管理XX人团队', project: '负责XX工程施工管理，工期提前XX天完成，一次验收通过' },
+            '行政/人事': { work: '统筹XX人企业行政体系，年预算XX万，推动办公流程数字化，费用同比降XX%', project: '主导XX制度/SOP建设，引入XX系统，提升团队协作效率XX%' },
+            '财务/会计': { work: '负责XX家企业审计/XX亿资金管理，完成XX套账务处理，发现XX项风险', project: '搭建XX财务分析模型，月度报表产出时间缩短XX%' },
+            '制造机械': { work: '管理XX台设备/XX条产线，产品良品率XX%，工时缩短XX%', project: '主导XX工艺改进项目，合格率从XX%提升至XX%，成本降低XX%' },
+            '不确定': { work: '简要描述你的工作职责和成果（建议包含量化数据）', project: '描述项目背景、你的角色和具体贡献' },
+        };
+
         function selectIndustry(el) {
             // 切换选中状态
             document.querySelectorAll('#industryTagContainer .industry-tag').forEach(tag => {
@@ -4891,6 +4905,15 @@
                 document.getElementById('industryTipTitle').textContent = tipData.title;
                 document.getElementById('industryTipContent').textContent = tipData.tip;
                 tipEl.classList.remove('hidden');
+            }
+
+            // 更新textarea占位提示
+            const ph = industryPlaceholders[window._selectedIndustry];
+            if (ph) {
+                const page = document.getElementById('page-create');
+                const textareas = page.querySelectorAll('textarea');
+                if (textareas[0]) { textareas[0].placeholder = ph.work; if (!textareas[0].dataset.userEdited) textareas[0].value = ''; }
+                if (textareas[1]) { textareas[1].placeholder = ph.project; if (!textareas[1].dataset.userEdited) textareas[1].value = ''; }
             }
         }
 
