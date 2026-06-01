@@ -2831,6 +2831,7 @@
             // 保存到localStorage
             try { localStorage.setItem('resume_assistant_data', JSON.stringify(resumeData)); } catch(e) {}
             updateResumeDetailPage(resumeData.markdown);
+            updateHomeDiagnosis();
             goTo('page-detail');
             setTimeout(() => { showToast('已切换到「' + item.name + '」'); }, 300);
         }
@@ -3045,6 +3046,7 @@
                 saveResumeData();
                 updateResumeNameUI();
                 updateHomeResumeCard();
+                updateHomeDiagnosis();
                 updateResumeDetailPage(markdown);
                 if (typeof updateJdResumeThumbFromData === 'function') updateJdResumeThumbFromData();
                 showToast('简历导入成功');
@@ -4577,6 +4579,7 @@ ${resume.selfEval || selfEval}`;
                 resumeData.fileName = `${resume.name || name}-简历.pdf`;
                 saveResumeData();
                 updateHomeResumeCard();
+                updateHomeDiagnosis();
 
                 // 进入预览模式让用户确认保存
                 enterPreviewMode(polishedMarkdown, 'page-create');
@@ -4947,6 +4950,7 @@ ${resume.selfEval || selfEval}`;
                 resumeData.markdown = window._lastCustomResume;
                 saveResumeData();
                 updateHomeResumeCard();
+                updateHomeDiagnosis();
                 updateResumeDetailPage(resumeData.markdown);
             }
             goTo('page-detail');
@@ -5003,6 +5007,7 @@ ${resume.selfEval || selfEval}`;
                 resumeData.markdown = window._previewMarkdown;
                 saveResumeData();
                 updateHomeResumeCard();
+                updateHomeDiagnosis();
                 updateResumeDetailPage(resumeData.markdown);
                 updateResumeNameUI();
 
@@ -5120,6 +5125,7 @@ ${resume.selfEval || selfEval}`;
                 resumeData.markdown = window._lastTranslation;
                 saveResumeData();
                 updateHomeResumeCard();
+                updateHomeDiagnosis();
                 updateResumeDetailPage(resumeData.markdown);
                 updateResumeNameUI();
                 goTo('page-detail');
