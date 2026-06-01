@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI简历助手 - Demo v3 (行业改写+模版选择版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * { box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', sans-serif; }
@@ -3090,45 +3092,57 @@
 
         // ==================== 导出功能 ====================
         function getExportFileName() {
-            const base = (resumeData.fileName || '简历').replace(/\.(pdf|docx?|png|jpe?g)$/i, '');
-            return base;
+            return (resumeData.fileName || '简历').replace(/\.(pdf|docx?|png|jpe?g)$/i, '');
         }
 
         function getResumeHTMLForExport() {
-            // 获取当前显示的模板内容
             const detailContent = document.getElementById('detail-content');
             if (detailContent && !detailContent.classList.contains('hidden')) {
                 const activeTpl = detailContent.querySelector('.resume-tpl:not(.hidden)');
                 if (activeTpl && activeTpl.innerHTML.trim()) return activeTpl.innerHTML;
             }
-            // fallback: 用markdown渲染
             if (!resumeData.markdown) return '<p>暂无简历内容</p>';
             return markdownToHTML(resumeData.markdown);
+        }
+
+        function createExportContainer() {
+            const content = getResumeHTMLForExport();
+            const container = document.createElement('div');
+            container.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;padding:40px;background:white;font-family:-apple-system,PingFang SC,Microsoft YaHei,sans-serif;font-size:14px;line-height:1.6;color:#333;';
+            container.innerHTML = `<style>h1{font-size:22px;margin-bottom:8px;color:#1a1a1a;}h2{font-size:16px;margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid #e5e7eb;color:#1a1a1a;}h3{font-size:14px;margin:12px 0 4px;}p{margin:4px 0;}ul,ol{padding-left:20px;margin:4px 0;}li{margin:2px 0;}table{width:100%;border-collapse:collapse;margin:8px 0;}th,td{border:1px solid #e5e7eb;padding:6px 8px;text-align:left;font-size:13px;}th{background:#f9fafb;}</style>${content}`;
+            document.body.appendChild(container);
+            return container;
         }
 
         function exportAsPDF() {
             hideExportSheet();
             showToast('正在生成PDF...');
-            setTimeout(() => {
-                const content = getResumeHTMLForExport();
-                const printWin = window.open('', '_blank');
-                printWin.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${getExportFileName()}</title>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; padding: 40px; font-size: 14px; line-height: 1.6; color: #333; }
-h1 { font-size: 22px; margin-bottom: 8px; }
-h2 { font-size: 16px; margin: 16px 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e5e7eb; color: #1a1a1a; }
-h3 { font-size: 14px; margin: 12px 0 4px; }
-p { margin: 4px 0; }
-ul, ol { padding-left: 20px; margin: 4px 0; }
-li { margin: 2px 0; }
-table { width: 100%; border-collapse: collapse; margin: 8px 0; }
-th, td { border: 1px solid #e5e7eb; padding: 6px 8px; text-align: left; font-size: 13px; }
-th { background: #f9fafb; }
-@media print { body { padding: 20px; } }
-</style></head><body>${content}</body></html>`);
-                printWin.document.close();
-                setTimeout(() => { printWin.print(); }, 500);
+            setTimeout(async () => {
+                const container = createExportContainer();
+                try {
+                    const canvas = await html2canvas(container, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+                    document.body.removeChild(container);
+                    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const pdfWidth = 210;
+                    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                    let heightLeft = pdfHeight;
+                    let position = 0;
+                    pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight);
+                    heightLeft -= 297;
+                    while (heightLeft > 0) {
+                        position -= 297;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight);
+                        heightLeft -= 297;
+                    }
+                    pdf.save(getExportFileName() + '.pdf');
+                    showToast('PDF已下载');
+                } catch(e) {
+                    document.body.removeChild(container);
+                    showToast('导出失败: ' + e.message);
+                }
             }, 300);
         }
 
@@ -3139,103 +3153,37 @@ th { background: #f9fafb; }
                 const content = getResumeHTMLForExport();
                 const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
 <head><meta charset="utf-8"><title>${getExportFileName()}</title>
-<style>
-body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 12pt; line-height: 1.6; }
-h1 { font-size: 18pt; }
-h2 { font-size: 14pt; margin-top: 12pt; border-bottom: 1px solid #ccc; padding-bottom: 3pt; }
-h3 { font-size: 12pt; }
-table { border-collapse: collapse; width: 100%; }
-th, td { border: 1px solid #ccc; padding: 4pt 6pt; }
-</style></head><body>${content}</body></html>`;
-                const blob = new Blob([html], { type: 'application/msword' });
-                const url = URL.createObjectURL(blob);
+<style>body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;font-size:12pt;line-height:1.6;}h1{font-size:18pt;}h2{font-size:14pt;margin-top:12pt;border-bottom:1px solid #ccc;padding-bottom:3pt;}h3{font-size:12pt;}table{border-collapse:collapse;width:100%;}th,td{border:1px solid #ccc;padding:4pt 6pt;}</style></head><body>${content}</body></html>`;
+                const blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
                 const a = document.createElement('a');
-                a.href = url;
+                a.href = URL.createObjectURL(blob);
                 a.download = getExportFileName() + '.doc';
                 a.click();
-                URL.revokeObjectURL(url);
-                showToast('Word文件已下载');
+                URL.revokeObjectURL(a.href);
+                showToast('Word已下载');
             }, 300);
         }
 
         function exportAsImage() {
             hideExportSheet();
             showToast('正在生成图片...');
-            setTimeout(() => {
-                const content = getResumeHTMLForExport();
-                // 创建一个离屏容器渲染简历
-                const container = document.createElement('div');
-                container.style.cssText = 'position:fixed;left:-9999px;top:0;width:800px;padding:40px;background:white;font-family:-apple-system,PingFang SC,sans-serif;font-size:14px;line-height:1.6;color:#333;';
-                container.innerHTML = `<style>h1{font-size:22px;margin-bottom:8px;}h2{font-size:16px;margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid #e5e7eb;}h3{font-size:14px;margin:12px 0 4px;}p{margin:4px 0;}ul,ol{padding-left:20px;margin:4px 0;}li{margin:2px 0;}table{width:100%;border-collapse:collapse;margin:8px 0;}th,td{border:1px solid #e5e7eb;padding:6px 8px;text-align:left;font-size:13px;}th{background:#f9fafb;}</style>${content}`;
-                document.body.appendChild(container);
-
-                // 使用 html2canvas 如果可用，否则用 SVG foreignObject 方案
-                const width = container.offsetWidth;
-                const height = container.offsetHeight;
-
-                const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
-                    <foreignObject width="100%" height="100%">
-                        <div xmlns="http://www.w3.org/1999/xhtml" style="font-family:-apple-system,PingFang SC,sans-serif;font-size:14px;line-height:1.6;color:#333;padding:40px;">${content.replace(/</g,'<').replace(/>/g,'>') ? content : content}</div>
-                    </foreignObject>
-                </svg>`;
-
-                // 简单方案：直接用canvas绘制文本区域截图
-                // 更可靠的方案：把markdown导出为纯文本格式的图片
-                const canvas = document.createElement('canvas');
-                const scale = 2;
-                canvas.width = width * scale;
-                canvas.height = Math.min(height * scale, 8000);
-                const ctx = canvas.getContext('2d');
-                ctx.scale(scale, scale);
-                ctx.fillStyle = 'white';
-                ctx.fillRect(0, 0, width, height);
-
-                // 用img加载SVG
-                const img = new Image();
-                const svgBlob = new Blob([`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml">${container.innerHTML}</div></foreignObject></svg>`], {type: 'image/svg+xml'});
-                const svgUrl = URL.createObjectURL(svgBlob);
-
-                img.onload = function() {
-                    ctx.drawImage(img, 0, 0);
-                    URL.revokeObjectURL(svgUrl);
+            setTimeout(async () => {
+                const container = createExportContainer();
+                try {
+                    const canvas = await html2canvas(container, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
                     document.body.removeChild(container);
                     canvas.toBlob(function(blob) {
-                        const url = URL.createObjectURL(blob);
                         const a = document.createElement('a');
-                        a.href = url;
+                        a.href = URL.createObjectURL(blob);
                         a.download = getExportFileName() + '.png';
                         a.click();
-                        URL.revokeObjectURL(url);
+                        URL.revokeObjectURL(a.href);
                         showToast('图片已下载');
                     }, 'image/png');
-                };
-                img.onerror = function() {
-                    // SVG foreignObject 方案失败，fallback到纯文本图片
+                } catch(e) {
                     document.body.removeChild(container);
-                    ctx.font = '14px PingFang SC, sans-serif';
-                    ctx.fillStyle = '#333';
-                    const lines = (resumeData.markdown || '').split('\n');
-                    let y = 30;
-                    lines.forEach(line => {
-                        const clean = line.replace(/[#*_\-|]/g, '').trim();
-                        if (clean) {
-                            if (line.startsWith('#')) { ctx.font = 'bold 18px PingFang SC, sans-serif'; }
-                            else { ctx.font = '14px PingFang SC, sans-serif'; }
-                            ctx.fillText(clean, 20, y);
-                            y += 22;
-                        }
-                    });
-                    canvas.toBlob(function(blob) {
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = getExportFileName() + '.png';
-                        a.click();
-                        URL.revokeObjectURL(url);
-                        showToast('图片已下载');
-                    }, 'image/png');
-                };
-                img.src = svgUrl;
+                    showToast('导出失败: ' + e.message);
+                }
             }, 300);
         }
 
