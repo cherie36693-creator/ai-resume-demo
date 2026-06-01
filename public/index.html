@@ -2518,6 +2518,8 @@
                     updateHomeDiagnosis();
                     // 同步更新详情页渲染
                     updateResumeDetailPage(resumeData.markdown);
+                    // 采纳后刷新雷达图分值
+                    refreshRadarChart();
                 }
 
                 // UI更新：查找诊断结果中对应的可点击区域并替换为采纳后高亮状态
@@ -4394,6 +4396,57 @@
             return null;
         }
 
+        function calcResumeScores(md) {
+            md = md || resumeData.markdown || '';
+            const wordCount = md.length;
+            const hasSections = (md.match(/^##\s/gm) || []).length;
+            const sContent = Math.min(95, Math.round(30 + hasSections * 8 + Math.min(wordCount/50, 30)));
+            const quantMatches = (md.match(/\d+[\.\d]*\s*[%％万亿倍个人次篇条项]/g) || []).length + (md.match(/提升|增长|降低|完成|突破/g) || []).length;
+            const sQuantify = Math.min(95, Math.round(10 + quantMatches * 8));
+            const proWords = (md.match(/主导|搭建|推动|优化|负责|统筹|制定|建立|实现|设计|管理|开发/g) || []).length;
+            const sExpress = Math.min(95, Math.round(20 + proWords * 5));
+            const keywords = (md.match(/熟[练悉]|精通|掌握|证书|资格|认证|CET|CPA|PMP/g) || []).length;
+            const sKeyword = Math.min(95, Math.round(15 + keywords * 10 + (hasSections > 4 ? 20 : 0)));
+            const hasH1 = /^#\s/m.test(md);
+            const hasH2 = hasSections >= 3;
+            const hasBullets = /^[-•*]\s/m.test(md);
+            const sStruct = Math.min(95, Math.round((hasH1?25:0) + (hasH2?30:0) + (hasBullets?20:0) + Math.min(hasSections*3, 20)));
+            return [sContent, sQuantify, sExpress, sKeyword, sStruct];
+        }
+
+        function refreshRadarChart() {
+            const panel = document.querySelector('#page-diagnosis .score-panel-body');
+            if (!panel) return;
+            const scores = calcResumeScores();
+            const labels = ['内容完整度','量化数据','表达专业','关键词','结构'];
+            const cx=80, cy=70, R=55;
+            const angles = [-90, -18, 54, 126, 198].map(a => a * Math.PI / 180);
+            const dataPoints = scores.map((s, i) => {
+                const r = R * s / 100;
+                return [cx + r * Math.cos(angles[i]), cy + r * Math.sin(angles[i])];
+            });
+            const outerPoints = angles.map(a => [cx + R * Math.cos(a), cy + R * Math.sin(a)]);
+            const midPoints = angles.map(a => [cx + R*0.66 * Math.cos(a), cy + R*0.66 * Math.sin(a)]);
+            const innerPoints = angles.map(a => [cx + R*0.33 * Math.cos(a), cy + R*0.33 * Math.sin(a)]);
+            const toStr = pts => pts.map(p => p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+            const colorFor = s => s >= 70 ? ['bg-green-50 text-green-600','border-green-100'] : s >= 50 ? ['bg-yellow-50 text-yellow-700','border-yellow-100'] : ['bg-red-50 text-red-600','border-red-100'];
+            const labelPos = [[80,10,'middle'],[145,48,'start'],[130,115,'start'],[2,115,'start'],[5,48,'start']];
+            panel.innerHTML = `<div class="flex justify-center mb-3">
+                <svg width="160" height="140" viewBox="0 0 160 140">
+                    <polygon points="${toStr(outerPoints)}" fill="none" stroke="#E5E7EB" stroke-width="0.5"/>
+                    <polygon points="${toStr(midPoints)}" fill="none" stroke="#E5E7EB" stroke-width="0.5"/>
+                    <polygon points="${toStr(innerPoints)}" fill="none" stroke="#E5E7EB" stroke-width="0.5"/>
+                    ${angles.map((_,i) => `<line x1="${cx}" y1="${cy}" x2="${outerPoints[i][0].toFixed(1)}" y2="${outerPoints[i][1].toFixed(1)}" stroke="#E5E7EB" stroke-width="0.5"/>`).join('')}
+                    <polygon points="${toStr(dataPoints)}" fill="rgba(99,102,241,0.15)" stroke="#6366F1" stroke-width="1.5"/>
+                    ${dataPoints.map(p => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3" fill="#6366F1"/>`).join('')}
+                    ${labels.map((l,i) => `<text x="${labelPos[i][0]}" y="${labelPos[i][1]}" text-anchor="${labelPos[i][2]}" font-size="8" fill="#6B7280">${l}</text>`).join('')}
+                </svg>
+            </div>
+            <div class="flex flex-wrap justify-center gap-2">
+                ${labels.map((l,i) => { const c=colorFor(scores[i]); return `<span class="px-2 py-0.5 ${c[0]} text-[9px] rounded border ${c[1]}">${l} ${scores[i]}%</span>`; }).join('')}
+            </div>`;
+        }
+
         function toggleScorePanel(header) {
             const body = header.parentElement.querySelector('.score-panel-body');
             const arrow = header.querySelector('.score-arrow');
@@ -4482,10 +4535,11 @@
 若不属于以上行业，按通用策略改写：① 量化成果（数字+对比） ② 明确角色和贡献边界 ③ 使用强动词（主导、搭建、推动、优化）
 
 ## 输出格式
-{"industry":"识别到的行业","sections":[{"title":"模块名","level":"critical","hint":"问题简述","original":"原文片段","rewrite":"按行业策略改写后的专业表达"}]}
+{"industry":"识别到的行业","summary":"整体修改建议（1-2句话概括简历核心问题和优化方向，如：工作经历缺少量化成果，建议补充具体数据体现业务贡献）","sections":[{"title":"模块名","level":"critical","hint":"问题简述","original":"原文片段","rewrite":"按行业策略改写后的专业表达"}]}
 
 ## 规则
 - industry填写识别到的行业类型
+- summary概括简历整体问题和优化方向，语言简练有指导性
 - sections列出2-4个最需改写的模块
 - level只能是"critical"或"suggestion"
 - original必须是简历中的原文（完整复制该句，不截断不修改，不含引号和换行）
@@ -4654,28 +4708,7 @@
                         </div>
                         <div class="score-panel-body mt-3">
                             ${(function(){
-                                // 动态计算5维分值（基于简历实际内容）
-                                const md = resumeData.markdown || '';
-                                const wordCount = md.length;
-                                // 内容完整度：根据模块数量和字数
-                                const hasSections = (md.match(/^##\s/gm) || []).length;
-                                const sContent = Math.min(95, Math.round(30 + hasSections * 8 + Math.min(wordCount/50, 30)));
-                                // 量化数据：统计数字+量化词出现次数
-                                const quantMatches = (md.match(/\d+[\.\d]*\s*[%％万亿倍个人次篇条项]/g) || []).length + (md.match(/提升|增长|降低|完成|突破/g) || []).length;
-                                const sQuantify = Math.min(95, Math.round(10 + quantMatches * 8));
-                                // 表达专业度：强动词和专业词汇
-                                const proWords = (md.match(/主导|搭建|推动|优化|负责|统筹|制定|建立|实现|设计|管理|开发/g) || []).length;
-                                const sExpress = Math.min(95, Math.round(20 + proWords * 5));
-                                // 关键词匹配：技能/证书/工具关键词密度
-                                const keywords = (md.match(/熟[练悉]|精通|掌握|证书|资格|认证|CET|CPA|PMP/g) || []).length;
-                                const sKeyword = Math.min(95, Math.round(15 + keywords * 10 + (hasSections > 4 ? 20 : 0)));
-                                // 结构规范：标题层级、段落结构
-                                const hasH1 = /^#\s/m.test(md);
-                                const hasH2 = hasSections >= 3;
-                                const hasBullets = /^[-•*]\s/m.test(md);
-                                const sStruct = Math.round((hasH1?25:0) + (hasH2?30:0) + (hasBullets?20:0) + Math.min(hasSections*3, 20));
-                                const scores = [sContent, sQuantify, sExpress, sKeyword, sStruct];
-                                // 雷达图坐标计算（5个顶点，中心80,70，半径55）
+                                const scores = calcResumeScores();
                                 const cx=80, cy=70, R=55;
                                 const angles = [-90, -18, 54, 126, 198].map(a => a * Math.PI / 180);
                                 const dataPoints = scores.map((s, i) => {
@@ -4706,6 +4739,17 @@
                             })()}
                         </div>
                     </div>
+
+                    <!-- 整体修改建议 -->
+                    ${report.summary ? `<div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-3 mb-3 border border-blue-100">
+                        <div class="flex items-start gap-2">
+                            <span class="text-[14px] mt-0.5">💡</span>
+                            <div>
+                                <p class="text-[11px] font-semibold text-gray-800 mb-1">整体建议</p>
+                                <p class="text-[11px] text-gray-600 leading-relaxed">${report.summary}</p>
+                            </div>
+                        </div>
+                    </div>` : ''}
 
                     <!-- 诊断提示 -->
                     <div class="bg-blue-50 rounded-xl p-3 mb-3 border border-blue-100">
