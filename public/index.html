@@ -4737,19 +4737,17 @@
                                 ${labels.map((l,i) => { const c=colorFor(scores[i]); return `<span class="px-2 py-0.5 ${c[0]} text-[9px] rounded border ${c[1]}">${l} ${scores[i]}%</span>`; }).join('')}
                             </div>`;
                             })()}
+                            ${report.summary ? `<div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-3 mt-3 border border-blue-100">
+                                <div class="flex items-start gap-2">
+                                    <span class="text-[13px] mt-0.5">💡</span>
+                                    <div>
+                                        <p class="text-[11px] font-semibold text-gray-800 mb-1">整体建议</p>
+                                        <p class="text-[11px] text-gray-600 leading-relaxed">${report.summary}</p>
+                                    </div>
+                                </div>
+                            </div>` : ''}
                         </div>
                     </div>
-
-                    <!-- 整体修改建议 -->
-                    ${report.summary ? `<div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-3 mb-3 border border-blue-100">
-                        <div class="flex items-start gap-2">
-                            <span class="text-[14px] mt-0.5">💡</span>
-                            <div>
-                                <p class="text-[11px] font-semibold text-gray-800 mb-1">整体建议</p>
-                                <p class="text-[11px] text-gray-600 leading-relaxed">${report.summary}</p>
-                            </div>
-                        </div>
-                    </div>` : ''}
 
                     <!-- 诊断提示 -->
                     <div class="bg-blue-50 rounded-xl p-3 mb-3 border border-blue-100">
