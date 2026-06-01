@@ -4653,32 +4653,57 @@
                             <svg class="w-4 h-4 text-gray-400 transition-transform score-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </div>
                         <div class="score-panel-body mt-3">
-                            <div class="flex justify-center mb-3">
+                            ${(function(){
+                                // 动态计算5维分值（基于简历实际内容）
+                                const md = resumeData.markdown || '';
+                                const wordCount = md.length;
+                                // 内容完整度：根据模块数量和字数
+                                const hasSections = (md.match(/^##\s/gm) || []).length;
+                                const sContent = Math.min(95, Math.round(30 + hasSections * 8 + Math.min(wordCount/50, 30)));
+                                // 量化数据：统计数字+量化词出现次数
+                                const quantMatches = (md.match(/\d+[\.\d]*\s*[%％万亿倍个人次篇条项]/g) || []).length + (md.match(/提升|增长|降低|完成|突破/g) || []).length;
+                                const sQuantify = Math.min(95, Math.round(10 + quantMatches * 8));
+                                // 表达专业度：强动词和专业词汇
+                                const proWords = (md.match(/主导|搭建|推动|优化|负责|统筹|制定|建立|实现|设计|管理|开发/g) || []).length;
+                                const sExpress = Math.min(95, Math.round(20 + proWords * 5));
+                                // 关键词匹配：技能/证书/工具关键词密度
+                                const keywords = (md.match(/熟[练悉]|精通|掌握|证书|资格|认证|CET|CPA|PMP/g) || []).length;
+                                const sKeyword = Math.min(95, Math.round(15 + keywords * 10 + (hasSections > 4 ? 20 : 0)));
+                                // 结构规范：标题层级、段落结构
+                                const hasH1 = /^#\s/m.test(md);
+                                const hasH2 = hasSections >= 3;
+                                const hasBullets = /^[-•*]\s/m.test(md);
+                                const sStruct = Math.round((hasH1?25:0) + (hasH2?30:0) + (hasBullets?20:0) + Math.min(hasSections*3, 20));
+                                const scores = [sContent, sQuantify, sExpress, sKeyword, sStruct];
+                                // 雷达图坐标计算（5个顶点，中心80,70，半径55）
+                                const cx=80, cy=70, R=55;
+                                const angles = [-90, -18, 54, 126, 198].map(a => a * Math.PI / 180);
+                                const dataPoints = scores.map((s, i) => {
+                                    const r = R * s / 100;
+                                    return [cx + r * Math.cos(angles[i]), cy + r * Math.sin(angles[i])];
+                                });
+                                const outerPoints = angles.map(a => [cx + R * Math.cos(a), cy + R * Math.sin(a)]);
+                                const midPoints = angles.map(a => [cx + R*0.66 * Math.cos(a), cy + R*0.66 * Math.sin(a)]);
+                                const innerPoints = angles.map(a => [cx + R*0.33 * Math.cos(a), cy + R*0.33 * Math.sin(a)]);
+                                const toStr = pts => pts.map(p => p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+                                const colorFor = s => s >= 70 ? ['bg-green-50 text-green-600','border-green-100'] : s >= 50 ? ['bg-yellow-50 text-yellow-700','border-yellow-100'] : ['bg-red-50 text-red-600','border-red-100'];
+                                const labels = ['内容完整度','量化数据','表达专业','关键词','结构'];
+                                const labelPos = [[80,10,'middle'],[145,48,'start'],[130,115,'start'],[2,115,'start'],[5,48,'start']];
+                                return `<div class="flex justify-center mb-3">
                                 <svg width="160" height="140" viewBox="0 0 160 140">
-                                    <polygon points="80,15 135,45 125,105 35,105 25,45" fill="none" stroke="#E5E7EB" stroke-width="0.5"/>
-                                    <polygon points="80,30 120,52 113,95 47,95 40,52" fill="none" stroke="#E5E7EB" stroke-width="0.5"/>
-                                    <polygon points="80,45 105,60 100,85 60,85 55,60" fill="none" stroke="#E5E7EB" stroke-width="0.5"/>
-                                    <line x1="80" y1="70" x2="80" y2="15" stroke="#E5E7EB" stroke-width="0.5"/>
-                                    <line x1="80" y1="70" x2="135" y2="45" stroke="#E5E7EB" stroke-width="0.5"/>
-                                    <line x1="80" y1="70" x2="125" y2="105" stroke="#E5E7EB" stroke-width="0.5"/>
-                                    <line x1="80" y1="70" x2="35" y2="105" stroke="#E5E7EB" stroke-width="0.5"/>
-                                    <line x1="80" y1="70" x2="25" y2="45" stroke="#E5E7EB" stroke-width="0.5"/>
-                                    <polygon points="80,35 115,52 108,95 45,90 42,50" fill="rgba(99,102,241,0.15)" stroke="#6366F1" stroke-width="1.5"/>
-                                    <circle cx="80" cy="35" r="3" fill="#6366F1"/><circle cx="115" cy="52" r="3" fill="#6366F1"/><circle cx="108" cy="95" r="3" fill="#6366F1"/><circle cx="45" cy="90" r="3" fill="#6366F1"/><circle cx="42" cy="50" r="3" fill="#6366F1"/>
-                                    <text x="80" y="10" text-anchor="middle" font-size="8" fill="#6B7280">内容完整度</text>
-                                    <text x="142" y="48" text-anchor="start" font-size="8" fill="#6B7280">量化数据</text>
-                                    <text x="128" y="112" text-anchor="start" font-size="8" fill="#6B7280">表达专业度</text>
-                                    <text x="2" y="112" text-anchor="start" font-size="8" fill="#6B7280">关键词匹配</text>
-                                    <text x="5" y="48" text-anchor="start" font-size="8" fill="#6B7280">结构规范</text>
+                                    <polygon points="${toStr(outerPoints)}" fill="none" stroke="#E5E7EB" stroke-width="0.5"/>
+                                    <polygon points="${toStr(midPoints)}" fill="none" stroke="#E5E7EB" stroke-width="0.5"/>
+                                    <polygon points="${toStr(innerPoints)}" fill="none" stroke="#E5E7EB" stroke-width="0.5"/>
+                                    ${angles.map((_,i) => `<line x1="${cx}" y1="${cy}" x2="${outerPoints[i][0].toFixed(1)}" y2="${outerPoints[i][1].toFixed(1)}" stroke="#E5E7EB" stroke-width="0.5"/>`).join('')}
+                                    <polygon points="${toStr(dataPoints)}" fill="rgba(99,102,241,0.15)" stroke="#6366F1" stroke-width="1.5"/>
+                                    ${dataPoints.map(p => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3" fill="#6366F1"/>`).join('')}
+                                    ${labels.map((l,i) => `<text x="${labelPos[i][0]}" y="${labelPos[i][1]}" text-anchor="${labelPos[i][2]}" font-size="8" fill="#6B7280">${l}</text>`).join('')}
                                 </svg>
                             </div>
                             <div class="flex flex-wrap justify-center gap-2">
-                                <span class="px-2 py-0.5 bg-green-50 text-green-600 text-[9px] rounded border border-green-100">内容完整 78%</span>
-                                <span class="px-2 py-0.5 bg-red-50 text-red-600 text-[9px] rounded border border-red-100">量化数据 35%</span>
-                                <span class="px-2 py-0.5 bg-yellow-50 text-yellow-700 text-[9px] rounded border border-yellow-100">表达力 55%</span>
-                                <span class="px-2 py-0.5 bg-yellow-50 text-yellow-700 text-[9px] rounded border border-yellow-100">关键词 50%</span>
-                                <span class="px-2 py-0.5 bg-green-50 text-green-600 text-[9px] rounded border border-green-100">结构 72%</span>
-                            </div>
+                                ${labels.map((l,i) => { const c=colorFor(scores[i]); return `<span class="px-2 py-0.5 ${c[0]} text-[9px] rounded border ${c[1]}">${l} ${scores[i]}%</span>`; }).join('')}
+                            </div>`;
+                            })()}
                         </div>
                     </div>
 
