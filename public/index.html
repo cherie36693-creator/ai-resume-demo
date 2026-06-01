@@ -1027,18 +1027,24 @@
                         <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 mb-4 border border-blue-100">
                             <p class="text-[12px] font-semibold text-gray-800 mb-2">你想投什么类型的岗位？</p>
                             <p class="text-[10px] text-gray-500 mb-3">选择方向后，AI会针对性地引导你填写重点内容</p>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 transition">技术开发</span>
-                                <span class="px-2.5 py-1.5 bg-blue-500 text-white text-[10px] rounded-lg border border-blue-500 cursor-pointer">产品/运营</span>
-                                <span class="px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 transition">设计</span>
-                                <span class="px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 transition">销售/商务</span>
-                                <span class="px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 transition">教育培训</span>
-                                <span class="px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 transition">医疗/护理</span>
-                                <span class="px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 transition">工程建筑</span>
-                                <span class="px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 transition">行政/人事</span>
-                                <span class="px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 transition">财务/会计</span>
-                                <span class="px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 transition">制造机械</span>
-                                <span class="px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 transition">不确定</span>
+                            <div class="flex flex-wrap gap-2" id="industryTagContainer">
+                                <span class="industry-tag px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer transition" onclick="selectIndustry(this)">技术开发</span>
+                                <span class="industry-tag px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer transition" onclick="selectIndustry(this)">产品/运营</span>
+                                <span class="industry-tag px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer transition" onclick="selectIndustry(this)">设计</span>
+                                <span class="industry-tag px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer transition" onclick="selectIndustry(this)">销售/商务</span>
+                                <span class="industry-tag px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer transition" onclick="selectIndustry(this)">教育培训</span>
+                                <span class="industry-tag px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer transition" onclick="selectIndustry(this)">医疗/护理</span>
+                                <span class="industry-tag px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer transition" onclick="selectIndustry(this)">工程建筑</span>
+                                <span class="industry-tag px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer transition" onclick="selectIndustry(this)">行政/人事</span>
+                                <span class="industry-tag px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer transition" onclick="selectIndustry(this)">财务/会计</span>
+                                <span class="industry-tag px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer transition" onclick="selectIndustry(this)">制造机械</span>
+                                <span class="industry-tag px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer transition" onclick="selectIndustry(this)">不确定</span>
+                            </div>
+                            <div id="industryTip" class="mt-3 hidden">
+                                <div class="bg-white/80 rounded-lg p-2.5 border border-blue-100">
+                                    <p class="text-[10px] text-blue-700 font-medium mb-1" id="industryTipTitle"></p>
+                                    <p class="text-[10px] text-gray-600 leading-relaxed" id="industryTipContent"></p>
+                                </div>
                             </div>
                         </div>
 
@@ -4854,6 +4860,40 @@
         }
 
         // ===== AI生成简历 - 从表单收集数据并生成 =====
+        // 岗位方向选择
+        window._selectedIndustry = '';
+        const industryTips = {
+            '技术开发': { title: '技术岗重点', tip: '突出技术栈深度、项目规模（QPS/用户量）、性能优化成果、开源贡献。工作描述用"设计→实现→效果"结构。' },
+            '产品/运营': { title: '产品运营岗重点', tip: '强调数据驱动能力：GMV/DAU/转化率等核心指标，用"策略→执行→数据变化"三段式描述经历。' },
+            '设计': { title: '设计岗重点', tip: '突出设计方法论、用户研究能力、设计系统搭建经验。量化设计影响：点击率提升、用户满意度等。' },
+            '销售/商务': { title: '销售商务岗重点', tip: '突出业绩数据：签约金额、完成率、客户数、团队排名。强调客户开拓和维护能力。' },
+            '教育培训': { title: '教育岗重点', tip: '强调教学成果：学员通过率、评分提升、竞赛获奖。量化规模：周课时、累计带班人数。' },
+            '医疗/护理': { title: '医疗岗重点', tip: '资质前置：执业证书、专科认证。量化负荷：科室床位数、日均护理人次、独立值班能力。' },
+            '工程建筑': { title: '工程岗重点', tip: '三要素必写：造价金额+建筑面积+工期。明确角色和管理规模，突出安全质量记录。' },
+            '行政/人事': { title: '行政人事岗重点', tip: '从"做了什么"转为"优化了什么"：描述改进前后对比。强调规模（统筹人数）和降本效果。' },
+            '财务/会计': { title: '财务岗重点', tip: '量化管理规模：资金总额、账套数。突出风控成果和资质证书（CPA/初级等）。' },
+            '制造机械': { title: '制造岗重点', tip: '突出设备/产线规模、良品率、工艺改进成果。明确特种作业证和质量体系认证。' },
+            '不确定': { title: '通用建议', tip: '每段经历包含：量化成果（数字+对比）、明确角色贡献、使用强动词（主导、搭建、推动）。' },
+        };
+
+        function selectIndustry(el) {
+            // 切换选中状态
+            document.querySelectorAll('#industryTagContainer .industry-tag').forEach(tag => {
+                tag.className = 'industry-tag px-2.5 py-1.5 bg-white text-gray-600 text-[10px] rounded-lg border border-gray-200 cursor-pointer transition';
+            });
+            el.className = 'industry-tag px-2.5 py-1.5 bg-blue-500 text-white text-[10px] rounded-lg border border-blue-500 cursor-pointer transition';
+            window._selectedIndustry = el.textContent.trim();
+
+            // 显示行业提示
+            const tipData = industryTips[window._selectedIndustry];
+            const tipEl = document.getElementById('industryTip');
+            if (tipData && tipEl) {
+                document.getElementById('industryTipTitle').textContent = tipData.title;
+                document.getElementById('industryTipContent').textContent = tipData.tip;
+                tipEl.classList.remove('hidden');
+            }
+        }
+
         // 头像上传处理
         function handleAvatarUpload(input) {
             const file = input.files[0];
@@ -4940,8 +4980,11 @@
             try {
                 const resumeRaw = `姓名：${name}\n求职意向：${jobIntent}\n电话：${phone}\n邮箱：${email}\n城市：${city}\n\n教育经历：\n${school} · ${major} · ${degree} · ${eduTime}\n\n工作经历：\n${company} · ${position} · ${workTime}\n${workDesc}\n\n项目经历：\n${projectName} · ${projectRole} · ${projectTime}\n${projectDesc}\n\n技能：${skills.join('、')}\n\n自我评价：\n${selfEval}`;
 
+                const industryHint = window._selectedIndustry && window._selectedIndustry !== '不确定'
+                    ? `\n用户目标行业：${window._selectedIndustry}。请按该行业特点润色表达（使用行业术语、突出该行业看重的能力）。`
+                    : '';
                 const polished = await callClaudeAPI(
-                    `你是专业简历撰写专家。请基于用户提供的原始信息进行适度润色。
+                    `你是专业简历撰写专家。请基于用户提供的原始信息进行适度润色。${industryHint}
 
 严格要求：
 1. **绝对不要编造任何信息**：不要虚构公司名、学校名、数据指标、经历细节
