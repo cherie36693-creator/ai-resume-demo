@@ -4808,7 +4808,12 @@
                 `;
                 detailContent.appendChild(loadingDiv);
             }
+            // 设置预览模式防止goTo重新渲染旧简历
+            window._previewMode = true;
             goTo('page-detail');
+            // loading期间隐藏预览底部栏
+            document.getElementById('detail-bar-preview').classList.add('hidden');
+            document.getElementById('detail-bar-normal').classList.add('hidden');
 
             try {
                 const resumeRaw = `姓名：${name}\n求职意向：${jobIntent}\n电话：${phone}\n邮箱：${email}\n城市：${city}\n\n教育经历：\n${school} · ${major} · ${degree} · ${eduTime}\n\n工作经历：\n${company} · ${position} · ${workTime}\n${workDesc}\n\n项目经历：\n${projectName} · ${projectRole} · ${projectTime}\n${projectDesc}\n\n技能：${skills.join('、')}\n\n自我评价：\n${selfEval}`;
@@ -4876,9 +4881,11 @@ ${resume.selfEval || selfEval}`;
                 enterPreviewMode(polishedMarkdown, 'page-create');
 
             } catch(err) {
+                window._previewMode = false;
                 const ld2 = document.getElementById('detail-loading');
                 if (ld2) ld2.remove();
                 // 显示错误提示
+                const detailContent2 = document.querySelector('#page-detail #detail-content');
                 const errDiv = document.createElement('div');
                 errDiv.className = 'flex flex-col items-center justify-center py-16';
                 errDiv.innerHTML = `
