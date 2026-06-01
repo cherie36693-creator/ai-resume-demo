@@ -4050,9 +4050,8 @@
         }
         // 证件照
         function getPhotoHtml(w, h, borderStyle) {
-            const ini = (window._currentRenderName||'?')[0];
             if (window._resumePhotoBase64) return `<img src="${window._resumePhotoBase64}" style="width:${w}px;height:${h}px;object-fit:cover;display:block;${borderStyle||''}" />`;
-            return `<div style="width:${w}px;height:${h}px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;${borderStyle||''}"><span style="font-size:${Math.floor(h/3)}px;font-weight:700;color:#94a3b8;">${ini}</span></div>`;
+            return '';
         }
 
         // 模板1: 简历本JLB-116风格 - 单栏，左侧蓝色竖条+蓝色图标段标题，右上角照片
