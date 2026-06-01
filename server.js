@@ -60,10 +60,18 @@ function proxyRequest(targetUrl, req, body) {
 
 const server = http.createServer(async (req, res) => {
     // 静态页面
-    if (req.url === '/' || req.url === '/index.html') {
-        const html = fs.readFileSync(HTML_FILE, 'utf-8');
-        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-        res.end(html);
+    const urlPath = req.url.split('?')[0];
+    if (urlPath === '/' || urlPath === '/index.html' || urlPath === '/pc.html') {
+        const fileName = urlPath === '/' ? 'index.html' : urlPath.slice(1);
+        const filePath = path.join(__dirname, 'public', fileName);
+        try {
+            const html = fs.readFileSync(filePath, 'utf-8');
+            res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+            res.end(html);
+        } catch(e) {
+            res.writeHead(404, { 'Content-Type': 'text/plain' });
+            res.end('Not found');
+        }
         return;
     }
 
