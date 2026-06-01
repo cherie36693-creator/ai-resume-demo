@@ -4665,22 +4665,28 @@
             // 收集自我评价
             const selfEval = textareas[2]?.value || '';
 
-            // 跳转到详情页并显示loading
+            // 显示全屏loading页面
             const detailContent = document.querySelector('#page-detail #detail-content');
             const originalView = document.getElementById('detail-original-view');
             if (originalView) originalView.classList.add('hidden');
-            if (detailContent) detailContent.classList.remove('hidden');
-            detailContent.querySelectorAll('.resume-tpl').forEach(t => t.classList.add('hidden'));
-            const loadingDiv = document.createElement('div');
-            loadingDiv.id = 'detail-loading';
-            loadingDiv.innerHTML = `
-                <div class="flex flex-col items-center justify-center py-16">
-                    <div class="w-10 h-10 border-3 border-gray-200 border-t-blue-500 rounded-full animate-spin mb-4" style="border-width:3px;"></div>
-                    <p class="text-[13px] font-medium text-gray-700">AI正在生成简历...</p>
-                    <p class="text-[11px] text-gray-400 mt-1">润色表达、优化结构</p>
-                </div>
-            `;
-            detailContent.appendChild(loadingDiv);
+            if (detailContent) {
+                detailContent.classList.remove('hidden');
+                detailContent.querySelectorAll('.resume-tpl').forEach(t => t.classList.add('hidden'));
+                // 清空已有内容，只显示loading
+                const existingLoading = document.getElementById('detail-loading');
+                if (existingLoading) existingLoading.remove();
+                const loadingDiv = document.createElement('div');
+                loadingDiv.id = 'detail-loading';
+                loadingDiv.style.cssText = 'position:absolute;inset:0;background:#fff;z-index:10;display:flex;align-items:center;justify-content:center;';
+                loadingDiv.innerHTML = `
+                    <div class="flex flex-col items-center justify-center">
+                        <div class="w-12 h-12 border-3 border-gray-200 border-t-blue-500 rounded-full animate-spin mb-4" style="border-width:3px;"></div>
+                        <p class="text-[14px] font-medium text-gray-700">AI正在生成简历...</p>
+                        <p class="text-[12px] text-gray-400 mt-2">润色表达、优化结构</p>
+                    </div>
+                `;
+                detailContent.appendChild(loadingDiv);
+            }
             goTo('page-detail');
 
             try {
