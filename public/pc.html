@@ -1329,29 +1329,18 @@
             btn.className = 'flex items-center gap-1.5 px-3 py-1 text-xs text-white bg-blue-500 rounded font-medium hover:bg-blue-600 transition-colors';
             document.getElementById("btn-ai-resume-text").textContent = "AI 简历助手";
 
-            // 检查 markdown 是否和当前文件匹配
-            const mdIsDefault = resumeData.markdown && resumeData.markdown.includes('杨雪靖');
-            const fileIsDefault = !resumeData.fileDataUrl || (resumeData.fileName || '').includes('杨雪靖');
-            const mdMatchesFile = fileIsDefault || !mdIsDefault;
-
-            if (mdMatchesFile) {
-                // markdown 匹配：切换到模板渲染 + AI 标注
-                renderDocWithTemplate(doc, resumeData.markdown);
-                doc.classList.add('ai-panel-on');
-                const needGenerate = Object.keys(aiSuggestions).length === 0 && resumeData.markdown;
-                if (needGenerate) {
-                    generateAiSuggestionsForced();
-                }
-                injectAiMarks(doc);
-                // 如果改写内容还是占位符，自动调用AI生成
-                const firstSug = aiSuggestions[Object.keys(aiSuggestions)[0]];
-                if (firstSug && firstSug.rewrite.includes('点击')) {
-                    runAiDiagnosis();
-                }
-            } else {
-                // markdown 不匹配（API 未解析）：保持原始文件，清空建议
-                doc.classList.add('ai-panel-on');
-                aiSuggestions = {};
+            // 始终切换到 markdown 模板渲染 + AI 标注
+            renderDocWithTemplate(doc, resumeData.markdown);
+            doc.classList.add('ai-panel-on');
+            const needGenerate = Object.keys(aiSuggestions).length === 0 && resumeData.markdown;
+            if (needGenerate) {
+                generateAiSuggestionsForced();
+            }
+            injectAiMarks(doc);
+            // 如果改写内容还是占位符，自动调用AI生成
+            const firstSug = aiSuggestions[Object.keys(aiSuggestions)[0]];
+            if (firstSug && firstSug.rewrite.includes('点击')) {
+                runAiDiagnosis();
             }
             cardsArea.style.display = 'block';
             if (featurePanel) featurePanel.style.display = 'block';
