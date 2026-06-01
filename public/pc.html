@@ -67,6 +67,12 @@
 <body class="bg-white">
     <!-- Toast -->
     <div class="toast" id="toast"></div>
+    <!-- Global Import Loading Overlay -->
+    <div id="import-loading-overlay" style="display:none; position:fixed; inset:0; background:rgba(255,255,255,0.85); z-index:9998; align-items:center; justify-content:center; flex-direction:column;">
+        <div style="width:48px; height:48px; border:4px solid #e5e7eb; border-top-color:#3b82f6; border-radius:50%; animation:spin 0.8s linear infinite; margin-bottom:16px;"></div>
+        <p id="import-loading-text" style="font-size:14px; color:#374151; font-weight:500;">正在导入文档...</p>
+        <p style="font-size:12px; color:#9ca3af; margin-top:6px;">AI正在识别文档内容</p>
+    </div>
 
     <!-- Window Chrome -->
     <div class="h-[38px] bg-[#f5f5f5] border-b border-gray-200 flex items-center px-4 select-none">
@@ -114,7 +120,7 @@
                 <div class="page active" id="main-home">
                     <div class="max-w-[960px] mx-auto py-8 px-6 fade-in">
                         <!-- Upload Area -->
-                        <div class="border-2 border-dashed border-gray-200 rounded-2xl py-12 text-center mb-8 hover:border-blue-300 transition-colors cursor-pointer" onclick="document.getElementById('fileInput').click()">
+                        <div id="home-upload-area" class="border-2 border-dashed border-gray-200 rounded-2xl py-12 text-center mb-8 hover:border-blue-300 transition-colors cursor-pointer" onclick="document.getElementById('fileInput').click()" ondragover="event.preventDefault(); this.classList.add('border-blue-400','bg-blue-50')" ondragleave="this.classList.remove('border-blue-400','bg-blue-50')" ondrop="event.preventDefault(); this.classList.remove('border-blue-400','bg-blue-50'); handleDropUpload(event)">
                             <div class="flex justify-center mb-4">
                                 <div class="relative">
                                     <div class="w-16 h-20 bg-gray-100 rounded-lg border border-gray-200"></div>
@@ -128,13 +134,13 @@
                         </div>
                         <!-- Action Buttons -->
                         <div class="grid grid-cols-3 gap-4 mb-8">
-                            <button class="flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl hover:bg-gray-50">
+                            <button class="flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl hover:bg-gray-50" onclick="document.getElementById('fileInput').click()">
                                 <span class="text-lg">📷</span><span class="text-sm text-gray-700">智能扫描</span>
                             </button>
-                            <button class="flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl hover:bg-gray-50">
+                            <button class="flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl hover:bg-gray-50" onclick="document.getElementById('fileInput').click()">
                                 <span class="text-lg">🖼️</span><span class="text-sm text-gray-700">导入图片</span>
                             </button>
-                            <button class="flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl hover:bg-gray-50">
+                            <button class="flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl hover:bg-gray-50" onclick="document.getElementById('fileInput').click()">
                                 <span class="text-lg">📄</span><span class="text-sm text-gray-700">导入文档</span>
                             </button>
                         </div>
@@ -181,32 +187,20 @@
                             <span class="text-xs text-gray-400 cursor-pointer hover:text-blue-500">查看所有文档 ›</span>
                         </div>
                         <div class="grid grid-cols-4 gap-4" id="recent-docs-grid">
-                            <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onclick="openResumeFromDoc('杨雪靖_儿科学硕士简历.pdf')">
-                                <div class="h-[140px] bg-gray-50 flex items-center justify-center"><span class="text-3xl">📋</span></div>
+                            <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onclick="openResumeFromDoc('杨雪靖_儿科学硕士简历')">
+                                <div class="h-[140px] bg-gray-50" style="padding:8px 10px; overflow:hidden;">
+                                    <div style="font-size:7px;font-weight:bold;color:#1f2937;margin:2px 0 1px;">杨雪靖</div>
+                                    <div style="font-size:6px;color:#6b7280;line-height:1.6;">儿科学硕士研究生 | 南京医科大学</div>
+                                    <div style="font-size:6px;color:#6b7280;line-height:1.6;">13260567861 | yangxuejing07@163.com</div>
+                                    <div style="font-size:7px;font-weight:bold;color:#1f2937;margin:3px 0 1px;">教育背景</div>
+                                    <div style="font-size:6px;color:#6b7280;line-height:1.6;">江汉大学 临床医学</div>
+                                    <div style="font-size:6px;color:#6b7280;line-height:1.6;">南京医科大学 儿科学</div>
+                                    <div style="font-size:7px;font-weight:bold;color:#1f2937;margin:3px 0 1px;">规培经历</div>
+                                    <div style="font-size:6px;color:#6b7280;line-height:1.6;">南京医科大学附属儿童医院</div>
+                                </div>
                                 <div class="p-3 border-t border-gray-100">
                                     <p class="text-xs font-medium text-gray-700 truncate">杨雪靖_儿科学硕士简历</p>
-                                    <p class="text-xs text-gray-400 mt-1">14:57</p>
-                                </div>
-                            </div>
-                            <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
-                                <div class="h-[140px] bg-gray-50 flex items-center justify-center"><span class="text-4xl text-orange-500 font-bold">P</span></div>
-                                <div class="p-3 border-t border-gray-100">
-                                    <p class="text-xs font-medium text-gray-700 truncate">ahhhh</p>
-                                    <p class="text-xs text-gray-400 mt-1">14:24</p>
-                                </div>
-                            </div>
-                            <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
-                                <div class="h-[140px] bg-gray-50 flex items-center justify-center"><span class="text-3xl">📄</span></div>
-                                <div class="p-3 border-t border-gray-100">
-                                    <p class="text-xs font-medium text-gray-700 truncate">31060125_03348...</p>
-                                    <p class="text-xs text-gray-400 mt-1">14:24</p>
-                                </div>
-                            </div>
-                            <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
-                                <div class="h-[140px] bg-gray-50 flex items-center justify-center"><span class="text-4xl text-green-600 font-bold">X</span></div>
-                                <div class="p-3 border-t border-gray-100">
-                                    <p class="text-xs font-medium text-gray-700 truncate">草稿</p>
-                                    <p class="text-xs text-gray-400 mt-1">14:15</p>
+                                    <p class="text-xs text-gray-400 mt-1">17:02</p>
                                 </div>
                             </div>
                         </div>
@@ -301,7 +295,7 @@
                                         <!-- Panel: AI诊断 -->
                                         <div id="panel-content-diagnosis">
                                             <!-- Radar Chart -->
-                                            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 mb-3">
+                                            <div id="radar-card" class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 mb-3">
                                                 <div class="flex items-center gap-1.5 mb-1">
                                                     <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                                                     <span class="text-xs font-medium text-gray-800">综合评分</span>
@@ -1144,7 +1138,9 @@
 
     <script>
     // ==================== API Config ====================
-    const PROXY_BASE = '';
+    const PROXY_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+        ? 'http://localhost:3456'
+        : location.origin;
     const API_CONFIG = {
         TEXTIN_APP_ID: 'def2a5dc9635069cff5698b74e16433f',
         TEXTIN_SECRET_CODE: '864abdb8d34cc2c6b0ea4f5646774c3f',
@@ -1243,11 +1239,68 @@
     }
 
     // === AI Inline Edit System (Google Docs style) ===
-    const aiSuggestions = {
-        1: { label: '规培经历 · 临床轮转', original: '1. 在PICU、NICU、新生儿科、心血管内科、肾脏科、血液肿瘤科、神经内科、呼吸内科、消化内科、儿童保健科等完成系统轮转。', rewrite: '系统完成PICU、NICU等10余个亚专科轮转，独立管理5-6张床位，累计诊疗患儿300余例，患者满意度98%以上，获各科室带教老师一致好评', alts: ['在PICU/NICU等核心科室系统轮转，掌握儿童常见病及危重症处理流程，独立完成入院评估与治疗方案制定', '完成规培轮转10余科室，重点在PICU积累危重症处理经验，参与抢救10余例，全部成功脱机/出院'], level: 'must' },
-        2: { label: '临床管理 · 工作描述', original: '2. 在上级医师指导下独立管理住院患儿，平均负责5-6张床位，掌握各种常见病、多发病的诊疗思路，能够独立完成入院记录、病程记录、手术记录等各类医疗文书书写，全面参与病情评估、诊疗方案制定、医嘱执行及医患沟通，保障治疗的及时性与规范性。患者满意度高，受到各个科室带教老师的一致好评。', rewrite: '独立管理住院患儿5-6张床位，累计诊疗300余例，覆盖儿内科常见病及多发病。全面负责入院评估、诊疗方案制定、医疗文书撰写及医患沟通全流程，患者满意度98%以上，获各科室带教老师一致好评。', alts: ['在上级医师指导下全权管理5-6张床位，独立完成病历书写与诊疗方案，累计管理住院患儿300余例，多次被评为优秀规培生', '规培期间独立负责病区5-6张床位管理，系统掌握儿内科常见病/多发病诊治，患者满意度高，临床综合能力获各轮转科室认可'], level: 'must' },
-        3: { label: '临床操作 · 急救能力', original: '4. 累积协助抢救危重病人10余例，熟练操作心电图机、心电监护仪、除颤仪等设备，能够独立完成心电图判读，并结合实验室及影像学结果进行初步诊断分析。', rewrite: '累计协助抢救危重患儿10余例（成功率100%），熟练操作心电图机、心电监护仪、除颤仪、呼吸机等设备，独立完成心电图判读与影像学初步诊断，多次获得上级医师认可。', alts: ['参与危重症抢救10余例，掌握心肺复苏、气管插管辅助、除颤等急救操作，具备独立判读心电图及影像学报告的能力', '累计参与危重患儿抢救10+例，熟练使用监护/除颤/呼吸支持设备，能结合实验室与影像结果进行快速临床决策'], level: 'suggest' }
-    };
+    let aiSuggestions = {};
+
+    // 根据当前简历内容生成诊断建议（从 markdown 提取关键段落）
+    function generateAiSuggestions() {
+        aiSuggestions = {};
+        const md = resumeData.markdown || '';
+        if (!md) return;
+        // 如果有原始文件但 markdown 是 fallback 默认数据，不生成建议
+        if (resumeData.fileDataUrl && md.includes('杨雪靖') && !resumeData.fileName.includes('杨雪靖')) {
+            return; // markdown 和实际文档不匹配，不显示错误的建议
+        }
+        // 提取可优化的段落（长度>30字的正文行）
+        const lines = md.split('\n').filter(l => {
+            const t = l.trim();
+            if (!t || t.startsWith('#') || t === '---') return false;
+            if (t.length < 30) return false;
+            if (/^[-*•]/.test(t)) return t.length > 35;
+            return true;
+        });
+        // 取前3个最长的段落作为诊断目标
+        const sorted = lines.sort((a, b) => b.length - a.length).slice(0, 3);
+        const labels = ['工作描述 · 量化数据', '经历描述 · 表达优化', '技能描述 · 成果导向'];
+        sorted.forEach((line, i) => {
+            const clean = line.replace(/^[-*•]\s*/, '').replace(/^\d+[.、]\s*/, '');
+            aiSuggestions[i + 1] = {
+                label: labels[i] || '内容优化',
+                original: clean,
+                rewrite: '（点击"AI优化"生成改写建议）',
+                alts: [],
+                level: i === 0 ? 'must' : 'suggest'
+            };
+        });
+    }
+
+    // 强制生成（用于 AI 面板激活时，忽略 fallback 检查）
+    function generateAiSuggestionsForced() {
+        aiSuggestions = {};
+        const md = resumeData.markdown || '';
+        if (!md) return;
+        const lines = md.split('\n').filter(l => {
+            const t = l.trim();
+            if (!t || t.startsWith('#') || t === '---') return false;
+            if (t.length < 30) return false;
+            if (/^[-*•]/.test(t)) return t.length > 35;
+            return true;
+        });
+        const sorted = lines.sort((a, b) => b.length - a.length).slice(0, 3);
+        const labels = ['工作描述 · 量化数据', '经历描述 · 表达优化', '技能描述 · 成果导向'];
+        sorted.forEach((line, i) => {
+            const clean = line.replace(/^[-*•]\s*/, '').replace(/^\d+[.、]\s*/, '');
+            aiSuggestions[i + 1] = {
+                label: labels[i],
+                original: clean,
+                rewrite: '（点击"AI优化"生成改写建议）',
+                alts: [],
+                level: i === 0 ? 'must' : 'suggest'
+            };
+        });
+    }
+
+    // 初始化默认简历的建议
+    generateAiSuggestions();
     let aiPanelActive = false;
 
     function toggleAiResumePanel() {
@@ -1259,10 +1312,27 @@
         if (aiPanelActive) {
             btn.className = 'flex items-center gap-1.5 px-3 py-1 text-xs text-white bg-blue-500 rounded font-medium hover:bg-blue-600 transition-colors';
             document.getElementById("btn-ai-resume-text").textContent = "AI 简历助手";
-            doc.classList.add('ai-panel-on');
+
+            // 检查 markdown 是否和当前文件匹配
+            const mdIsDefault = resumeData.markdown && resumeData.markdown.includes('杨雪靖');
+            const fileIsDefault = !resumeData.fileDataUrl || (resumeData.fileName || '').includes('杨雪靖');
+            const mdMatchesFile = fileIsDefault || !mdIsDefault;
+
+            if (mdMatchesFile) {
+                // markdown 匹配：切换到模板渲染 + AI 标注
+                renderDocWithTemplate(doc, resumeData.markdown);
+                doc.classList.add('ai-panel-on');
+                if (Object.keys(aiSuggestions).length === 0 && resumeData.markdown) {
+                    generateAiSuggestionsForced();
+                }
+                injectAiMarks(doc);
+            } else {
+                // markdown 不匹配（API 未解析）：保持原始文件，清空建议
+                doc.classList.add('ai-panel-on');
+                aiSuggestions = {};
+            }
             cardsArea.style.display = 'block';
             if (featurePanel) featurePanel.style.display = 'block';
-            injectAiMarks(doc);
             renderInlineCards();
         } else {
             btn.className = 'flex items-center gap-1.5 px-3 py-1 text-xs text-gray-500 rounded font-medium hover:text-blue-600 hover:bg-blue-50 transition-colors';
@@ -1380,13 +1450,21 @@
 
     function renderInlineCards() {
         const container = document.getElementById('inline-cards-list');
-        const docText = (document.getElementById('doc-preview-content')?.textContent) || '';
+        const radarCard = document.getElementById('radar-card');
+        // 如果没有建议（新导入的简历还未分析）
+        if (Object.keys(aiSuggestions).length === 0) {
+            if (radarCard) radarCard.style.display = 'none';
+            container.innerHTML = `<div class="text-center py-6">
+                <p class="text-sm text-gray-500 mb-3">暂无诊断结果</p>
+                <p class="text-xs text-gray-400 mb-4">导入新简历后，需要重新运行 AI 诊断</p>
+                <button class="px-5 py-2 bg-blue-500 text-white text-xs font-medium rounded-lg hover:bg-blue-600" onclick="runAiDiagnosis()">运行 AI 诊断</button>
+            </div>`;
+            return;
+        }
+        if (radarCard) radarCard.style.display = '';
+        const docText = (document.getElementById('doc-preview-content')?.textContent) || resumeData.markdown || '';
         let html = '';
         for (const [idx, s] of Object.entries(aiSuggestions)) {
-            // 只显示简历中确实存在对应原文的建议
-            const cleanOrig = s.original.replace(/^\d+\.\s*/, '');
-            const matchKey = cleanOrig.slice(0, 15);
-            if (!docText.includes(matchKey)) continue;
             const dotColor = s.level === 'must' ? 'bg-red-400' : 'bg-yellow-400';
             html += `<div class="inline-card" id="card-${idx}" onclick="focusMark(${idx})">
                 <div class="flex items-center justify-between mb-1.5">
@@ -1403,6 +1481,11 @@
         }
         html += `<button class="w-full py-2 bg-blue-500 text-white text-xs font-medium rounded-lg hover:bg-blue-600 mt-2" onclick="acceptAllEdits()">全部采纳</button>`;
         container.innerHTML = html;
+    }
+
+    // AI诊断入口（暂用Demo提示）
+    function runAiDiagnosis() {
+        showToast('AI诊断需要连接服务，请部署后使用');
     }
 
     function focusMark(idx) {
@@ -1544,17 +1627,17 @@
     }
 
     // Add a new doc to 最近文档 grid (with localStorage persistence)
-    function addRecentDoc(name, type) {
-        // Save to localStorage
+    function addRecentDoc(name, type, markdown) {
         let recentDocs = JSON.parse(localStorage.getItem('pc_recent_docs') || '[]');
-        // Remove duplicate
         recentDocs = recentDocs.filter(d => d.name !== name);
         const now = new Date();
         const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
-        recentDocs.unshift({ name, type, time });
+        // 存储前10行预览文本
+        const md = markdown || resumeData.markdown || '';
+        const preview = md.split('\n').filter(l => l.trim()).slice(0, 12).join('\n');
+        recentDocs.unshift({ name, type, time, preview });
         if (recentDocs.length > 8) recentDocs = recentDocs.slice(0, 8);
         localStorage.setItem('pc_recent_docs', JSON.stringify(recentDocs));
-        // Re-render
         renderRecentDocs();
     }
 
@@ -1563,19 +1646,38 @@
         if (!grid) return;
         const recentDocs = JSON.parse(localStorage.getItem('pc_recent_docs') || '[]');
         if (recentDocs.length === 0) {
-            // 如果localStorage为空但有主简历，初始化一条
             if (resumeData.markdown && resumeData.fileName) {
                 const name = resumeData.fileName.replace(/\.(pdf|docx?|png|jpe?g)$/i, '');
-                addRecentDoc(name, 'resume');
-                return; // addRecentDoc will call renderRecentDocs again
+                addRecentDoc(name, 'resume', resumeData.markdown);
+                return;
             }
             return;
         }
-        const icons = { resume: '📋', translated: '🌐', custom: '✨', ai: '🤖' };
         grid.innerHTML = recentDocs.map(d => {
-            const icon = icons[d.type] || '📋';
+            // 优先用存储的 preview，其次查 resumeLibrary，最后查当前简历
+            let md = d.preview || '';
+            if (!md) {
+                const match = resumeLibrary.find(r => r.name === d.name);
+                md = match ? match.markdown : '';
+            }
+            if (!md && d.name === resumeData.fileName?.replace(/\.(pdf|docx?|png|jpe?g)$/i, '')) {
+                md = resumeData.markdown || '';
+            }
+            let thumbHtml = '';
+            if (md) {
+                const lines = md.split('\n').filter(l => l.trim()).slice(0, 10);
+                thumbHtml = '<div style="padding:8px 10px; overflow:hidden; height:100%;">';
+                lines.forEach(l => {
+                    const c = l.replace(/^#+\s*/, '').replace(/\*\*/g, '').replace(/^[-*]\s*/, '').trim().substring(0, 30);
+                    if (l.startsWith('#')) thumbHtml += `<div style="font-size:7px;font-weight:bold;color:#1f2937;margin:2px 0 1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c}</div>`;
+                    else thumbHtml += `<div style="font-size:6px;color:#6b7280;line-height:1.6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c}</div>`;
+                });
+                thumbHtml += '</div>';
+            } else {
+                thumbHtml = '<div style="display:flex;align-items:center;justify-content:center;height:100%;"><span style="font-size:28px;">📄</span></div>';
+            }
             return `<div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onclick="openResumeFromDoc('${d.name.replace(/'/g,"\\'")}')">
-                <div class="h-[140px] bg-gray-50 flex items-center justify-center"><span class="text-3xl">${icon}</span></div>
+                <div class="h-[140px] bg-gray-50">${thumbHtml}</div>
                 <div class="p-3 border-t border-gray-100"><p class="text-xs font-medium text-gray-700 truncate">${d.name}</p><p class="text-xs text-gray-400 mt-1">${d.time}</p></div>
             </div>`;
         }).join('');
@@ -1587,7 +1689,28 @@
     // Render resume markdown into doc-preview-content
     function renderDocDetailContent(markdown) {
         const container = document.getElementById('doc-preview-content');
-        if (!container || !markdown) return;
+        if (!container) return;
+
+        // 优先显示原始文件（PDF/图片）
+        if (resumeData.fileDataUrl) {
+            const type = resumeData.fileType || '';
+            if (type.startsWith('image/')) {
+                container.innerHTML = `<img src="${resumeData.fileDataUrl}" style="width:100%;height:auto;display:block;" alt="简历原件"/>`;
+            } else if (type === 'application/pdf') {
+                container.innerHTML = `<embed src="${resumeData.fileDataUrl}" type="application/pdf" style="width:100%;height:100%;min-height:800px;" />`;
+            } else {
+                // Word等无法直接预览的格式，用模板渲染
+                renderDocWithTemplate(container, markdown);
+            }
+            return;
+        }
+
+        // 没有原始文件时，用模板渲染
+        renderDocWithTemplate(container, markdown);
+    }
+
+    function renderDocWithTemplate(container, markdown) {
+        if (!markdown) { container.innerHTML = '<p style="color:#999;text-align:center;padding:40px;">暂无内容</p>'; return; }
         let tplId = 'spring2024';
         try { tplId = _selectedPCTemplate || resumeData.selectedTemplate || 'spring2024'; } catch(e) {}
         const templateHtml = renderTemplateByStyle(markdown, tplId);
@@ -2005,14 +2128,22 @@
     }
 
     async function handleFileUpload(event) {
-        const file = event.target.files[0];
+        const file = event.target.files ? event.target.files[0] : event;
         if (!file) return;
-        event.target.value = '';
+        if (event.target && event.target.value !== undefined) event.target.value = '';
         resumeData.fileName = file.name;
 
-        // Show loading (in modal if open, or via toast)
+        // 保存原始文件为 dataURL（用于文档详情页原样展示）
+        const fileDataUrl = await fileToDataUrl(file);
+        resumeData.fileDataUrl = fileDataUrl;
+        resumeData.fileType = file.type || guessFileType(file.name);
+
+        // Show loading
         const importBody = document.getElementById('import-body');
-        if (importBody) {
+        const modalOpen = document.getElementById('importModal')?.classList.contains('show');
+        const overlay = document.getElementById('import-loading-overlay');
+
+        if (modalOpen && importBody) {
             importBody.innerHTML = `
                 <div class="text-center py-8">
                     <div class="w-10 h-10 border-3 border-gray-200 border-t-blue-500 rounded-full animate-spin mx-auto mb-4" style="border-width:3px;"></div>
@@ -2020,7 +2151,10 @@
                     <p class="text-xs text-gray-400 mt-1">AI正在识别简历内容</p>
                 </div>`;
         } else {
-            showToast('正在解析 ' + file.name + '...');
+            if (overlay) {
+                document.getElementById('import-loading-text').textContent = '正在导入 ' + file.name + '...';
+                overlay.style.display = 'flex';
+            }
         }
 
         try {
@@ -2028,23 +2162,83 @@
             if (!markdown.trim()) throw new Error('未识别到有效内容');
             resumeData.markdown = markdown;
             saveData();
-            if (document.getElementById('importModal')?.classList.contains('show')) hideImportModal();
+            if (modalOpen) hideImportModal();
+            if (overlay) overlay.style.display = 'none';
             updateUIHasResume();
             renderDocDetailContent(resumeData.markdown);
             addResumeToLibrary(resumeData.fileName.replace(/\.(pdf|docx?|png|jpe?g)$/i, ''), resumeData.markdown);
-            addRecentDoc(resumeData.fileName.replace(/\.(pdf|docx?|png|jpe?g)$/i, ''), 'resume');
+            addRecentDoc(resumeData.fileName.replace(/\.(pdf|docx?|png|jpe?g)$/i, ''), 'resume', resumeData.markdown);
             renderRecentDocs();
-            showToast('简历解析成功！');
+            generateAiSuggestions();
+            showToast('✓ 导入成功');
         } catch(err) {
-            if (importBody) {
+            if (overlay) overlay.style.display = 'none';
+            if (modalOpen && importBody) {
                 importBody.innerHTML = `
                     <div class="text-center py-6">
-                        <p class="text-sm text-red-500 mb-3">解析失败: ${err.message}</p>
+                        <p class="text-sm text-red-500 mb-3">导入失败: ${err.message}</p>
                         <button class="px-5 py-2 bg-blue-500 text-white text-sm rounded-lg" onclick="hideImportModal()">关闭</button>
                     </div>`;
             } else {
-                showToast('解析失败: ' + err.message);
+                showToast('导入失败: ' + err.message);
             }
+        }
+    }
+
+    function fileToDataUrl(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => resolve('');
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function guessFileType(name) {
+        const ext = name.split('.').pop().toLowerCase();
+        const map = { pdf:'application/pdf', png:'image/png', jpg:'image/jpeg', jpeg:'image/jpeg', doc:'application/msword', docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document' };
+        return map[ext] || 'application/octet-stream';
+    }
+
+    // 处理拖拽上传
+    function handleDropUpload(event) {
+        const file = event.dataTransfer.files[0];
+        if (!file) return;
+        const validTypes = ['.pdf','.doc','.docx','.jpg','.jpeg','.png'];
+        const ext = '.' + file.name.split('.').pop().toLowerCase();
+        if (!validTypes.includes(ext)) {
+            showToast('不支持的文件格式，请上传 PDF/Word/图片');
+            return;
+        }
+        handleFileUploadFromFile(file);
+    }
+
+    async function handleFileUploadFromFile(file) {
+        resumeData.fileName = file.name;
+        resumeData.fileDataUrl = await fileToDataUrl(file);
+        resumeData.fileType = file.type || guessFileType(file.name);
+
+        const overlay = document.getElementById('import-loading-overlay');
+        if (overlay) {
+            document.getElementById('import-loading-text').textContent = '正在导入 ' + file.name + '...';
+            overlay.style.display = 'flex';
+        }
+        try {
+            const markdown = await parseFileWithTextIn(file);
+            if (!markdown.trim()) throw new Error('未识别到有效内容');
+            resumeData.markdown = markdown;
+            saveData();
+            if (overlay) overlay.style.display = 'none';
+            updateUIHasResume();
+            renderDocDetailContent(resumeData.markdown);
+            addResumeToLibrary(resumeData.fileName.replace(/\.(pdf|docx?|png|jpe?g)$/i, ''), resumeData.markdown);
+            addRecentDoc(resumeData.fileName.replace(/\.(pdf|docx?|png|jpe?g)$/i, ''), 'resume', resumeData.markdown);
+            renderRecentDocs();
+            generateAiSuggestions();
+            showToast('✓ 导入成功');
+        } catch(err) {
+            if (overlay) overlay.style.display = 'none';
+            showToast('导入失败: ' + err.message);
         }
     }
 
@@ -3603,7 +3797,7 @@
 
     function getPhotoHtml(w, h, style) {
         const ini = (window._currentRenderName || resumeData.fileName || '?')[0];
-        return `<div style="width:${w}px;height:${h}px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;${style||''}"><span style="font-size:${Math.floor(h/3)}px;font-weight:700;color:#94a3b8;">${ini}</span></div>`;
+        return `<div style="width:${w}px;height:${h}px;background:linear-gradient(135deg,#e8edf5,#dce4f0);display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #c8d4e3;${style||''}"><svg width="${Math.floor(w*0.5)}" height="${Math.floor(h*0.4)}" viewBox="0 0 24 24" fill="#8fa4bf"><circle cx="12" cy="8" r="4"/><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/></svg><span style="font-size:${Math.floor(h/6)}px;font-weight:600;color:#6b82a3;margin-top:2px;">${ini}</span></div>`;
     }
 
     function renderA4Content(sec, opts) {
@@ -3618,6 +3812,94 @@
             else h += `<p style="font-size:12px;color:#333;margin:3px 0;line-height:1.7;">${t}</p>`;
         }
         return h;
+    }
+
+    // 文档详情页渲染 - 接近原始PDF文档样式（蓝色标题条+双栏信息+模块标题条）
+    function renderDocOriginalStyle(markdown) {
+        if (!markdown) return '<p style="color:#999;text-align:center;padding:40px;">暂无内容</p>';
+        const data = parseResumeForTemplate(markdown);
+        if (!data) return '<p style="color:#999;text-align:center;padding:40px;">解析失败</p>';
+        const info = extractPersonalInfo(markdown);
+        window._currentRenderName = data.name || '';
+
+        // 顶部标题栏
+        let header = `<div style="text-align:center;padding:16px 0 12px;border-bottom:3px solid #34567a;">
+            <p style="font-size:22px;font-weight:700;color:#34567a;margin:0;letter-spacing:4px;">个人简历 RESUME</p>
+        </div>`;
+
+        // 姓名+照片+个人信息双栏
+        const ini = (data.name || '?')[0];
+        const photoHtml = `<div style="width:80px;height:100px;background:#e8edf2;border-radius:4px;display:flex;align-items:center;justify-content:center;border:1px solid #d1d9e0;"><span style="font-size:32px;font-weight:700;color:#6b7fa3;">${ini}</span></div>`;
+
+        // 收集个人信息字段
+        const infoFields = [];
+        const fieldMap = [['性别','性别'],['年龄','年龄'],['电话','电话'],['户籍','户籍'],['所在地','现所在地'],['邮箱','邮箱'],['政治面貌','政治面貌'],['民族','民族']];
+        for (const [key, label] of fieldMap) {
+            if (info[key]) infoFields.push([label, info[key]]);
+        }
+        // 从 markdown 直接提取更多字段
+        const extraPatterns = [
+            [/性\s*别[：:\s]*([\u4e00-\u9fa5]+)/,'性别'],
+            [/年\s*龄[：:\s]*(\d+)/,'年龄'],
+            [/户\s*籍[：:\s]*(.+)/,'户籍'],
+            [/民\s*族[：:\s]*(.+)/,'民族'],
+            [/政治面貌[：:\s]*(.+)/,'政治面貌'],
+            [/现所在地[：:\s]*(.+)/,'现所在地'],
+        ];
+        for (const [pat, label] of extraPatterns) {
+            if (infoFields.some(f => f[0] === label)) continue;
+            const m = markdown.match(pat);
+            if (m) infoFields.push([label, m[1].trim().replace(/\*\*/g,'')]);
+        }
+
+        let infoGrid = '';
+        if (infoFields.length > 0) {
+            infoGrid = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 24px;margin-top:6px;">';
+            for (const [label, val] of infoFields) {
+                infoGrid += `<p style="font-size:12px;color:#444;margin:2px 0;"><span style="color:#666;">${label}：</span>${val}</p>`;
+            }
+            infoGrid += '</div>';
+        }
+
+        let nameSection = `<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:20px 0 16px;">
+            <div style="flex:1;">
+                <p style="font-size:22px;font-weight:700;color:#1a1a1a;margin:0 0 4px;">${data.name}</p>
+                ${infoGrid}
+            </div>
+            <div style="flex-shrink:0;margin-left:20px;">${photoHtml}</div>
+        </div>`;
+
+        // 模块渲染 - 蓝色背景标题条
+        const sectionIcons = {'求职意向':'👤','教育经历':'🎓','在校经历':'🎓','工作经历':'💼','项目经历':'💼','相关技能':'💻','职业技能':'💻','技能':'💻','奖项证书':'🏆','荣誉奖项':'🏆','自我评价':'⭐','发表论文':'📄','规培经历':'🏥','实习经历':'💼','科研经历':'🔬'};
+
+        let sections = '';
+        for (const sec of data.sections) {
+            if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
+            const icon = sectionIcons[sec.title] || '📋';
+            // 模块标题条
+            sections += `<div style="margin-bottom:18px;">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #34567a;">
+                    <span style="font-size:13px;">${icon}</span>
+                    <span style="font-size:14px;font-weight:700;color:#34567a;">${sec.title}</span>
+                </div>`;
+            // 内容
+            for (const item of (sec.content || [])) {
+                if (!item || !item.text) continue;
+                const t = item.text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+                if (item.type === 'subtitle') {
+                    sections += `<p style="font-size:13px;font-weight:600;color:#1a1a1a;margin:10px 0 4px;">• ${t}</p>`;
+                } else if (/^\d{4}[-~／]/.test(item.text) || /\d{4}\s*[-~年]/.test(item.text)) {
+                    sections += `<p style="font-size:12px;color:#555;margin:6px 0 2px;font-weight:500;">${t}</p>`;
+                } else if (/^[-•*→·]/.test(item.text)) {
+                    sections += `<p style="font-size:12px;color:#333;margin:3px 0 3px 16px;line-height:1.8;">• ${t.replace(/^[-•*→·]\s*/, '')}</p>`;
+                } else {
+                    sections += `<p style="font-size:12px;color:#333;margin:3px 0;line-height:1.8;">${t}</p>`;
+                }
+            }
+            sections += '</div>';
+        }
+
+        return `<div style="font-family:'PingFang SC',-apple-system,'Microsoft YaHei',sans-serif;padding:28px 32px;line-height:1.6;">${header}${nameSection}${sections}</div>`;
     }
 
     function renderTemplateByStyle(markdown, templateId) {
@@ -3642,16 +3924,52 @@
 
     // 模板1: 蓝色经典 - 单栏，左上姓名+右上照片，蓝色横线，图标段标题
     function renderTplSpring2024(data, info) {
-        const photo = getPhotoHtml(56, 70, 'border-radius:4px;');
-        const cp = [info['电话'], info['邮箱'], info['出生年月'], info['学历']].filter(Boolean);
-        const icons = ['📋','💼','🔬','🏆','💡','⭐','📚','🎯'];
-        let ii = 0, secs = '';
+        const md = resumeData.markdown || '';
+        // 提取个人信息字段
+        const fields = [];
+        const pats = [[/性\s*别[：:\s]*([\u4e00-\u9fa5]+)/,'性别'],[/电\s*话[：:\s]*([\d\-*]+)/,'电话'],[/户\s*籍[：:\s]*([^\n,，|]+)/,'户籍'],[/邮\s*箱[：:\s]*([\w.\-]+@[\w.\-]+)/,'邮箱'],[/政治面貌[：:\s]*([^\n,，|]+)/,'政治面貌'],[/民\s*族[：:\s]*([^\n,，|]+)/,'民族'],[/年\s*龄[：:\s]*(\d+)/,'年龄'],[/出生年月[：:\s]*([^\n,，|]+)/,'出生年月'],[/学\s*历[：:\s]*([^\n,，|]+)/,'学历']];
+        for (const [pat, label] of pats) {
+            const m = md.match(pat);
+            if (m) fields.push([label, m[1].trim()]);
+        }
+        if (!fields.find(f=>f[0]==='电话') && info['电话']) fields.push(['电话', info['电话']]);
+        if (!fields.find(f=>f[0]==='邮箱') && info['邮箱']) fields.push(['邮箱', info['邮箱']]);
+
+        // 个人信息网格（三列）
+        let infoHtml = '';
+        if (fields.length > 0) {
+            infoHtml = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px 12px;margin-top:8px;">';
+            for (const [label, val] of fields) {
+                infoHtml += `<p style="font-size:11px;color:#555;margin:2px 0;"><span style="color:#888;">${label}：</span>${val}</p>`;
+            }
+            infoHtml += '</div>';
+        }
+
+        // 头部：深色背景 + 姓名 + PERSONAL RESUME
+        const header = `<div style="background:#2d3748;padding:16px 20px;border-radius:4px;margin-bottom:12px;display:flex;align-items:baseline;justify-content:space-between;">
+            <span style="font-size:20px;font-weight:700;color:#fff;letter-spacing:3px;">${data.name}</span>
+            <span style="font-size:11px;color:#a0aec0;letter-spacing:2px;">PERSONAL RESUME</span>
+        </div>`;
+
+        // 个人信息区
+        const infoSection = fields.length > 0 ? `<div style="padding:6px 0 12px;border-bottom:1px solid #e2e8f0;margin-bottom:14px;">${infoHtml}</div>` : '';
+
+        // 各模块 - 深色圆角条标题
+        const secIcons = {'求职意向':'👤','教育经历':'🎓','在校经历':'🎓','工作经历':'💼','项目经历':'📁','相关技能':'💻','职业技能':'💻','技能':'💻','奖项证书':'🏆','荣誉奖项':'🏆','自我评价':'⭐','发表论文':'📄','规培经历':'🏥','实习经历':'💼','科研经历':'🔬','培训经历':'📚','证书':'📜','语言能力':'🌐','兴趣爱好':'🎯'};
+        let secs = '';
         for (const sec of data.sections) {
             if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
-            const icon = icons[ii % icons.length]; ii++;
-            secs += `<div style="margin-bottom:14px;padding-left:0;"><div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;padding-bottom:4px;border-bottom:2px solid #2576b9;"><span style="font-size:13px;">${icon}</span><span style="font-size:14px;font-weight:700;color:#2576b9;">${sec.title}</span></div>${renderA4Content(sec, {dateColor:'#888'})}</div>`;
+            const icon = secIcons[sec.title] || '📋';
+            secs += `<div style="margin-bottom:16px;">
+                <div style="background:#2d3748;color:#fff;padding:6px 14px;border-radius:4px;margin-bottom:8px;display:inline-flex;align-items:center;gap:6px;">
+                    <span style="font-size:12px;">${icon}</span>
+                    <span style="font-size:13px;font-weight:600;letter-spacing:1px;">${sec.title}</span>
+                </div>
+                ${renderA4Content(sec, {dateColor:'#666'})}
+            </div>`;
         }
-        return `<div style="font-family:'PingFang SC',-apple-system,sans-serif;padding:24px;line-height:1.5;"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #2576b9;"><div><p style="font-size:24px;font-weight:700;color:#1a1a1a;margin:0;letter-spacing:2px;">${data.name}</p><p style="font-size:12px;color:#666;margin:6px 0 0;">${cp.join(' | ')}</p>${info['求职意向']?`<p style="font-size:12px;color:#2576b9;margin:5px 0 0;font-weight:500;">求职意向：${info['求职意向']}</p>`:''}</div><div>${photo}</div></div>${secs}</div>`;
+
+        return `<div style="font-family:'PingFang SC',-apple-system,sans-serif;padding:20px 24px;line-height:1.6;font-size:12px;">${header}${infoSection}${secs}</div>`;
     }
 
     // 模板2: 清新多彩 - 单栏，彩色圆形图标+段标题
