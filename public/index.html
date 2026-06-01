@@ -5295,6 +5295,10 @@
                     resumeBody = customResume.substring(0, noteMatch.index).trim();
                     aiNotes = noteMatch[1].trim();
                 }
+                // 去掉AI生成的非人名标题行（如"优化后简历（xxx行业）"）
+                resumeBody = resumeBody.replace(/^#\s*(?:优化后简历|定制简历|优化简历|岗位定制简历)[^\n]*\n?/m, '');
+                // 同步清理缓存版本
+                window._lastCustomResume = resumeBody.replace(/==([^=]+)==/g, '$1');
                 // 渲染简历正文
                 let htmlContent = renderResumeMarkdown(resumeBody);
                 htmlContent = htmlContent.replace(/==([^=]+)==/g, '<span class="ai-modified">$1</span>');
