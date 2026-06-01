@@ -3216,9 +3216,9 @@
             TEXTIN_APP_ID: 'def2a5dc9635069cff5698b74e16433f',
             TEXTIN_SECRET_CODE: '864abdb8d34cc2c6b0ea4f5646774c3f',
             TEXTIN_PARSE_URL: `${PROXY_BASE}/proxy/textin/ai/service/v1/pdf_to_markdown`,
-            BEDROCK_BASE: `${PROXY_BASE}/proxy/claude`,
-            BEDROCK_TOKEN: '019d0ade11857546928b983f26c1b43b',
-            BEDROCK_MODEL: 'claude-sonnet-4-6',
+            LLM_BASE: 'https://api.siliconflow.cn/v1',
+            LLM_TOKEN: 'sk-pifyixapbhdfdjuniwizakekksoezalquhosuyjbqwgrunma',
+            LLM_MODEL: 'deepseek-ai/DeepSeek-V3',
         };
 
         // 全局状态：存储解析后的简历文本
@@ -3454,17 +3454,19 @@
 
         // Claude API 调用
         async function callClaudeAPI(systemPrompt, userMessage, maxTokens) {
-            const resp = await fetch(`${API_CONFIG.BEDROCK_BASE}/model/${API_CONFIG.BEDROCK_MODEL}/invoke`, {
+            const resp = await fetch(`${API_CONFIG.LLM_BASE}/chat/completions`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${API_CONFIG.BEDROCK_TOKEN}`,
+                    'Authorization': `Bearer ${API_CONFIG.LLM_TOKEN}`,
                 },
                 body: JSON.stringify({
-                    anthropic_version: 'bedrock-2023-05-31',
+                    model: API_CONFIG.LLM_MODEL,
                     max_tokens: maxTokens || 4096,
-                    system: systemPrompt,
-                    messages: [{ role: 'user', content: userMessage }],
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: userMessage },
+                    ],
                 }),
             });
             if (!resp.ok) {
@@ -3472,10 +3474,10 @@
                 throw new Error(`API错误(${resp.status}): ${errText.slice(0, 200)}`);
             }
             const result = await resp.json();
-            if (result.stop_reason === 'max_tokens') {
+            if (result.choices?.[0]?.finish_reason === 'length') {
                 console.warn('[callClaudeAPI] 输出被截断（max_tokens）');
             }
-            return result.content?.[0]?.text || '';
+            return result.choices?.[0]?.message?.content || '';
         }
 
         // TextIn 文件解析
