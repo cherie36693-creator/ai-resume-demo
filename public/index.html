@@ -1055,6 +1055,17 @@
                                 <span class="text-[10px] text-red-400">* 必填</span>
                             </div>
                             <div class="bg-white rounded-xl border border-gray-200 p-3 space-y-2.5">
+                                <!-- 头像上传 -->
+                                <div class="flex items-center gap-3 pb-2 border-b border-gray-100">
+                                    <div id="avatarPreview" class="w-14 h-14 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden cursor-pointer flex-shrink-0" onclick="document.getElementById('avatarInput').click()">
+                                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-[11px] text-gray-700 font-medium">上传头像</p>
+                                        <p class="text-[10px] text-gray-400">选填，建议正装证件照</p>
+                                    </div>
+                                    <input type="file" id="avatarInput" accept="image/*" class="hidden" onchange="handleAvatarUpload(this)">
+                                </div>
                                 <div class="flex items-center gap-2">
                                     <label class="text-[11px] text-gray-500 w-14 flex-shrink-0">姓名</label>
                                     <input type="text" value="陈天越" class="flex-1 text-[12px] text-gray-800 bg-gray-50 rounded-lg px-2.5 py-2 border border-gray-150 outline-none focus:border-blue-300">
@@ -4791,6 +4802,23 @@
         }
 
         // ===== AI生成简历 - 从表单收集数据并生成 =====
+        // 头像上传处理
+        function handleAvatarUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                window._resumePhotoBase64 = e.target.result;
+                const preview = document.getElementById('avatarPreview');
+                if (preview) {
+                    preview.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+                    preview.classList.remove('border-dashed', 'border-gray-300');
+                    preview.classList.add('border-solid', 'border-blue-300');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
         async function generateResumeFromForm() {
             const page = document.getElementById('page-create');
             const inputs = page.querySelectorAll('input[type="text"]');
