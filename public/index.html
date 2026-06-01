@@ -218,13 +218,16 @@
             <div class="notch"></div>
             <div class="screen" id="screen">
 
-                <!-- 入口1: 首页 -->
+                <!-- 入口1: CS首页 -->
                 <div class="page" id="page-cs-home">
                     <div class="status-bar"><span class="text-xs font-medium">12:54</span><span class="text-xs">●●●● ⟩</span></div>
                     <!-- 顶部绿色header -->
                     <div class="bg-[#3B82F6] px-5 pt-2 pb-4">
                         <div class="flex items-center gap-2 mb-3">
-                            <span class="text-white font-semibold text-[14px]">AI简历助手</span>
+                            <div class="w-7 h-7 bg-white rounded flex items-center justify-center">
+                                <span class="text-[10px] font-bold text-[#3B82F6]">CS</span>
+                            </div>
+                            <span class="text-white font-semibold text-[14px]">扫描全能王</span>
                         </div>
                         <div class="bg-white/20 rounded-lg px-3 py-2">
                             <span class="text-white/80 text-[12px]">🔍 试试搜索应用，如"转 Word"</span>
@@ -286,7 +289,7 @@
                     </div>
                     <!-- 底部Tab栏 -->
                     <div class="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex justify-around py-2">
-                        <div class="flex flex-col items-center gap-0.5"><span class="text-[14px]">🏠</span><span class="text-[9px] text-[#3B82F6] font-medium">首页</span></div>
+                        <div class="flex flex-col items-center gap-0.5"><div class="w-5 h-5 bg-[#3B82F6] rounded flex items-center justify-center"><span class="text-white text-[8px] font-bold">CS</span></div><span class="text-[9px] text-[#3B82F6] font-medium">首页</span></div>
                         <div class="flex flex-col items-center gap-0.5" onclick="goTo('page-cs-doclist')"><span class="text-[14px]">📑</span><span class="text-[9px] text-gray-400">全部文档</span></div>
                         <div class="flex flex-col items-center gap-0.5"><div class="w-10 h-10 bg-[#3B82F6] rounded-full flex items-center justify-center -mt-4 shadow-lg"><span class="text-white text-[18px]">📷</span></div></div>
                         <div class="flex flex-col items-center gap-0.5" onclick="goTo('page-cs-toolbox')"><span class="text-[14px]">🧰</span><span class="text-[9px] text-gray-400">工具箱</span></div>
@@ -480,7 +483,7 @@
                     </div>
                     <!-- 底部Tab栏 -->
                     <div class="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex justify-around py-2">
-                        <div class="flex flex-col items-center gap-0.5" onclick="goTo('page-cs-home')"><span class="text-[14px]">🏠</span><span class="text-[9px] text-gray-400">首页</span></div>
+                        <div class="flex flex-col items-center gap-0.5" onclick="goTo('page-cs-home')"><div class="w-5 h-5 bg-gray-300 rounded flex items-center justify-center"><span class="text-white text-[8px] font-bold">CS</span></div><span class="text-[9px] text-gray-400">首页</span></div>
                         <div class="flex flex-col items-center gap-0.5" onclick="goTo('page-cs-doclist')"><span class="text-[14px]">📑</span><span class="text-[9px] text-gray-400">全部文档</span></div>
                         <div class="flex flex-col items-center gap-0.5"><div class="w-10 h-10 bg-[#3B82F6] rounded-full flex items-center justify-center -mt-4 shadow-lg"><span class="text-white text-[18px]">📷</span></div></div>
                         <div class="flex flex-col items-center gap-0.5"><span class="text-[14px]">🧰</span><span class="text-[9px] text-[#3B82F6] font-medium">工具箱</span></div>
@@ -1978,7 +1981,7 @@
             <div style="display: flex; flex-direction: column; gap: 6px;" id="navList">
                 <p class="text-[10px] text-gray-400 font-medium uppercase tracking-wider mb-1">入口页面</p>
                 <button class="nav-btn" data-page="page-cs-home" onclick="goTo('page-cs-home')">
-                    <span class="nav-icon">📱</span> 入口1: 首页
+                    <span class="nav-icon">📱</span> 入口1: CS首页
                 </button>
                 <button class="nav-btn" data-page="page-cs-docdetail" onclick="goTo('page-cs-docdetail')">
                     <span class="nav-icon">👁️</span> 入口2: 文档列表
@@ -3489,6 +3492,12 @@
             }
         } catch(e) {}
 
+        // 恢复头像数据
+        try {
+            const savedPhoto = localStorage.getItem('resume_photo_base64');
+            if (savedPhoto) window._resumePhotoBase64 = savedPhoto;
+        } catch(e) {}
+
         function saveResumeData() {
             try {
                 localStorage.setItem('resume_assistant_data', JSON.stringify(resumeData));
@@ -3727,12 +3736,16 @@
                 } else if (firstImg.url) {
                     window._resumePhotoBase64 = firstImg.url;
                 }
+                try { localStorage.setItem('resume_photo_base64', window._resumePhotoBase64); } catch(e) {}
             }
             let md = result.result?.markdown || '';
             // 如果markdown中有图片引用（![...](...)），也尝试提取第一个作为照片
             if (!window._resumePhotoBase64) {
                 const imgMatch = md.match(/!\[.*?\]\((data:image\/[^)]+|https?:\/\/[^)]+)\)/);
-                if (imgMatch) window._resumePhotoBase64 = imgMatch[1];
+                if (imgMatch) {
+                    window._resumePhotoBase64 = imgMatch[1];
+                    try { localStorage.setItem('resume_photo_base64', window._resumePhotoBase64); } catch(e) {}
+                }
             }
             return md;
         }
@@ -4926,6 +4939,7 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 window._resumePhotoBase64 = e.target.result;
+                try { localStorage.setItem('resume_photo_base64', window._resumePhotoBase64); } catch(e2) {}
                 const preview = document.getElementById('avatarPreview');
                 if (preview) {
                     preview.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
