@@ -6435,12 +6435,9 @@ ${resume.selfEval || selfEval}`;
                         '情景模拟': 'bg-orange-50 text-orange-600 border-orange-100',
                         '反问准备': 'bg-pink-50 text-pink-600 border-pink-100',
                     };
-                    const roundColors = { '第一轮': 'text-blue-600', '第二轮': 'text-indigo-600', '终面': 'text-purple-600' };
                     let lastRound = '';
                     data.questions.forEach((q, i) => {
-                        if (q.round && q.round !== lastRound) {
-                            lastRound = q.round;
-                            questionsHtml += `<div class="flex items-center gap-2 mt-${i===0?'0':'3'} mb-2"><span class="text-[12px] font-semibold ${roundColors[q.round] || 'text-gray-700'}">${q.round}</span><div class="flex-1 h-px bg-gray-200"></div></div>`;
+                        if (false) {
                         }
                         const catClass = categoryColors[q.category] || 'bg-gray-50 text-gray-600 border-gray-100';
                         questionsHtml += `
