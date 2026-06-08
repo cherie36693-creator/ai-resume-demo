@@ -3319,6 +3319,7 @@
                 name = name.replace(/\.(pdf|docx?)$/i, '');
                 const nameMatch = resumeData.markdown.match(/^#\s*(.+)/m);
                 if (nameMatch && nameMatch[1].trim().length <= 8) name = nameMatch[1].trim() + '-简历';
+                else if (name.length > 12) name = name.substring(0, 12) + '...';
                 allResumes.push({ name: name, markdown: resumeData.markdown, template: null, time: '当前', isPrimary: true });
             }
             // localStorage 版本
