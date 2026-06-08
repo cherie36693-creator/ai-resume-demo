@@ -6245,6 +6245,8 @@ ${resume.selfEval || selfEval}`;
                 try { versions = JSON.parse(localStorage.getItem('resume_versions') || '[]'); } catch(e) {}
                 versions.unshift(versionData);
                 localStorage.setItem('resume_versions', JSON.stringify(versions.slice(0, 10)));
+                resumeData.originalMarkdown = resumeData.markdown;
+                resumeData.markdown = cleanMd;
             }
             window._previewMode = false;
             updateResumeDetailPage(resumeData.markdown);
