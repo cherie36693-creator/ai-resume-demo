@@ -6,6 +6,9 @@ const { URL } = require('url');
 
 const PORT = process.env.PORT || 3456;
 const HTML_FILE = path.join(__dirname, 'public', 'index.html');
+const LLM_API_KEY = 'sk-pifyixapbhdfdjuniwizakekksoezalquhosuyjbqwgrunma';
+const LLM_API_HOST = 'api.siliconflow.cn';
+const LLM_MODEL = 'deepseek-ai/DeepSeek-V3';
 
 const CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*',
@@ -83,36 +86,74 @@ const server = http.createServer(async (req, res) => {
     }
 
     // API 代理路由
-    let targetUrl = '';
     if (req.url.startsWith('/proxy/textin/')) {
-        targetUrl = 'https://api.textin.com/' + req.url.replace('/proxy/textin/', '');
-    } else if (req.url.startsWith('/proxy/claude/')) {
-        targetUrl = 'http://deepseek-work.intsig.net/proxy/aws/claude/bedrock/' + req.url.replace('/proxy/claude/', '');
-    } else if (req.url.startsWith('/proxy/cdn/')) {
-        targetUrl = 'https://cdn.jsdelivr.net/npm/' + req.url.replace('/proxy/cdn/', '');
-    } else {
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.end('Not found');
+        const targetUrl = 'https://api.textin.com/' + req.url.replace('/proxy/textin/', '');
+        let body = [];
+        req.on('data', chunk => body.push(chunk));
+        req.on('end', async () => {
+            body = Buffer.concat(body);
+            try {
+                const result = await proxyRequest(targetUrl, req, body);
+                res.writeHead(result.statusCode, { ...CORS_HEADERS, 'Content-Type': result.headers['content-type'] || 'application/json' });
+                res.end(result.body);
+            } catch (err) {
+                res.writeHead(502, { ...CORS_HEADERS, 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: err.message }));
+            }
+        });
         return;
     }
 
-    // 读取请求体并转发
-    let body = [];
-    req.on('data', chunk => body.push(chunk));
-    req.on('end', async () => {
-        body = Buffer.concat(body);
-        try {
-            const result = await proxyRequest(targetUrl, req, body);
-            res.writeHead(result.statusCode, {
-                ...CORS_HEADERS,
-                'Content-Type': result.headers['content-type'] || 'application/json',
-            });
-            res.end(result.body);
-        } catch (err) {
-            res.writeHead(502, { ...CORS_HEADERS, 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: err.message }));
-        }
-    });
+    if (req.url.startsWith('/proxy/claude/')) {
+        let body = [];
+        req.on('data', chunk => body.push(chunk));
+        req.on('end', async () => {
+            body = Buffer.concat(body);
+            try {
+                const reqBody = JSON.parse(body.toString());
+                const messages = [];
+                if (reqBody.system) messages.push({ role: 'system', content: reqBody.system });
+                if (reqBody.messages) {
+                    reqBody.messages.forEach(m => {
+                        messages.push({ role: m.role, content: typeof m.content === 'string' ? m.content : m.content.map(c => c.text || '').join('') });
+                    });
+                }
+                const openaiBody = JSON.stringify({ model: LLM_MODEL, messages, max_tokens: reqBody.max_tokens || 4096, temperature: 0.7, stream: false });
+                const result = await proxyRequest('https://' + LLM_API_HOST + '/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + LLM_API_KEY } }, Buffer.from(openaiBody));
+                const openaiResp = JSON.parse(result.body.toString());
+                let text = '';
+                if (openaiResp.choices && openaiResp.choices[0]) text = openaiResp.choices[0].message.content || '';
+                const claudeResp = { content: [{ type: 'text', text }], stop_reason: 'end_turn', model: LLM_MODEL };
+                res.writeHead(200, { ...CORS_HEADERS, 'Content-Type': 'application/json' });
+                res.end(JSON.stringify(claudeResp));
+            } catch (err) {
+                res.writeHead(502, { ...CORS_HEADERS, 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: err.message }));
+            }
+        });
+        return;
+    }
+
+    if (req.url.startsWith('/proxy/cdn/')) {
+        const targetUrl = 'https://cdn.jsdelivr.net/npm/' + req.url.replace('/proxy/cdn/', '');
+        let body = [];
+        req.on('data', chunk => body.push(chunk));
+        req.on('end', async () => {
+            body = Buffer.concat(body);
+            try {
+                const result = await proxyRequest(targetUrl, req, body);
+                res.writeHead(result.statusCode, { ...CORS_HEADERS, 'Content-Type': result.headers['content-type'] || 'application/json' });
+                res.end(result.body);
+            } catch (err) {
+                res.writeHead(502, { ...CORS_HEADERS, 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: err.message }));
+            }
+        });
+        return;
+    }
+
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    res.end('Not found');
 });
 
 server.listen(PORT, '0.0.0.0', () => {

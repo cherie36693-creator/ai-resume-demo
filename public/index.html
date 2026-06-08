@@ -3225,7 +3225,7 @@
             const tplName = templateNames[currentTemplate] || currentTemplate;
             showToast('正在生成「' + tplName + '」风格简历...');
             setTimeout(() => {
-                const newVersionName = (resumeData.fileName || '简历').replace(/\.(pdf|docx?)$/i, '') + '-' + tplName + '版';
+                const newVersionName = (resumeData.fileName || '简历').replace(/\.(pdf|docx?)$/i, '').substring(0, 8) + '-' + tplName;
                 const versionData = {
                     name: newVersionName,
                     markdown: resumeData.markdown,
@@ -6083,7 +6083,7 @@ ${resume.selfEval || selfEval}`;
 
         function saveCustomResume() {
             if (window._lastCustomResume) {
-                const name = (resumeData.fileName || '简历').replace(/\.(pdf|docx?)$/i,'') + '-岗位匹配';
+                const name = (resumeData.fileName || '简历').replace(/\.(pdf|docx?)$/i,'').substring(0, 8) + '-岗位定制';
                 let versions = [];
                 try { versions = JSON.parse(localStorage.getItem('resume_versions') || '[]'); } catch(e) {}
                 versions.unshift({ name: name, markdown: window._lastCustomResume, template: 'greenside', time: new Date().toLocaleString('zh-CN') });
@@ -6158,9 +6158,10 @@ ${resume.selfEval || selfEval}`;
                 const cleanMd = window._previewMarkdown.replace(/==([^=]+)==/g, '$1');
                 const templateNames = {spring2024:'蓝色经典',student:'清新多彩',bluegray:'绿色双栏',greenside:'蓝色双栏',navybiz:'珊瑚粉渐变',timeline:'暗夜星空',minimal:'彩虹侧栏',orange:'翡翠几何',cleanline:'奶茶拿铁',biznavy:'薄荷清风',academic:'云朵蓝',modern:'蜜桃粉',lavender:'薰衣草',sunset:'落日橙',matcha:'抹茶慕斯',sakura:'樱花季'};
                 const tplName = templateNames[currentTemplate] || currentTemplate;
-                const source = window._previewFrom === 'page-jd' ? '岗位匹配' : window._previewFrom === 'page-diagnosis' ? 'AI优化' : window._previewFrom === 'page-translate' ? '翻译' : 'AI生成';
+                const source = window._previewFrom === 'page-jd' ? '岗位定制' : window._previewFrom === 'page-diagnosis' ? 'AI优化' : window._previewFrom === 'page-translate' ? '翻译' : 'AI生成';
+                const baseName = (resumeData.fileName || '简历').replace(/\.(pdf|docx?)$/i, '').substring(0, 8);
                 const versionData = {
-                    name: (resumeData.fileName || '简历').replace(/\.(pdf|docx?)$/i, '') + '-' + source + '-' + tplName,
+                    name: baseName + '-' + source + '-' + tplName,
                     markdown: cleanMd,
                     template: currentTemplate,
                     time: new Date().toLocaleString('zh-CN')
@@ -6281,7 +6282,7 @@ ${resume.selfEval || selfEval}`;
         function saveTranslationAsNew() {
             if (window._lastTranslation) {
                 const lang = window._lastTransLang || 'EN';
-                const name = (resumeData.fileName || '简历').replace(/\.(pdf|docx?)$/i,'') + '-翻译-' + lang;
+                const name = (resumeData.fileName || '简历').replace(/\.(pdf|docx?)$/i,'').substring(0, 8) + '-翻译-' + lang;
                 let versions = [];
                 try { versions = JSON.parse(localStorage.getItem('resume_versions') || '[]'); } catch(e) {}
                 versions.unshift({ name: name, markdown: window._lastTranslation, template: currentTemplate, time: new Date().toLocaleString('zh-CN') });
