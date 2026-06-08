@@ -3412,14 +3412,25 @@
             const vIdx = idx - 1;
             if (vIdx < 0 || vIdx >= versions.length) return;
             const chosen = versions[vIdx];
-            const oldPrimary = { name: resumeData.fileName || '简历', markdown: resumeData.markdown, template: null, time: new Date().toLocaleString('zh-CN') };
+            if (!chosen || !chosen.markdown) { showToast('该版本数据异常'); return; }
+            // 把当前主简历存为版本
+            if (resumeData.markdown) {
+                const oldPrimary = { name: resumeData.fileName || '简历', markdown: resumeData.markdown, template: null, time: new Date().toLocaleString('zh-CN') };
+                versions.splice(vIdx, 1);
+                versions.unshift(oldPrimary);
+            } else {
+                versions.splice(vIdx, 1);
+            }
+            // 设置新主简历
             resumeData.markdown = chosen.markdown;
+            resumeData.originalMarkdown = chosen.markdown;
             resumeData.fileName = chosen.name;
+            if (chosen.template) currentTemplate = chosen.template;
             try { localStorage.setItem('resume_assistant_data', JSON.stringify(resumeData)); } catch(e) {}
-            versions.splice(vIdx, 1);
-            versions.unshift(oldPrimary);
             try { localStorage.setItem('resume_versions', JSON.stringify(versions)); } catch(e) {}
             renderResumeList();
+            updateResumeNameUI();
+            updateHomeResumeCard();
             updateResumeDetailPage(resumeData.markdown);
             updateHomeDiagnosis();
             showToast('已设为主简历');
@@ -3954,6 +3965,7 @@
 
         // 通用简历Markdown渲染（处理标题、表格、列表、分隔线）
         function renderResumeMarkdown(md) {
+            md = md.replace(/==([^=]+)==/g, '$1');
             const lines = md.split('\n');
             let html = '';
             let inTable = false;
@@ -4969,12 +4981,8 @@
             const target = detailContainer.querySelector('.tpl-' + currentTemplate);
             if (target) {
                 target.classList.remove('hidden');
-                // 预览模式下不显示高亮标记，直接去掉==
-                if (window._previewMode) {
-                    target.innerHTML = target.innerHTML.replace(/==([^=]+)==/g, '$1');
-                } else {
-                    target.innerHTML = target.innerHTML.replace(/==([^=]+)==/g, '<span class="ai-modified">$1</span>');
-                }
+                // 详情页始终去掉==标记，不显示高亮
+                target.innerHTML = target.innerHTML.replace(/==([^=]+)==/g, '$1');
                 setTimeout(() => applyPagination(target), 80);
             }
         }
