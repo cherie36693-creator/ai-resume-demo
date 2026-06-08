@@ -303,7 +303,7 @@
                 <div class="page" id="page-cs-doclist">
                     <div class="status-bar"><span class="text-xs font-medium">12:54</span><span class="text-xs">●●●● ⟩</span></div>
                     <div class="flex items-center px-5 py-3">
-                        <svg class="w-5 h-5 text-gray-600 cursor-pointer" onclick="goTo('page-cs-home')" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        <svg class="w-5 h-5 text-gray-600 cursor-pointer" onclick="goBack()" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                         <h1 class="flex-1 text-center text-[17px] font-semibold">全部文档</h1>
                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     </div>
@@ -1237,7 +1237,7 @@
                     <!-- 底部操作栏（吸底） -->
                     <div class="sticky bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-3 flex gap-2 z-10">
                         <button class="flex-1 py-3 bg-gray-100 text-gray-600 text-[13px] font-medium rounded-xl">存草稿</button>
-                        <button class="flex-[2] py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-[13px] font-medium rounded-xl" onclick="goTo('page-templates')">选择模版并生成</button>
+                        <button class="flex-[2] py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-[13px] font-medium rounded-xl" onclick="prepareCreatePreview()">选择模版并生成</button>
                     </div>
 
                     <!-- AI优化浮层 -->
@@ -1657,9 +1657,9 @@
                 </div>
 
                 <!-- Page: 求职指导 -->
-                <div class="page" id="page-interview">
+                <div class="page page-full bg-gray-50" id="page-interview">
                     <div class="status-bar"><span class="text-xs font-medium">12:54</span><span class="text-xs">●●●● ⟩</span></div>
-                    <div class="flex items-center px-5 py-3">
+                    <div class="flex items-center px-5 py-3 bg-white">
                         <svg class="w-5 h-5 text-gray-600 cursor-pointer" onclick="goBack()" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                         <h1 class="flex-1 text-center text-[17px] font-semibold">AI面试稿</h1>
                         <div class="w-5"></div>
@@ -1766,13 +1766,11 @@
                                 </div>
                             </div>
 
-                            <div class="h-[60px]"></div>
                         </div>
 
-                        <div class="h-16"></div>
-                    </div>
+                        </div>
                     <!-- 底部按钮吸底 -->
-                    <div id="interview-bottom-bar" style="display:none;position:absolute;bottom:0;left:0;right:0;background:#fff;padding:10px 20px 16px;border-top:1px solid #f3f4f6;z-index:10;">
+                    <div id="interview-bottom-bar" style="display:none;padding:10px 20px 12px;border-top:1px solid #f3f4f6;">
                         <div class="flex gap-2">
                             <button class="flex-1 py-2.5 bg-blue-50 text-blue-500 text-[12px] font-medium rounded-xl" onclick="generateMoreInterview()">生成更多</button>
                             <button class="flex-1 py-2.5 bg-gray-100 text-gray-500 text-[12px] font-medium rounded-xl" onclick="interviewGenerated=false; _interviewMd=''; generateRealInterview()">重新生成</button>
@@ -2170,7 +2168,9 @@
             // 进入详情页时
             if (pageId === 'page-detail') {
                 try {
-                    if (window._previewMode) {
+                    if (window._generatingResume) {
+                        // 正在生成简历，不覆盖loading状态
+                    } else if (window._previewMode) {
                         // 预览模式：显示模板渲染内容 + 预览底部栏
                         const ov = document.getElementById('detail-original-view');
                         const dc = document.getElementById('detail-content');
@@ -2252,15 +2252,15 @@
             const btnNo = document.getElementById('btn-no-resume');
 
             if (state === 'has') {
-                hasResume.style.display = 'block';
-                noResume.style.display = 'none';
-                btnHas.className = 'flex-1 py-2 text-xs font-medium rounded-md bg-white text-gray-800 shadow-sm';
-                btnNo.className = 'flex-1 py-2 text-xs font-medium rounded-md text-gray-500';
+                if (hasResume) hasResume.style.display = 'block';
+                if (noResume) noResume.style.display = 'none';
+                if (btnHas) btnHas.className = 'flex-1 py-2 text-xs font-medium rounded-md bg-white text-gray-800 shadow-sm';
+                if (btnNo) btnNo.className = 'flex-1 py-2 text-xs font-medium rounded-md text-gray-500';
             } else {
-                hasResume.style.display = 'none';
-                noResume.style.display = 'block';
-                btnNo.className = 'flex-1 py-2 text-xs font-medium rounded-md bg-white text-gray-800 shadow-sm';
-                btnHas.className = 'flex-1 py-2 text-xs font-medium rounded-md text-gray-500';
+                if (hasResume) hasResume.style.display = 'none';
+                if (noResume) noResume.style.display = 'block';
+                if (btnNo) btnNo.className = 'flex-1 py-2 text-xs font-medium rounded-md bg-white text-gray-800 shadow-sm';
+                if (btnHas) btnHas.className = 'flex-1 py-2 text-xs font-medium rounded-md text-gray-500';
             }
             goTo('page-home');
         }
@@ -3275,7 +3275,11 @@
             const tplName = templateNames[currentTemplate] || '默认模板';
             window._selectedTemplateName = tplName;
 
-            if (window._pendingPreview) {
+            if (window._pendingPreview && window._pendingPreview.from === 'page-create') {
+                // 从AI生成简历页来：选好模板后触发AI生成
+                window._pendingPreview = null;
+                generateResumeFromForm();
+            } else if (window._pendingPreview) {
                 // 从岗位匹配/翻译结果来：选好模板后进入预览页
                 const pending = window._pendingPreview;
                 window._pendingPreview = null;
@@ -3296,13 +3300,41 @@
                 if (dc) dc.classList.remove('hidden');
                 goTo('page-detail');
                 setTimeout(() => showToast('已切换为「' + tplName + '」模板'), 100);
-            } else if (from === 'page-create') {
-                // 从AI生成简历页来：触发AI生成流程
-                generateResumeFromForm();
             } else {
                 // 默认行为：进入预览
                 enterPreviewMode(resumeData.markdown, from || 'page-home');
             }
+        }
+
+        function prepareCreatePreview() {
+            const page = document.getElementById('page-create');
+            const inputs = page.querySelectorAll('input[type="text"]');
+            const textareas = page.querySelectorAll('textarea');
+            const name = inputs[0]?.value || '姓名';
+            const jobIntent = inputs[1]?.value || '';
+            const phone = inputs[2]?.value || '';
+            const email = inputs[3]?.value || '';
+            const city = inputs[4]?.value || '';
+            const school = inputs[5]?.value || '';
+            const major = inputs[6]?.value || '';
+            const degree = inputs[7]?.value || '';
+            const eduTime = inputs[8]?.value || '';
+            const company = inputs[9]?.value || '';
+            const position = inputs[10]?.value || '';
+            const workTime = inputs[11]?.value || '';
+            const workDesc = textareas[0]?.value || '';
+            const projectName = inputs[12]?.value || '';
+            const projectRole = inputs[13]?.value || '';
+            const projectTime = inputs[14]?.value || '';
+            const projectDesc = textareas[1]?.value || '';
+            const skillTags = page.querySelectorAll('#skillTagContainer span');
+            const skills = Array.from(skillTags).map(s => s.textContent.replace('×', '').trim()).filter(Boolean);
+            const selfEval = textareas[2]?.value || '';
+            const previewMd = `# ${name}\n${[jobIntent, city, phone, email].filter(Boolean).join(' | ')}\n\n## 教育经历\n${school} · ${major} · ${degree} · ${eduTime}\n\n## 工作经历\n**${company}** · ${position} · ${workTime}\n${workDesc}\n\n## 项目经历\n**${projectName}** · ${projectRole} · ${projectTime}\n${projectDesc}\n\n## 技能清单\n${skills.join(' / ')}\n\n## 自我评价\n${selfEval}`;
+            window._createFormMarkdown = previewMd;
+            window._pendingPreview = { markdown: previewMd, from: 'page-create' };
+            window._templateFrom = 'page-create';
+            goTo('page-templates');
         }
 
         // 简历列表动态渲染
@@ -3314,11 +3346,14 @@
             const allResumes = [];
             // 主简历
             if (resumeData.markdown) {
-                let name = resumeData.fileName || '简历';
+                let name = resumeData.fileName || '';
                 name = name.replace(/\.(pdf|docx?)$/i, '');
-                const nameMatch = resumeData.markdown.match(/^#\s*(.+)/m);
-                if (nameMatch && nameMatch[1].trim().length <= 8) name = nameMatch[1].trim() + '-简历';
-                else if (name.length > 12) name = name.substring(0, 12) + '...';
+                if (!name || name === '简历') {
+                    const nameMatch = resumeData.markdown.match(/^#\s*(.+)/m);
+                    if (nameMatch && nameMatch[1].trim().length <= 8) name = nameMatch[1].trim() + '-简历';
+                    else name = name || '简历';
+                }
+                if (name.length > 16) name = name.substring(0, 16) + '...';
                 allResumes.push({ name: name, markdown: resumeData.markdown, template: null, time: '当前', isPrimary: true });
             }
             // localStorage 版本
@@ -3487,8 +3522,13 @@
         function finishImport() {
             hideImportSheet();
             setTimeout(() => {
-                toggleState('has');
-                goTo('page-detail');
+                if (resumeData.markdown) {
+                    toggleState('has');
+                    goTo('page-detail');
+                } else {
+                    toggleState('has');
+                    goTo('page-home');
+                }
             }, 350);
         }
 
@@ -3963,8 +4003,12 @@
         }
 
         // 通用简历Markdown渲染（处理标题、表格、列表、分隔线）
-        function renderResumeMarkdown(md) {
-            md = md.replace(/==([^=]+)==/g, '$1');
+        function renderResumeMarkdown(md, keepHighlight) {
+            if (keepHighlight) {
+                md = md.replace(/==([^=]+)==/g, '%%AIHL_START%%$1%%AIHL_END%%');
+            } else {
+                md = md.replace(/==([^=]+)==/g, '$1');
+            }
             const lines = md.split('\n');
             let html = '';
             let inTable = false;
@@ -3978,7 +4022,7 @@
                 }
                 // 第一行是表头，第二行是分隔线（跳过），其余是数据
                 const headers = tableRows[0];
-                const dataRows = tableRows.slice(2);
+                const dataRows = tableRows.slice(2).filter(r => r !== null);
                 html += '<div class="overflow-x-auto my-2"><table class="w-full text-[11px] border-collapse">';
                 html += '<thead><tr>';
                 headers.forEach(h => html += `<th class="px-2 py-1.5 bg-gray-50 text-left font-semibold text-gray-700 border-b border-gray-200">${h}</th>`);
@@ -4061,6 +4105,9 @@
                 html += `<p class="text-[11px] text-gray-600 leading-relaxed py-0.5">${trimmed.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`;
             }
             if (inTable) flushTable();
+            if (keepHighlight) {
+                html = html.replace(/%%AIHL_START%%/g, '<span class="ai-modified">').replace(/%%AIHL_END%%/g, '</span>');
+            }
             return html;
         }
 
@@ -4681,7 +4728,7 @@
                     leftSecs += `<div style="margin-top:8px;"><p style="font-size:8px;color:#fff;font-weight:700;margin:0 0 4px;padding-bottom:3px;border-bottom:1px solid rgba(255,255,255,0.2);">${sec.title}</p>`;
                     for (const item of sec.content) {
                         const sc = skillColors[si % skillColors.length]; si++;
-                        const w = 55 + Math.floor(Math.random()*35);
+                        const w = 55 + ((si * 17 + 7) % 35);
                         leftSecs += `<div style="margin:3px 0;"><p style="font-size:7px;color:rgba(255,255,255,0.9);margin:0 0 1px;">${item.text.replace(/^[-•*→·]\s*/,'')}</p><div style="height:4px;background:rgba(255,255,255,0.15);border-radius:2px;overflow:hidden;"><div style="height:100%;width:${w}%;background:${sc};border-radius:2px;"></div></div></div>`;
                     }
                     leftSecs += '</div>';
@@ -5499,7 +5546,10 @@
             // 收集自我评价
             const selfEval = textareas[2]?.value || '';
 
-            // 跳转到详情页并显示loading
+            // 直接以预览模式进入详情页显示loading
+            window._generatingResume = true;
+            window._previewMode = true;
+            window._previewFrom = 'page-create';
             const detailContent = document.querySelector('#page-detail #detail-content');
             const originalView = document.getElementById('detail-original-view');
             if (originalView) originalView.classList.add('hidden');
@@ -5515,6 +5565,10 @@
                 </div>
             `;
             detailContent.appendChild(loadingDiv);
+            document.getElementById('detail-bar-normal').classList.add('hidden');
+            document.getElementById('detail-bar-preview').classList.add('hidden');
+            const title = document.getElementById('detail-page-title');
+            if (title) title.textContent = '简历预览';
             goTo('page-detail');
 
             try {
@@ -5578,19 +5632,21 @@ ${resume.selfEval || selfEval}`;
                 versions.unshift({ name: genName, markdown: polishedMarkdown, template: currentTemplate, time: new Date().toLocaleString('zh-CN') });
                 localStorage.setItem('resume_versions', JSON.stringify(versions.slice(0, 10)));
 
-                // 如果用户还没有导入过简历，则设为当前简历
-                if (!resumeData.markdown) {
-                    resumeData.markdown = polishedMarkdown;
-                    resumeData.fileName = genName + '.pdf';
-                    saveResumeData();
-                    updateHomeResumeCard();
-                    updateHomeDiagnosis();
-                }
+                // AI生成的简历设为当前简历
+                resumeData.markdown = polishedMarkdown;
+                resumeData.fileName = genName + '.pdf';
+                saveResumeData();
+                updateHomeResumeCard();
+                updateHomeDiagnosis();
 
-                // 进入预览模式让用户确认
-                enterPreviewMode(polishedMarkdown, 'page-create');
+                // 直接渲染预览内容（已在预览模式，不再跳页面）
+                window._generatingResume = false;
+                window._previewMarkdown = polishedMarkdown;
+                updateResumeDetailPage(polishedMarkdown);
+                document.getElementById('detail-bar-preview').classList.remove('hidden');
 
             } catch(err) {
+                window._generatingResume = false;
                 const ld2 = document.getElementById('detail-loading');
                 if (ld2) ld2.remove();
                 // 显示错误提示
@@ -5982,8 +6038,7 @@ ${resume.selfEval || selfEval}`;
                 resumeBody = customResume.substring(0, noteMatch.index).trim();
                 aiNotes = noteMatch[1].trim();
             }
-            let htmlContent = renderResumeMarkdown(resumeBody);
-            htmlContent = htmlContent.replace(/==([^=]+)==/g, '<span class="ai-modified">$1</span>');
+            let htmlContent = renderResumeMarkdown(resumeBody, true);
             let aiNotesHtml = '';
             const modifiedParts = resumeBody.match(/==([^=]+)==/g);
             if (aiNotes) {
@@ -6031,7 +6086,7 @@ ${resume.selfEval || selfEval}`;
                     title = '基本信息';
                 }
                 window._jdSections.push({ title, md: rawMd });
-                const bodyHtml = renderResumeMarkdown(rawMd).replace(/==([^=]+)==/g, '<span class="ai-modified">$1</span>');
+                const bodyHtml = renderResumeMarkdown(rawMd, true);
                 cardsHtml += `<div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-2.5" id="jd-sec-${idx}">
                     <div class="px-4 pt-3 pb-1 flex items-center justify-between">
                         <h3 class="text-[13px] font-semibold text-gray-800">${title}</h3>
@@ -6165,6 +6220,7 @@ ${resume.selfEval || selfEval}`;
         function confirmPreviewSave() {
             if (window._previewMarkdown) {
                 const cleanMd = window._previewMarkdown.replace(/==([^=]+)==/g, '$1');
+                window._previewMarkdown = null;
                 const templateNames = {spring2024:'蓝色经典',student:'清新多彩',bluegray:'绿色双栏',greenside:'蓝色双栏',navybiz:'珊瑚粉渐变',timeline:'暗夜星空',minimal:'彩虹侧栏',orange:'翡翠几何',cleanline:'奶茶拿铁',biznavy:'薄荷清风',academic:'云朵蓝',modern:'蜜桃粉',lavender:'薰衣草',sunset:'落日橙',matcha:'抹茶慕斯',sakura:'樱花季'};
                 const tplName = templateNames[currentTemplate] || currentTemplate;
                 const source = window._previewFrom === 'page-jd' ? '岗位定制' : window._previewFrom === 'page-diagnosis' ? 'AI优化' : window._previewFrom === 'page-translate' ? '翻译' : 'AI生成';
@@ -6449,7 +6505,6 @@ ${resume.selfEval || selfEval}`;
                     <div class="space-y-3 overflow-y-auto pb-4" style="max-height: 400px;">
                         ${questionsHtml}
                     </div>
-                    <div class="h-16"></div>
                 `;
                 interviewGenerated = true;
                 _interviewMd = resumeData.originalMarkdown || resumeData.markdown;
@@ -6532,29 +6587,17 @@ ${resume.selfEval || selfEval}`;
 
         // (goTo 已在原始定义中处理诊断和面试自动触发，此处不再重复覆盖)
 
-        // ===== 导入完成后自动跳转 =====
-        const _originalFinishImport = finishImport;
-        finishImport = function() {
-            hideImportSheet();
-            setTimeout(() => {
-                if (resumeData.markdown) {
-                    toggleState('has');
-                    goTo('page-detail');
-                } else {
-                    _originalFinishImport();
-                }
-            }, 350);
-        };
-
         // 更新首页简历卡片显示
         function updateHomeResumeCard() {
             const nameEl = document.getElementById('home-resume-name');
             const dateEl = document.getElementById('home-resume-date');
             if (nameEl) {
-                // 优先从markdown内容提取真实姓名，格式为"姓名-简历"
                 let displayName = '';
-                const _notName = ['求职','总结','简历','概述','个人','profile','summary'];
-                if (resumeData.markdown) {
+                if (resumeData.fileName && resumeData.fileName !== '简历') {
+                    displayName = resumeData.fileName.replace(/\.(pdf|docx?|png|jpe?g)$/i, '');
+                }
+                if (!displayName && resumeData.markdown) {
+                    const _notName = ['求职','总结','简历','概述','个人','profile','summary'];
                     const nameMatch = resumeData.markdown.match(/^#\s*(.+)/m);
                     if (nameMatch && !_notName.some(k => nameMatch[1].toLowerCase().includes(k)) && nameMatch[1].trim().length <= 8) {
                         displayName = nameMatch[1].trim() + '-简历';
@@ -6563,10 +6606,9 @@ ${resume.selfEval || selfEval}`;
                         if (realName) displayName = realName[1].trim() + '-简历';
                     }
                 }
-                if (!displayName && resumeData.fileName) {
-                    displayName = resumeData.fileName.replace(/\.(pdf|docx?|png|jpe?g)$/i, '');
-                }
-                if (displayName) nameEl.textContent = displayName;
+                if (!displayName) displayName = '简历';
+                if (displayName.length > 18) displayName = displayName.substring(0, 18) + '...';
+                nameEl.textContent = displayName;
             }
             if (dateEl) {
                 const now = new Date();
