@@ -1773,10 +1773,10 @@
 
                         </div>
                     <!-- 底部按钮吸底 -->
-                    <div id="interview-bottom-bar" style="display:none;padding:10px 20px 12px;border-top:1px solid #f3f4f6;background:#fff;">
+                    <div id="interview-bottom-bar" style="display:none;padding:10px 20px 12px;border-top:1px solid #f3f4f6;background:#fff;position:relative;z-index:20;">
                         <div class="flex gap-2">
-                            <button class="flex-1 py-2.5 bg-blue-50 text-blue-500 text-[12px] font-medium rounded-xl" onclick="generateMoreInterview()">生成更多</button>
-                            <button class="flex-1 py-2.5 bg-gray-100 text-gray-500 text-[12px] font-medium rounded-xl" onclick="interviewGenerated=false; _interviewMd=''; generateRealInterview()">重新生成</button>
+                            <button class="flex-1 py-2.5 bg-blue-50 text-blue-500 text-[12px] font-medium rounded-xl cursor-pointer" onclick="generateMoreInterview()">生成更多</button>
+                            <button class="flex-1 py-2.5 bg-gray-100 text-gray-500 text-[12px] font-medium rounded-xl cursor-pointer" onclick="interviewGenerated=false; _interviewMd=''; generateRealInterview()">重新生成</button>
                         </div>
                     </div>
                 </div>
