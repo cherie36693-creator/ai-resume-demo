@@ -2239,11 +2239,20 @@
                 setTimeout(function() {
                     try {
                         if (typeof resumeData !== 'undefined' && resumeData.markdown && typeof runRealDiagnosis === 'function' && !window._realDiagRunning) {
-                            // 同一份简历已诊断过则跳过
                             if (window._lastDiagMd === (resumeData.originalMarkdown || resumeData.markdown) && window._diagReport) return;
                             runRealDiagnosis();
                         }
                     } catch(e) { console.log('auto-diag skip:', e); }
+                }, 200);
+            }
+            // 进入面试稿页时，自动基于主简历生成面试题
+            if (pageId === 'page-interview') {
+                setTimeout(function() {
+                    try {
+                        if (typeof resumeData !== 'undefined' && resumeData.markdown && typeof generateRealInterview === 'function') {
+                            generateRealInterview();
+                        }
+                    } catch(e) { console.log('auto-interview skip:', e); }
                 }, 200);
             }
         }

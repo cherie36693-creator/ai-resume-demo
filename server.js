@@ -119,13 +119,32 @@ const server = http.createServer(async (req, res) => {
                     });
                 }
                 const openaiBody = JSON.stringify({ model: LLM_MODEL, messages, max_tokens: reqBody.max_tokens || 4096, temperature: 0.7, stream: false });
-                const result = await proxyRequest('https://' + LLM_API_HOST + '/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + LLM_API_KEY } }, Buffer.from(openaiBody));
-                const openaiResp = JSON.parse(result.body.toString());
-                let text = '';
-                if (openaiResp.choices && openaiResp.choices[0]) text = openaiResp.choices[0].message.content || '';
-                const claudeResp = { content: [{ type: 'text', text }], stop_reason: 'end_turn', model: LLM_MODEL };
-                res.writeHead(200, { ...CORS_HEADERS, 'Content-Type': 'application/json' });
-                res.end(JSON.stringify(claudeResp));
+                const maxRetries = 2;
+                let lastErr = null;
+                for (let attempt = 0; attempt <= maxRetries; attempt++) {
+                    try {
+                        const result = await proxyRequest('https://' + LLM_API_HOST + '/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + LLM_API_KEY } }, Buffer.from(openaiBody));
+                        if (result.statusCode >= 500) {
+                            lastErr = new Error('LLM API returned ' + result.statusCode + ': ' + result.body.toString().slice(0, 200));
+                            if (attempt < maxRetries) { await new Promise(r => setTimeout(r, 1000 * (attempt + 1))); continue; }
+                            throw lastErr;
+                        }
+                        const openaiResp = JSON.parse(result.body.toString());
+                        if (openaiResp.error) {
+                            throw new Error(openaiResp.error.message || JSON.stringify(openaiResp.error));
+                        }
+                        let text = '';
+                        if (openaiResp.choices && openaiResp.choices[0]) text = openaiResp.choices[0].message.content || '';
+                        const claudeResp = { content: [{ type: 'text', text }], stop_reason: 'end_turn', model: LLM_MODEL };
+                        res.writeHead(200, { ...CORS_HEADERS, 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify(claudeResp));
+                        return;
+                    } catch(retryErr) {
+                        lastErr = retryErr;
+                        if (attempt < maxRetries) { await new Promise(r => setTimeout(r, 1000 * (attempt + 1))); continue; }
+                    }
+                }
+                throw lastErr;
             } catch (err) {
                 res.writeHead(502, { ...CORS_HEADERS, 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ error: err.message }));
