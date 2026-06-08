@@ -4358,7 +4358,7 @@
             const nameMatch = md.match(/^#\s*(.+)/m);
             if (nameMatch) {
                 const heading = nameMatch[1].trim();
-                const isNotName = notNameKeywords.some(k => heading.toLowerCase().includes(k)) || heading.length > 8;
+                const isNotName = notNameKeywords.some(k => heading.toLowerCase().includes(k)) || heading.length > 20;
                 if (!isNotName) {
                     data.name = heading;
                 } else {
@@ -6520,7 +6520,7 @@ ${resume.selfEval || selfEval}`;
                         <span class="interview-tab px-3 py-1.5 bg-gray-100 text-gray-500 text-[11px] rounded-full cursor-pointer" onclick="switchInterviewTab(this, '简历弱点')">简历弱点</span>
                     </div>
 
-                    <div class="space-y-3 pb-20">
+                    <div class="space-y-3 pb-20" id="interview-question-list">
                         ${questionsHtml}
                     </div>
                 `;
@@ -6553,7 +6553,7 @@ ${resume.selfEval || selfEval}`;
             if (_generatingMore) return;
             _generatingMore = true;
             const container = document.querySelector('#page-interview .fade-in');
-            const listEl = container.querySelector('.space-y-3.overflow-y-auto') || document.getElementById('interview-question-list');
+            const listEl = document.getElementById('interview-question-list') || container.querySelector('.space-y-3');
             if (!listEl) { _generatingMore = false; return; }
             if (document.getElementById('more-loading')) { _generatingMore = false; return; }
             const existing = listEl.querySelectorAll('[class*="rounded-xl"][class*="border"]').length;
