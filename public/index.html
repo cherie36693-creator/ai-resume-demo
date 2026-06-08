@@ -35,6 +35,9 @@
 
         .ai-modified { color: #2563eb; background: #eff6ff; padding: 1px 4px; border-radius: 3px; border-bottom: 1.5px solid #3b82f6; }
         #detail-content, .resume-tpl { overflow: hidden; max-width: 100%; }
+        [contenteditable] { outline: none !important; }
+        [contenteditable]:focus { box-shadow: none !important; }
+        #template-preview-render [contenteditable] { border: none !important; background: transparent !important; }
         .a4-page-container { overflow: hidden; max-width: 100%; word-break: break-word; overflow-wrap: break-word; }
 
         .score-ring { position: relative; width: 80px; height: 80px; }
@@ -1770,7 +1773,7 @@
 
                         </div>
                     <!-- 底部按钮吸底 -->
-                    <div id="interview-bottom-bar" style="display:none;padding:10px 20px 12px;border-top:1px solid #f3f4f6;">
+                    <div id="interview-bottom-bar" style="display:none;padding:10px 20px 12px;border-top:1px solid #f3f4f6;background:#fff;">
                         <div class="flex gap-2">
                             <button class="flex-1 py-2.5 bg-blue-50 text-blue-500 text-[12px] font-medium rounded-xl" onclick="generateMoreInterview()">生成更多</button>
                             <button class="flex-1 py-2.5 bg-gray-100 text-gray-500 text-[12px] font-medium rounded-xl" onclick="interviewGenerated=false; _interviewMd=''; generateRealInterview()">重新生成</button>
@@ -5489,7 +5492,7 @@
 
                     <div class="flex gap-2 mt-4 pb-6">
                         <button class="flex-1 py-2.5 bg-gray-100 text-gray-600 text-[13px] font-medium rounded-xl" onclick="goBack()">返回</button>
-                        <button class="flex-[2] py-2.5 bg-blue-500 text-white text-[13px] font-medium rounded-xl" onclick="enterPreviewMode(resumeData.markdown, 'page-diagnosis')">确认预览</button>
+                        <button class="flex-[2] py-2.5 bg-blue-500 text-white text-[13px] font-medium rounded-xl" onclick="acceptAllDiagEdits()">采纳全部并预览</button>
                     </div>
                 `;
             } catch(err) {
@@ -6184,6 +6187,7 @@ ${resume.selfEval || selfEval}`;
                     tpl.querySelectorAll('p, span, b, strong, li, td').forEach(el => {
                         if (el.querySelector('p, li')) return;
                         if (!el.textContent.trim()) return;
+                        if (el.textContent.trim().length < 2) return;
                         el.contentEditable = 'true';
                         el.style.outline = 'none';
                         el.style.cursor = 'text';
@@ -6502,7 +6506,7 @@ ${resume.selfEval || selfEval}`;
                         <span class="interview-tab px-3 py-1.5 bg-gray-100 text-gray-500 text-[11px] rounded-full cursor-pointer" onclick="switchInterviewTab(this, '简历弱点')">简历弱点</span>
                     </div>
 
-                    <div class="space-y-3 overflow-y-auto pb-4" style="max-height: 400px;">
+                    <div class="space-y-3 overflow-y-auto pb-20" style="max-height: calc(100vh - 280px);">
                         ${questionsHtml}
                     </div>
                 `;
