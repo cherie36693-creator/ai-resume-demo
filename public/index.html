@@ -6309,6 +6309,7 @@ ${resume.selfEval || selfEval}`;
                     `你是专业简历翻译师。将中文简历完整翻译为${langName}。
 
 严格要求：
+- 必须保持Markdown格式：用 # 表示姓名，用 ## 表示各段标题（如 ## Education, ## Work Experience 等）
 - 输出中不得包含任何中文字符，所有内容必须100%为${langName}
 - 人名必须翻译为拼音或英文名（如"王小明"→"Xiaoming Wang"）
 - 论文标题、项目名称等如原文为中文，必须翻译为${langName}
@@ -6316,19 +6317,21 @@ ${resume.selfEval || selfEval}`;
 - 按照${style}的规范重写
 - 使用目标语言国家的简历写作习惯
 - 保持专业性，使用行业术语
-- 输出完整翻译后的简历，不要遗漏任何部分`,
+- 输出完整翻译后的简历，不要遗漏任何部分
+- 不要输出代码块标记(\`\`\`)，直接输出Markdown文本`,
                     `请翻译为${langName}：\n\n${(resumeData.originalMarkdown || resumeData.markdown).replace(/==([^=]+)==/g, '$1')}`
                 );
 
                 document.getElementById('translate-title').textContent = '翻译结果';
                 window._lastTransLang = langName;
-                renderTransResultPage(translated, langName);
+                const cleanTranslated = translated.replace(/^```(?:markdown|md)?\s*\n?/i, '').replace(/\n?```\s*$/,'').trim();
+                renderTransResultPage(cleanTranslated, langName);
 
                 // 缓存结果
-                window._lastTranslation = translated;
+                window._lastTranslation = cleanTranslated;
                 _transCacheMd = resumeData.originalMarkdown || resumeData.markdown;
                 _transCacheLang = lang;
-                _transCacheResult = translated;
+                _transCacheResult = cleanTranslated;
             } catch(err) {
                 document.getElementById('translate-title').textContent = '翻译失败';
                 transResult.innerHTML = `
