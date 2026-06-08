@@ -2777,8 +2777,8 @@
                     const rest = md.substring(titleEnd);
                     const nextTitle = rest.match(/\n(#{1,3}\s)/);
                     const moduleEnd = nextTitle ? titleEnd + nextTitle.index : md.length;
-                    const markedLines = rewriteText.split('\n').filter(l => l.trim()).map(l => `==${l.trim()}==`).join('\n');
-                    resumeData.markdown = md.substring(0, titleEnd) + '\n' + markedLines + '\n' + md.substring(moduleEnd);
+                    const cleanLines = rewriteText.split('\n').filter(l => l.trim()).join('\n');
+                    resumeData.markdown = md.substring(0, titleEnd) + '\n' + cleanLines + '\n' + md.substring(moduleEnd);
                 }
             });
             saveResumeData();
@@ -2825,7 +2825,7 @@
         function mAcceptSent(idx) {
             const item = window._mSentItems?.[idx];
             if (item && resumeData.markdown.includes(item.original)) {
-                resumeData.markdown = resumeData.markdown.replace(item.original, item.optimized);
+                resumeData.markdown = resumeData.markdown.replace(item.original, item.optimized.replace(/==([^=]+)==/g, '$1'));
                 saveResumeData();
             }
             const el = document.getElementById(`m-sent-${idx}`);
@@ -2835,7 +2835,7 @@
             if (!window._mSentItems) return;
             window._mSentItems.forEach(item => {
                 if (resumeData.markdown.includes(item.original)) {
-                    resumeData.markdown = resumeData.markdown.replace(item.original, item.optimized);
+                    resumeData.markdown = resumeData.markdown.replace(item.original, item.optimized.replace(/==([^=]+)==/g, '$1'));
                 }
             });
             saveResumeData();
@@ -2921,9 +2921,8 @@
                         const rest = md.substring(titleEnd);
                         const nextTitle = rest.match(/\n(#{1,3}\s)/);
                         const moduleEnd = nextTitle ? titleEnd + nextTitle.index : md.length;
-                        // 用改写内容替换模块内容，加 == 标记
-                        const markedLines = editedText.split('\n').filter(l => l.trim()).map(l => `==${l.trim()}==`).join('\n');
-                        resumeData.markdown = md.substring(0, titleEnd) + '\n' + markedLines + '\n' + md.substring(moduleEnd);
+                        const cleanLines = editedText.split('\n').filter(l => l.trim()).join('\n');
+                        resumeData.markdown = md.substring(0, titleEnd) + '\n' + cleanLines + '\n' + md.substring(moduleEnd);
                         saveResumeData();
                     }
                 }
@@ -4292,6 +4291,7 @@
         // 从markdown解析简历结构化数据
         function parseResumeFromMarkdown(md) {
             if (!md) return null;
+            md = md.replace(/==([^=]+)==/g, '$1');
             const lines = md.split('\n');
             const data = { name: '', subtitle: '', skills: [], sections: [] };
             // 提取姓名（第一个一级标题，但排除非人名内容）
