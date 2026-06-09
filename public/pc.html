@@ -4229,13 +4229,16 @@
                     </div>
                 `;
             }
-            // 右侧：定制后简历可编辑区域 + 操作按钮
+            // 右侧：定制后简历渲染（模板式） + 操作按钮
             window._jdCustomResumeBody = resumeBody;
-            const customRenderedHtml = renderMarkdownToHtml(resumeBody.replace(/==([^=]+)==/g, '<span style="background:#dbeafe;padding:1px 3px;border-radius:3px;color:#1d4ed8;">$1</span>'));
+            window._lastCustomResume = resumeBody;
+            const tplHtml = renderTemplateByStyle(resumeBody, _selectedPCTemplate || 'spring2024');
             const rightPanel = result.parentElement;
             result.innerHTML = `${aiNotesHtml}
-            <div class="flex-1 overflow-y-auto text-sm text-gray-700 leading-relaxed" id="jd-custom-editable" contenteditable="true" style="outline:none;cursor:text;">${customRenderedHtml}</div>`;
-            result.className = 'flex-1 overflow-hidden p-5 flex flex-col';
+            <div class="flex-1 overflow-y-auto bg-[#f5f5f7] p-4 flex justify-center">
+                <div class="w-full max-w-[520px] bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">${tplHtml}</div>
+            </div>`;
+            result.className = 'flex-1 overflow-hidden flex flex-col';
             // 吸底按钮区域
             let bottomBar = rightPanel.querySelector('.jd-custom-bottom-bar');
             if (!bottomBar) {
@@ -4243,7 +4246,10 @@
                 bottomBar.className = 'jd-custom-bottom-bar px-5 py-3 border-t border-gray-100 flex-shrink-0';
                 rightPanel.appendChild(bottomBar);
             }
-            bottomBar.innerHTML = `<button class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm font-medium rounded-xl hover:from-indigo-600 hover:to-purple-600 shadow-sm flex items-center justify-center gap-1.5" onclick="saveCustomResume()"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>保存为新简历</button>`;
+            bottomBar.innerHTML = `<div class="flex gap-2 mb-2">
+                <button class="flex-1 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-xs font-medium rounded-lg hover:from-indigo-600 hover:to-purple-600 shadow-sm flex items-center justify-center gap-1.5" onclick="showJdTemplatePreview()"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z"/></svg>选择模板预览</button>
+                <button class="px-3 py-2.5 bg-white border border-gray-200 text-xs text-gray-600 font-medium rounded-lg hover:bg-gray-50" onclick="navigator.clipboard.writeText(window._lastCustomResume || ''); showToast('已复制')">复制</button>
+            </div>`;
         } catch(err) { result.innerHTML = `<p class="text-sm text-red-500">生成失败: ${err.message}</p>`; }
     }
 
@@ -4281,9 +4287,7 @@
     }
 
     function saveCustomResume() {
-        const editEl = document.getElementById('jd-custom-editable');
-        const editedText = editEl ? editEl.innerText.trim() : '';
-        const content = editedText || window._lastCustomResume;
+        const content = window._lastCustomResume || window._jdCustomResumeBody;
         if (content) {
             resumeData.markdown = content;
             saveData();
