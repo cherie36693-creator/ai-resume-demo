@@ -5423,19 +5423,19 @@
                 // 移除loading
                 document.querySelectorAll('#detail-loading').forEach(el => el.remove());
 
-                // 用AI润色后的结构化内容组织markdown
-                const polishedMarkdown = `# ${resume.name || name}
-${resume.jobIntent || jobIntent} | ${resume.city || city} | ${resume.phone || phone} | ${resume.email || email}
+                // 用AI润色后的结构化内容组织markdown（姓名、电话、邮箱等个人信息强制用用户原始输入）
+                const polishedMarkdown = `# ${name}
+${jobIntent} | ${city} | ${phone} | ${email}
 
 ## 教育经历
-${resume.education?.school || school} · ${resume.education?.major || major} · ${resume.education?.degree || degree} · ${resume.education?.time || eduTime}
+${school} · ${major} · ${degree} · ${eduTime}
 
 ## 工作经历
-**${resume.work?.company || company}** · ${resume.work?.position || position} · ${resume.work?.time || workTime}
+**${company}** · ${position} · ${workTime}
 ${resume.work?.desc || workDesc}
 
 ## 项目经历
-**${resume.project?.name || projectName}** · ${resume.project?.role || projectRole} · ${resume.project?.time || projectTime}
+**${projectName}** · ${projectRole} · ${projectTime}
 ${resume.project?.desc || projectDesc}
 
 ## 技能清单
@@ -5445,7 +5445,7 @@ ${(resume.skills || skills).join(' / ')}
 ${resume.selfEval || selfEval}`;
 
                 // 保存为新版本，不覆盖原简历
-                const genName = `${resume.name || name}-简历`;
+                const genName = `${name}-简历`;
                 let versions = [];
                 try { versions = JSON.parse(localStorage.getItem('resume_versions') || '[]'); } catch(e) {}
                 versions.unshift({ name: genName, markdown: polishedMarkdown, template: currentTemplate, time: new Date().toLocaleString('zh-CN') });
@@ -6179,7 +6179,7 @@ ${selfEval}`;
 严格要求：
 - 必须保持Markdown格式：用 # 表示姓名，用 ## 表示各段标题（如 ## Education, ## Work Experience 等）
 - 输出中不得包含任何中文字符，所有内容必须100%为${langName}
-- 人名必须翻译为拼音或英文名（如"王小明"→"Xiaoming Wang"）
+- 简历主人的姓名保持原文不变（不要翻译或修改姓名）
 - 论文标题、项目名称等如原文为中文，必须翻译为${langName}
 - 作者列表中的中文人名全部转为拼音
 - 按照${style}的规范重写
