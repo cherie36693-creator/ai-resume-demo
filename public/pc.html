@@ -3433,9 +3433,10 @@
         const jobVal = document.getElementById('f-job')?.value.trim();
         if (!nameVal || !jobVal) { showToast('请至少填写姓名和求职意向'); return; }
         if (pendingResumeRaw.replace(/[：\n\s]/g,'').length < 10) { showToast('请至少填写部分信息'); return; }
-        // 弹出模板预览弹窗，选模板后生成
+        // 把表单数据转成 markdown 用于预览
+        const fMd = buildFormMarkdown();
         _tplPreviewFrom = 'create';
-        _tplPreviewMarkdown = pendingResumeRaw;
+        _tplPreviewMarkdown = fMd;
         showTemplatePreviewModal();
     }
 
@@ -3675,6 +3676,41 @@
             backToForm();
             showToast('生成失败: ' + err.message);
         }
+    }
+
+    function buildFormMarkdown() {
+        const v = id => document.getElementById(id)?.value?.trim() || '';
+        let md = `# ${v('f-name')}\n\n`;
+        const subtitle = [v('f-job'), v('f-city'), v('f-phone'), v('f-email')].filter(Boolean).join(' | ');
+        if (subtitle) md += `${subtitle}\n\n---\n\n`;
+        if (v('f-school')) {
+            md += `## 教育背景\n\n**${v('f-school')}** ${v('f-major') ? '· ' + v('f-major') : ''} ${v('f-degree') ? '（' + v('f-degree') + '）' : ''}\n`;
+            if (v('f-edutime')) md += `${v('f-edutime')}\n`;
+            md += '\n';
+        }
+        if (v('f-company')) {
+            md += `## 工作经历\n\n**${v('f-company')}** ${v('f-position') ? '· ' + v('f-position') : ''}\n`;
+            if (v('f-worktime')) md += `${v('f-worktime')}\n`;
+            if (v('f-workdesc')) md += `\n${v('f-workdesc').split('\n').map(l => l.trim() ? '- ' + l.trim() : '').filter(Boolean).join('\n')}\n`;
+            md += '\n';
+        }
+        if (v('f-project')) {
+            md += `## 项目经历\n\n**${v('f-project')}** ${v('f-projrole') ? '· ' + v('f-projrole') : ''}\n`;
+            if (v('f-projtime')) md += `${v('f-projtime')}\n`;
+            if (v('f-projdesc')) md += `\n${v('f-projdesc').split('\n').map(l => l.trim() ? '- ' + l.trim() : '').filter(Boolean).join('\n')}\n`;
+            md += '\n';
+        }
+        document.querySelectorAll('.extra-project-item').forEach(item => {
+            const inputs = item.querySelectorAll('input, textarea');
+            if (inputs[0]?.value) {
+                md += `**${inputs[0].value}** ${inputs[1]?.value ? '· ' + inputs[1].value : ''}\n`;
+                if (inputs[2]?.value) md += `${inputs[2].value}\n`;
+                if (inputs[3]?.value) md += `\n${inputs[3].value.split('\n').map(l => l.trim() ? '- ' + l.trim() : '').filter(Boolean).join('\n')}\n`;
+                md += '\n';
+            }
+        });
+        if (v('f-self')) md += `## 自我评价\n\n${v('f-self')}\n`;
+        return md;
     }
 
     async function doCreateResume() {
