@@ -3002,13 +3002,16 @@
         const activeResume = interviewResumeList[interviewActiveIdx];
         const md = activeResume ? activeResume.markdown : resumeData.markdown;
         if (!md) { container.innerHTML = '<div class="bg-white shadow-lg rounded-sm w-full max-w-[480px] min-h-[560px] p-10"><p class="text-center text-xs text-gray-400 mt-20">导入简历后显示文档预览</p></div>'; return; }
-        if (resumeData.fileDataUrl) {
+        if (!activeResume && resumeData.fileDataUrl) {
             const type = resumeData.fileType || '';
-            if (type.startsWith('image/')) {
-                container.innerHTML = `<div class="bg-white shadow-lg rounded-sm w-full max-w-[480px] min-h-[560px] p-0"><img src="${resumeData.fileDataUrl}" style="width:100%;height:auto;display:block;" alt="简历原件"/></div>`;
+            const durl = resumeData.fileDataUrl;
+            const isImg = type.startsWith('image/') || durl.startsWith('data:image/');
+            const isPdf = type === 'application/pdf' || durl.startsWith('data:application/pdf');
+            if (isImg) {
+                container.innerHTML = `<div class="bg-white shadow-lg rounded-sm w-full max-w-[480px] min-h-[560px] p-0"><img src="${durl}" style="width:100%;height:auto;display:block;" alt="简历原件"/></div>`;
                 return;
-            } else if (type === 'application/pdf') {
-                container.innerHTML = `<div class="bg-white shadow-lg rounded-sm w-full max-w-[480px] min-h-[700px] p-0"><embed src="${resumeData.fileDataUrl}#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf" style="width:100%;height:700px;border:none;"/></div>`;
+            } else if (isPdf) {
+                container.innerHTML = `<div class="bg-white shadow-lg rounded-sm w-full max-w-[480px] min-h-[700px] p-0"><embed src="${durl}#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf" style="width:100%;height:700px;border:none;"/></div>`;
                 return;
             }
         }
