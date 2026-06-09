@@ -827,198 +827,12 @@
                     </div>
 
                     <div class="px-5 fade-in">
-                        <!-- 初始loading态 -->
+                        <!-- 初始loading态（默认显示） -->
                         <div class="flex flex-col items-center justify-center py-12" id="diag-initial-loading">
                             <div class="w-10 h-10 border-3 border-gray-200 border-t-blue-500 rounded-full" style="border-width:3px;animation:spin2 .8s linear infinite"></div>
                             <p class="text-[13px] font-medium text-gray-700 mt-4">AI正在诊断你的简历...</p>
                             <p class="text-[11px] text-gray-400 mt-1">分析内容质量、量化程度、表达专业度</p>
                         </div>
-
-                        <!-- 多维评分雷达图 -->
-                        <div class="bg-white rounded-2xl border border-gray-200 mb-4 shadow-sm p-4">
-                            <div class="flex items-center justify-between mb-3">
-                                <h4 class="text-[12px] font-semibold text-gray-800 flex items-center gap-1.5">
-                                    <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                                    综合评分
-                                </h4>
-                            </div>
-                            <div class="flex justify-center mb-3">
-                                <svg width="160" height="140" viewBox="0 0 160 140">
-                                    <polygon points="80,15 135,45 125,105 35,105 25,45" fill="none" stroke="#E5E7EB" stroke-width="0.5"/>
-                                    <polygon points="80,30 120,52 113,95 47,95 40,52" fill="none" stroke="#E5E7EB" stroke-width="0.5"/>
-                                    <polygon points="80,45 105,60 100,85 60,85 55,60" fill="none" stroke="#E5E7EB" stroke-width="0.5"/>
-                                    <line x1="80" y1="70" x2="80" y2="15" stroke="#E5E7EB" stroke-width="0.5"/>
-                                    <line x1="80" y1="70" x2="135" y2="45" stroke="#E5E7EB" stroke-width="0.5"/>
-                                    <line x1="80" y1="70" x2="125" y2="105" stroke="#E5E7EB" stroke-width="0.5"/>
-                                    <line x1="80" y1="70" x2="35" y2="105" stroke="#E5E7EB" stroke-width="0.5"/>
-                                    <line x1="80" y1="70" x2="25" y2="45" stroke="#E5E7EB" stroke-width="0.5"/>
-                                    <polygon points="80,35 115,52 108,95 45,90 42,50" fill="rgba(99,102,241,0.15)" stroke="#6366F1" stroke-width="1.5"/>
-                                    <circle cx="80" cy="35" r="3" fill="#6366F1"/>
-                                    <circle cx="115" cy="52" r="3" fill="#6366F1"/>
-                                    <circle cx="108" cy="95" r="3" fill="#6366F1"/>
-                                    <circle cx="45" cy="90" r="3" fill="#6366F1"/>
-                                    <circle cx="42" cy="50" r="3" fill="#6366F1"/>
-                                    <text x="80" y="10" text-anchor="middle" font-size="8" fill="#6B7280">内容完整度</text>
-                                    <text x="142" y="48" text-anchor="start" font-size="8" fill="#6B7280">量化数据</text>
-                                    <text x="128" y="112" text-anchor="start" font-size="8" fill="#6B7280">表达专业度</text>
-                                    <text x="2" y="112" text-anchor="start" font-size="8" fill="#6B7280">关键词匹配</text>
-                                    <text x="5" y="48" text-anchor="start" font-size="8" fill="#6B7280">结构规范</text>
-                                </svg>
-                            </div>
-                            <div class="flex flex-wrap justify-center gap-2">
-                                <span class="px-2 py-0.5 bg-green-50 text-green-600 text-[9px] rounded border border-green-100">内容完整 78%</span>
-                                <span class="px-2 py-0.5 bg-red-50 text-red-600 text-[9px] rounded border border-red-100">量化数据 35%</span>
-                                <span class="px-2 py-0.5 bg-yellow-50 text-yellow-700 text-[9px] rounded border border-yellow-100">表达力 55%</span>
-                                <span class="px-2 py-0.5 bg-yellow-50 text-yellow-700 text-[9px] rounded border border-yellow-100">关键词 50%</span>
-                                <span class="px-2 py-0.5 bg-green-50 text-green-600 text-[9px] rounded border border-green-100">结构 72%</span>
-                            </div>
-                        </div>
-
-                        <!-- 诊断提示 -->
-                        <div class="bg-blue-50 rounded-xl p-3 mb-4 border border-blue-100">
-                            <p class="text-[11px] text-blue-600 leading-relaxed">发现 <strong>3处</strong> 可优化内容，点击高亮区域查看AI改写建议</p>
-                        </div>
-
-                        <!-- 缺失模块检测 -->
-                        <div class="bg-white rounded-2xl border border-gray-200 mb-4 shadow-sm p-4">
-                            <h4 class="text-[12px] font-semibold text-gray-800 mb-3 flex items-center gap-1.5">
-                                <svg class="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
-                                内容完整度检测
-                            </h4>
-                            <!-- 各模块完整度 -->
-                            <div class="space-y-2.5">
-                                <div>
-                                    <div class="flex items-center justify-between mb-1">
-                                        <span class="text-[10px] text-gray-600">基本信息</span>
-                                        <span class="text-[10px] font-medium text-green-600">90%</span>
-                                    </div>
-                                    <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-green-400 rounded-full" style="width:90%"></div></div>
-                                </div>
-                                <div>
-                                    <div class="flex items-center justify-between mb-1">
-                                        <span class="text-[10px] text-gray-600">项目经历</span>
-                                        <span class="text-[10px] font-medium text-green-600">70%</span>
-                                    </div>
-                                    <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-green-400 rounded-full" style="width:70%"></div></div>
-                                </div>
-                                <div>
-                                    <div class="flex items-center justify-between mb-1">
-                                        <span class="text-[10px] text-gray-600">实习/工作经历</span>
-                                        <span class="text-[10px] font-medium text-red-500">0%</span>
-                                    </div>
-                                    <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-red-400 rounded-full" style="width:0%"></div></div>
-                                </div>
-                                <div>
-                                    <div class="flex items-center justify-between mb-1">
-                                        <span class="text-[10px] text-gray-600">专业技能</span>
-                                        <span class="text-[10px] font-medium text-yellow-600">60%</span>
-                                    </div>
-                                    <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-yellow-400 rounded-full" style="width:60%"></div></div>
-                                </div>
-                                <div>
-                                    <div class="flex items-center justify-between mb-1">
-                                        <span class="text-[10px] text-gray-600">求职意向</span>
-                                        <span class="text-[10px] font-medium text-red-500">缺失</span>
-                                    </div>
-                                    <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-red-400 rounded-full" style="width:0%"></div></div>
-                                </div>
-                            </div>
-                            <!-- 缺失模块提示 -->
-                            <div class="mt-3 pt-3 border-t border-gray-100">
-                                <p class="text-[10px] text-gray-500 mb-2">建议补充以下模块：</p>
-                                <div class="flex flex-wrap gap-1.5">
-                                    <span class="px-2 py-1 bg-red-50 text-red-600 text-[10px] rounded-md border border-red-100">+ 实习经历</span>
-                                    <span class="px-2 py-1 bg-red-50 text-red-600 text-[10px] rounded-md border border-red-100">+ 求职意向</span>
-                                    <span class="px-2 py-1 bg-yellow-50 text-yellow-700 text-[10px] rounded-md border border-yellow-100">+ 量化成果</span>
-                                    <span class="px-2 py-1 bg-yellow-50 text-yellow-700 text-[10px] rounded-md border border-yellow-100">+ 竞赛/获奖</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 分行业改写策略 -->
-                        <div class="bg-white rounded-2xl border border-gray-200 mb-4 shadow-sm p-4">
-                            <h4 class="text-[12px] font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                                <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                                行业针对性建议
-                            </h4>
-                            <div class="flex items-center gap-2 mb-3">
-                                <span class="px-2 py-0.5 bg-blue-100 text-blue-600 text-[10px] font-medium rounded-md">检测行业：集成电路/半导体</span>
-                                <span class="px-2 py-0.5 bg-orange-100 text-orange-600 text-[10px] font-medium rounded-md">证明方式：项目成果</span>
-                            </div>
-                            <div class="bg-blue-50 rounded-lg p-2.5 border border-blue-100 mb-3">
-                                <p class="text-[11px] text-blue-700 leading-relaxed font-medium">IC设计岗核心改写方向：</p>
-                                <p class="text-[11px] text-blue-600 leading-relaxed mt-1">每段项目需突出：用了什么工具/方法、解决了什么问题、验证结果如何。「参与项目」→「独立完成XX模块设计，通过XX仿真验证功能正确性」</p>
-                            </div>
-                            <div>
-                                <p class="text-[10px] text-gray-500 mb-1.5">本行业必备关键词：</p>
-                                <div class="flex flex-wrap gap-1.5">
-                                    <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded-md">RTL设计</span>
-                                    <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded-md">时序收敛</span>
-                                    <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded-md">功耗优化</span>
-                                    <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded-md">DFT</span>
-                                    <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded-md">STA</span>
-                                    <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded-md">Verilog</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 模板化简历（互联网风 + 问题区域可点击） -->
-                        <div id="resumeContent" class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-                            <!-- 互联网风头部 -->
-                            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 px-4 py-3">
-                                <h3 class="text-[16px] font-bold text-white">陈天越</h3>
-                                <p class="text-[9px] text-indigo-100 mt-0.5">微电子科学与工程 · 同济大学 · 北京</p>
-                                <div class="flex gap-1 mt-1.5 flex-wrap">
-                                    <span class="px-1.5 py-0.5 bg-white/20 text-white text-[7px] rounded-full">Verilog/VHDL</span>
-                                    <span class="px-1.5 py-0.5 bg-white/20 text-white text-[7px] rounded-full">嵌入式开发</span>
-                                    <span class="px-1.5 py-0.5 bg-white/20 text-white text-[7px] rounded-full">射频电路</span>
-                                    <span class="px-1.5 py-0.5 bg-white/20 text-white text-[7px] rounded-full">CET-6</span>
-                                </div>
-                            </div>
-
-                            <!-- 教育背景 -->
-                            <div class="px-4 py-3 border-b border-gray-100">
-                                <h4 class="text-[12px] font-bold text-indigo-600 mb-1.5 flex items-center gap-1.5">
-                                    <span class="w-1 h-4 bg-indigo-500 rounded-full"></span>
-                                    教育背景
-                                </h4>
-                                <p class="text-[11px] text-gray-700 leading-relaxed pl-3">同济大学（985）· 微电子科学与工程 · 本科 · 2022-2026</p>
-                                <p class="text-[10px] text-gray-500 pl-3 mt-0.5">GPA 3.59/5.00 | 考研总分368</p>
-                            </div>
-
-                            <!-- 项目经历（可优化 - 可点击） -->
-                            <div class="px-4 py-3 border-b border-gray-100 border-l-[3px] border-l-yellow-400 bg-yellow-50/30 cursor-pointer active:bg-yellow-50" onclick="openDiagDrawer(0)">
-                                <h4 class="text-[12px] font-bold text-indigo-600 mb-1.5 flex items-center justify-between">
-                                    <span class="flex items-center gap-1.5"><span class="w-1 h-4 bg-indigo-500 rounded-full"></span>项目经历</span>
-                                    <span class="px-1.5 py-0.5 bg-yellow-100 text-yellow-700 text-[9px] rounded font-medium">点击优化 ›</span>
-                                </h4>
-                                <p class="text-[11px] font-medium text-gray-800 mb-1 pl-3">基于ARM的4位密码锁 · 课程设计</p>
-                                <p class="text-[11px] text-gray-500 leading-relaxed pl-3">基于STM32F103+KeilVision5开发设计4位密码锁，并完成电路搭建</p>
-                            </div>
-
-                            <!-- 实习经历（缺失 - 可点击） -->
-                            <div class="px-4 py-3 border-b border-gray-100 border-l-[3px] border-l-red-400 bg-red-50/30 cursor-pointer active:bg-red-50" onclick="openDiagDrawer(1)">
-                                <h4 class="text-[12px] font-bold text-indigo-600 mb-1.5 flex items-center justify-between">
-                                    <span class="flex items-center gap-1.5"><span class="w-1 h-4 bg-indigo-500 rounded-full"></span>实习/工作经历</span>
-                                    <span class="px-1.5 py-0.5 bg-red-100 text-red-600 text-[9px] rounded font-medium">需补充 ›</span>
-                                </h4>
-                                <p class="text-[11px] text-gray-500 leading-relaxed pl-3">未检测到实习或工作经历，建议补充相关实践经验</p>
-                            </div>
-
-                            <!-- 自我评价（可优化 - 可点击） -->
-                            <div class="px-4 py-3 border-l-[3px] border-l-yellow-400 bg-yellow-50/30 cursor-pointer active:bg-yellow-50" onclick="openDiagDrawer(2)">
-                                <h4 class="text-[12px] font-bold text-indigo-600 mb-1.5 flex items-center justify-between">
-                                    <span class="flex items-center gap-1.5"><span class="w-1 h-4 bg-indigo-500 rounded-full"></span>自我评价</span>
-                                    <span class="px-1.5 py-0.5 bg-yellow-100 text-yellow-700 text-[9px] rounded font-medium">点击优化 ›</span>
-                                </h4>
-                                <p class="text-[11px] text-gray-600 leading-relaxed pl-3">积极踏实，具备较强的自主学习能力与实践动手能力，对集成电路领域颇有兴趣。</p>
-                            </div>
-                        </div>
-
-                        <!-- 底部提示 -->
-                        <p class="text-[10px] text-gray-400 text-center mt-3">点击高亮区域查看AI改写建议，可编辑后采纳</p>
-
-                        <div class="h-20"></div>
                     </div>
 
                 </div>
@@ -2239,7 +2053,10 @@
                 setTimeout(function() {
                     try {
                         if (typeof resumeData !== 'undefined' && resumeData.markdown && typeof runRealDiagnosis === 'function' && !window._realDiagRunning) {
-                            if (window._lastDiagMd === (resumeData.originalMarkdown || resumeData.markdown) && window._diagReport) return;
+                            if (window._lastDiagMd === (resumeData.originalMarkdown || resumeData.markdown) && window._diagReport) {
+                                renderDiagResult(window._diagReport);
+                                return;
+                            }
                             runRealDiagnosis();
                         }
                     } catch(e) { console.log('auto-diag skip:', e); }
@@ -3204,12 +3021,16 @@
         function previewSelectedTemplate(tplId) {
             const md = (window._pendingPreview && window._pendingPreview.markdown) || (window._previewMarkdown) || resumeData.markdown;
             if (!md) { showToast('请先导入简历'); return; }
-            const previewRender = document.getElementById('template-preview-render');
-            if (!previewRender) return;
             const oldTpl = currentTemplate;
             currentTemplate = tplId;
             const data = parseResumeFromMarkdown(md);
             if (!data) { currentTemplate = oldTpl; return; }
+            if (window._previewMode || window._pendingPreview) {
+                confirmTemplateSelection();
+                return;
+            }
+            const previewRender = document.getElementById('template-preview-render');
+            if (!previewRender) return;
             const renderers = {spring2024: renderSpring2024Template, student: renderStudentTemplate, bluegray: renderBluegrayTemplate, greenside: renderGreensideTemplate, navybiz: renderNavybizTemplate, timeline: renderTimelineTemplate, minimal: renderMinimalTemplate, orange: renderOrangeTemplate, cleanline: renderCleanlineTemplate, biznavy: renderBiznavyTemplate, academic: renderAcademicTemplate, modern: renderModernTemplate, lavender: renderLavenderTemplate, sunset: renderSunsetTemplate, matcha: renderMatchaTemplate, sakura: renderSakuraTemplate};
             const fn = renderers[tplId];
             if (fn) previewRender.innerHTML = fn(data);
@@ -5279,8 +5100,27 @@
                 window._diagReport = report;
                 window._lastDiagMd = resumeData.originalMarkdown || resumeData.markdown;
 
-                // 更新 suggestions 数组供 showSuggestion 使用
-                suggestions = (report.sections || []).map(s => ({
+                renderDiagResult(report);
+            } catch(err) {
+                console.error('[AI诊断] 完整错误:', err);
+                contentArea.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-12">
+                        <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-3">
+                            <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                        </div>
+                        <p class="text-[13px] font-medium text-gray-700 mb-1">诊断失败</p>
+                        <p class="text-[11px] text-gray-400 mb-4 px-8 text-center">${err.message}</p>
+                        <button class="px-6 py-2.5 bg-blue-500 text-white text-[12px] font-medium rounded-xl" onclick="runRealDiagnosis()">重新诊断</button>
+                    </div>
+                `;
+            }
+            window._realDiagRunning = false;
+        }
+
+        function renderDiagResult(report) {
+            const contentArea = document.querySelector('#page-diagnosis .fade-in');
+            // 更新 suggestions 数组供 showSuggestion 使用
+            suggestions = (report.sections || []).map(s => ({
                     title: s.title,
                     problem: s.problem,
                     original: s.original,
@@ -5409,10 +5249,9 @@
                             textLines.push(l);
                         }
                     });
-                    const highlightStyle = hasDiag ? 'background:linear-gradient(to right,#fef3c7,#fef9c3);padding:1px 3px;border-radius:2px;border-bottom:1.5px solid #f59e0b;' : '';
                     const textHtml = textLines.slice(0, 4).map(l => {
                         const formatted = l.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-                        return hasDiag ? `<p class="text-[11px] text-gray-700 leading-relaxed"><span style="${highlightStyle}">${formatted}</span></p>` : `<p class="text-[11px] text-gray-600 leading-relaxed">${formatted}</p>`;
+                        return `<p class="text-[11px] text-gray-600 leading-relaxed">${formatted}</p>`;
                     }).join('');
                     const content = photoHtml ? `<div class="flex gap-3"><div class="flex-1">${textHtml}</div>${photoHtml}</div>` : textHtml;
                     const hasMore = mod.lines.length > 4;
@@ -5501,23 +5340,9 @@
 
                     <div class="flex gap-2 mt-4 pb-6">
                         <button class="flex-1 py-2.5 bg-gray-100 text-gray-600 text-[13px] font-medium rounded-xl" onclick="goBack()">返回</button>
-                        <button class="flex-[2] py-2.5 bg-blue-500 text-white text-[13px] font-medium rounded-xl" onclick="acceptAllDiagEdits()">采纳全部并预览</button>
+                        <button class="flex-[2] py-2.5 bg-blue-500 text-white text-[13px] font-medium rounded-xl" onclick="acceptAllDiagEdits()">预览</button>
                     </div>
                 `;
-            } catch(err) {
-                console.error('[AI诊断] 完整错误:', err);
-                contentArea.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-12">
-                        <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-3">
-                            <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
-                        </div>
-                        <p class="text-[13px] font-medium text-gray-700 mb-1">诊断失败</p>
-                        <p class="text-[11px] text-gray-400 mb-4 px-8 text-center">${err.message}</p>
-                        <button class="px-6 py-2.5 bg-blue-500 text-white text-[12px] font-medium rounded-xl" onclick="runRealDiagnosis()">重新诊断</button>
-                    </div>
-                `;
-            }
-            window._realDiagRunning = false;
         }
 
         // ===== AI生成简历 - 从表单收集数据并生成 =====
