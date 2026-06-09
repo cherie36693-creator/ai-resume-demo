@@ -1271,88 +1271,21 @@
 
     // ==================== API Calls ====================
     async function callClaudeAPI(systemPrompt, userMessage, maxTokens) {
-        // PC版暂用mock模式，功能调试中
-        await new Promise(r => setTimeout(r, 800 + Math.random() * 1200));
-        if (systemPrompt.includes('发现简历中的不足') && userMessage.includes('【')) {
-            const sections = userMessage.match(/【(.+?)】/g) || [];
-            const moduleNames = sections.map(s => s.replace(/[【】]/g, '')).filter(s => s.length < 10);
-            const issues = [];
-            if (moduleNames.find(m => m.includes('工作') || m.includes('经历') || m.includes('经验'))) {
-                issues.push({module: moduleNames.find(m => m.includes('工作') || m.includes('经历') || m.includes('经验')), level:'red', problem:'职责描述偏陈述式，缺少量化成果数据（数字/百分比/金额）'});
-            }
-            if (moduleNames.find(m => m.includes('自我') || m.includes('评价') || m.includes('总结'))) {
-                issues.push({module: moduleNames.find(m => m.includes('自我') || m.includes('评价') || m.includes('总结')), level:'yellow', problem:'自我评价过于通用化，缺乏针对目标岗位的差异化表述'});
-            }
-            if (moduleNames.find(m => m.includes('教育') || m.includes('背景'))) {
-                issues.push({module: moduleNames.find(m => m.includes('教育') || m.includes('背景')), level:'yellow', problem:'教育经历缺少GPA/排名/核心课程等竞争力信息'});
-            }
-            if (moduleNames.find(m => m.includes('项目'))) {
-                issues.push({module: moduleNames.find(m => m.includes('项目')), level:'red', problem:'项目经历缺少STAR结构，未明确个人角色贡献与业务成果'});
-            }
-            if (issues.length < 2) {
-                issues.push({module: moduleNames[0] || '工作经历', level:'red', problem:'关键动词弱化，建议使用"主导/搭建/驱动"替代"负责/参与"'});
-                issues.push({module: moduleNames[1] || '求职总结', level:'yellow', problem:'缺少行业关键词覆盖，不利于HR系统筛选'});
-            }
-            return JSON.stringify(issues.slice(0, 4));
-        }
-        if ((systemPrompt.includes('诊断') && !systemPrompt.includes('问题诊断')) || (systemPrompt.includes('分析简历') && !systemPrompt.includes('HR'))) {
-            return JSON.stringify({score:72,modules:[{name:"基本信息",score:85,level:"good",issues:["缺少LinkedIn/个人网站链接"],suggestions:["添加作品集或GitHub链接"]},{name:"工作经历",score:65,level:"warning",issues:["缺少量化数据","职责描述过于笼统"],suggestions:["补充具体业绩指标，如DAU提升XX%","使用STAR法则重写每段经历"]},{name:"教育背景",score:80,level:"good",issues:[],suggestions:["可补充相关课程或GPA排名"]},{name:"技能",score:70,level:"warning",issues:["技能列举缺少熟练度标注"],suggestions:["按精通/熟练/了解分级展示"]},{name:"自我评价",score:55,level:"danger",issues:["过于通用化，缺乏针对性"],suggestions:["结合目标岗位要求针对性优化","用具体事例支撑每个特质"]}]});
-        }
-        if (systemPrompt.includes('简历') && (systemPrompt.includes('撰写') || systemPrompt.includes('生成')) && !systemPrompt.includes('优化')) {
-            const nameMatch = userMessage.match(/姓名[：:\s]*([^\n,，]+)/) || userMessage.match(/^#\s*(.+)/m);
-            const jobMatch = userMessage.match(/求职意向[：:\s]*([^\n,，]+)/) || userMessage.match(/意向[：:\s]*([^\n,，]+)/);
-            const schoolMatch = userMessage.match(/学校[：:\s]*([^\n,，]+)/) || userMessage.match(/(\S+大学|\S+学院)/);
-            const pName = nameMatch ? nameMatch[1].trim() : '杨雪靖';
-            const pJob = jobMatch ? jobMatch[1].trim() : '产品经理';
-            const pSchool = schoolMatch ? schoolMatch[1].trim() : '南京医科大学';
-            return `# ${pName}\n\n**${pJob}** | 求职意向：${pJob}\n\n📱 138****5678 | 📧 ${pName.toLowerCase()}@email.com\n\n---\n\n## 教育背景\n\n**${pSchool}（2019.09-2023.06）**\n- GPA：3.6/4.0，专业前15%\n- 核心课程：数据结构、计算机网络、软件工程\n\n## 工作经历\n\n**2023.07-至今 某知名企业 ${pJob}**\n\n- 负责核心业务产品线规划与落地，管理3人团队，年度OKR完成率120%\n- 主导用户增长策略设计与执行，通过A/B测试优化转化链路，核心指标提升62%\n- 搭建实时数据看板覆盖20+核心业务指标，驱动产品决策效率提升40%\n- 牵头跨部门协作（研发、设计、运营），推动重点项目按期上线\n\n## 项目经历\n\n**智能推荐系统优化（2024.03-2024.09）**\n\n- 背景：核心推荐CTR持续走低，用户时长下降\n- 职责：产品负责人，定义优化方向，设计A/B测试方案\n- 成果：CTR提升28%，用户日均时长增加12分钟\n\n## 专业技能\n\n- 产品设计：Axure（精通）、Figma（精通）\n- 数据分析：SQL（精通）、Python（熟练）\n- 项目管理：JIRA、飞书\n\n## 自我评价\n\n具备扎实的专业功底和丰富的实践经验，擅长数据驱动决策，具备优秀的跨部门协作能力和项目推进能力。`;
-        }
-        if (systemPrompt.includes('定制') || (systemPrompt.includes('简历') && systemPrompt.includes('行业') && userMessage.includes('目标岗位JD'))) {
-            return `# 杨雪靖\n\n**儿科学硕士研究生 | 南京医科大学**\n\n📱 13260567861 | 📧 yangxuejing07@163.com | 出生年月：1998-12 | 学历：硕士研究生\n\n---\n\n## 教育背景\n\n**南京医科大学** · 儿科学（专业型硕士） · 2023.09 - 至今\n- 研究方向：小儿急诊重症方向\n- 研究课题：基于真实世界数据的儿童脓毒症死亡率预测模型的开发与验证\n\n**江汉大学** · 临床医学（儿科学方向） · 2016.09 - 2021.06\n\n## 规培经历\n\n**南京医科大学附属儿童医院** · 专业型硕士（规培） · 2023.09 - 至今\n\n1. ==系统完成PICU、NICU等10余个亚专科轮转，累计诊疗住院患儿300余例==，掌握各种常见病、多发病的诊疗思路。\n2. ==独立管理5-6张床位，患者满意度98%以上==，能够独立完成入院记录、病程记录等各类医疗文书书写，全面参与病情评估、诊疗方案制定，获各科室带教老师一致好评。\n3. 熟练掌握==心肺复苏、四大穿刺、静脉采血、体格检查、气管插管辅助==等儿科基本操作技能，具备扎实的临床动手能力。\n4. ==积极参与危重患儿抢救10余例（成功率100%）==，熟练操作心电图机、心电监护仪、除颤仪、呼吸机等设备，能够独立完成心电图判读与影像学初步诊断。\n\n## 发表论文及软著\n\n1. ==Xuejing Yang（第一作者）==, Wei Gu, Hongjun Miao, et al. Accurate Prediction of Mortality in Children with Sepsis. ==Italian Journal of Pediatrics.（SCI，二审中）==\n2. 杨雪靖，时丹，覃宇华. 人工智能在儿童脓毒症早期识别及精准治疗中的应用前景. ==中国小儿急救医学（核心期刊，已录用）==\n\n## 自我评价\n\n==儿科学专业型硕士，具备扎实临床功底与独立科研能力==。独立管理住院患儿300余例，熟练掌握心肺复苏及四大穿刺操作。==SCI论文在投1篇（二审）、中文核心已录用1篇==，兼具临床思维与学术素养。\n\n## AI改动说明\n\n**优化策略：医疗行业 - 资质前置+量化负荷+差异化**\n\n1. 规培经历：补充量化数据（300余例、98%满意度、100%抢救成功率）\n2. 论文成果：标注第一作者、期刊级别（SCI/核心）\n3. 自我评价：重写为结果导向，突出临床+科研双能力`;
-        }
-        if (systemPrompt.includes('改写') || systemPrompt.includes('优化') || systemPrompt.includes('润色')) {
-            const moduleMatch = userMessage.match(/模块：(.+)/);
-            const moduleName = moduleMatch ? moduleMatch[1] : '';
-            const origMatch = userMessage.match(/原文：([\s\S]+?)$/);
-            const origText = origMatch ? origMatch[1].trim() : '';
-            if (moduleName.includes('技能') && (!origText || origText.includes('未填写'))) {
-                const bg = userMessage.substring(0, 500);
-                if (bg.includes('规培') || bg.includes('儿科') || bg.includes('临床')) {
-                    return '• 临床技能：心肺复苏、腰椎穿刺、骨髓穿刺、胸腔穿刺（熟练）\n• 设备操作：心电图机、心电监护仪、除颤仪、呼吸机（熟练）\n• 数据分析：SPSS、R语言、Python（基础统计分析）\n• 语言能力：英语CET-6（能独立完成SCI论文撰写与修改）';
-                }
-                if (bg.includes('产品') || bg.includes('运营') || bg.includes('互联网')) {
-                    return '• 产品设计：Axure、Figma、Sketch（精通）\n• 数据分析：SQL（精通）、Python数据处理（熟练）、Tableau/神策（熟练）\n• 项目管理：JIRA、飞书多维表格、Confluence（精通）\n• 方法论：A/B测试、用户增长模型、AARRR漏斗、OKR拆解';
-                }
-                return '• 核心技能：根据简历内容提炼的XX能力（精通）\n• 工具使用：与岗位相关的XX工具（熟练）\n• 行业知识：XX领域全链路理解';
-            }
-            if (origText && origText.length > 10) {
-                const bg = userMessage.substring(0, 500);
-                if (bg.includes('规培') || bg.includes('儿科') || bg.includes('临床') || bg.includes('PICU')) {
-                    return '系统完成PICU、NICU等10余个亚专科轮转，累计管理住院患儿XX例，覆盖常见病及危重症全谱系诊疗。独立管理5-6张床位，规范完成各类医疗文书XX份，患者家属满意度达XX%以上，获各科室带教老师一致好评。熟练掌握心肺复苏、四大穿刺等核心操作XX项，参与危重患儿抢救10余例，抢救成功率XX%。';
-                }
-                if (bg.includes('产品') || bg.includes('运营') || bg.includes('GMV') || bg.includes('DAU')) {
-                    return '从0到1搭建核心业务产品体系，主导产品全生命周期管理，驱动业务GMV实现从0到XX万级突破。深入用户行为分析，主导回收链路优化策略，将关键环节转化率从XX%提升至XX%（+XX个百分点）。搭建标准化产品模块体系，支持业务快速扩展，将功能上线周期从XX天缩短至XX天（效率提升XX%）。';
-                }
-                if (bg.includes('项目') || bg.includes('背景') || bg.includes('职责')) {
-                    return '【背景】面对核心业务增长瓶颈，需要系统性优化产品链路提升关键指标。\n【职责】作为产品负责人，主导方案设计、跨部门协调及落地执行。\n【行动】通过数据分析定位问题→制定优化策略→设计A/B方案→推动研发实现→复盘迭代。\n【结果】核心指标提升XX%，用户体验评分提升XX分，获得业务线年度最佳项目。';
-                }
-                return '基于原有经历进行STAR法则重构：明确背景与目标、突出个人职责与决策、量化行动成果。补充具体数据指标（如服务用户XX万、效率提升XX%、成本降低XX%），增强说服力与差异化竞争力。';
-            }
-            return '基于简历原文进行优化改写，补充量化数据和具体成果描述，使用STAR法则突出个人贡献与影响力。';
-        }
-        if (systemPrompt.includes('面试')) {
-            return '## 面试问题预测\n\n**Q1: 请介绍一个你主导的用户增长项目？**\n\n推荐回答：在字节跳动期间，我主导了首页推荐系统优化项目。通过用户行为分析发现推荐CTR持续走低，我制定了"个性化+时效性"双轮驱动策略，设计了3组A/B测试方案。最终推荐CTR提升28%，用户日均时长增加12分钟。\n\n**Q2: 你如何处理跨部门协作中的冲突？**\n\n推荐回答：我习惯用数据说话。曾经在一个项目中，研发团队和运营团队对优先级有分歧，我通过ROI分析和影响面评估，用可视化报告让各方达成共识，项目最终按期上线。\n\n**Q3: 描述一次产品决策失败的经历？**\n\n推荐回答：早期在美团做商家工具时，我曾过度追求功能丰富度而忽视了易用性。上线后商家使用率仅30%，后续通过用户访谈简化流程，使用率提升到75%。这让我深刻理解了"少即是多"的设计理念。';
-        }
-        if (systemPrompt.includes('翻译') || systemPrompt.includes('translate')) {
-            const tNameMatch = userMessage.match(/^#\s*(.+)/m) || userMessage.match(/姓名[：:\s]*([^\n,，]+)/);
-            const tName = tNameMatch ? tNameMatch[1].trim() : 'Yang Xuejing';
-            const tNamePinyin = tName.replace(/[一-龥]/g, '') || 'Yang Xuejing';
-            return `# ${tNamePinyin || tName}\n\n**Pediatrics Master's Student** | Nanjing Medical University\n\n📱 13260567861 | 📧 yangxuejing07@163.com\n\n---\n\n## Education\n\n**Nanjing Medical University — M.S. in Pediatrics (2023.09-Present)**\n- Research: Development and Validation of an Explainable Mortality Prediction Model for Children with Sepsis Based on Real-World Data\n\n**Jianghan University — B.S. in Clinical Medicine, Pediatrics (2016.09-2021.06)**\n\n## Clinical Training\n\n**Children's Hospital of Nanjing Medical University (2023.09-Present)**\n- Completed systematic rotations across 10+ subspecialties including PICU, NICU, Cardiology, Nephrology, and Hematology\n- Independently managed 5-6 patient beds with 98%+ satisfaction rate\n- Proficient in CPR, lumbar puncture, bone marrow aspiration, and thoracentesis\n- Participated in 10+ critical patient rescues with 100% success rate\n\n## Publications\n\n1. Xuejing Yang (First Author), et al. "Accurate Prediction of Mortality in Children with Sepsis." Italian Journal of Pediatrics. (Under Review)\n2. Yang X, Shi D, Qin Y. "Application of AI in Early Recognition and Precision Treatment of Pediatric Sepsis." Chinese Pediatric Emergency Medicine, 2026.`;
-        }
-        if (systemPrompt.includes('岗位') || systemPrompt.includes('HR') || systemPrompt.includes('匹配')) {
-            return JSON.stringify({score:72,verdict:"简历综合能力较强，但与目标岗位要求存在关键差距，针对性优化后竞争力将大幅提升",strengths:["产品经理经验丰富，5年互联网背景，大厂履历加分","具备数据驱动思维，A/B测试和增长实验经验突出","跨部门协作与项目推动能力强，有完整项目交付记录"],gaps:["缺少目标岗位核心要求的AI/大模型产品经验","行业背景集中在电商领域，目标行业经验为空白","项目管理认证（PMP/NPDP）未体现"],actions:[{title:"突出AI相关经验",detail:"将推荐系统、数据看板等项目用AI产品视角重新包装描述",impact:"high"},{title:"补充行业认知",detail:"在自我评价中加入对目标行业的理解和学习投入",impact:"high"},{title:"量化关键成果",detail:"每段经历补充DAU/转化率/ROI等核心业务指标",impact:"medium"},{title:"优化关键词覆盖",detail:"根据JD补充LLM、Agent、NLU等技术关键词",impact:"medium"}],estimated_score:91});
-        }
-        return '已为您完成AI分析处理。请查看结果并根据建议进行调整。';
+        const resp = await fetch('/proxy/claude/v1/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                system: systemPrompt,
+                messages: [{ role: 'user', content: userMessage }],
+                max_tokens: maxTokens || 2048
+            })
+        });
+        if (!resp.ok) throw new Error('API请求失败: ' + resp.status);
+        const result = await resp.json();
+        if (result.error) throw new Error(result.error);
+        const text = result.content && result.content[0] ? result.content[0].text : '';
+        if (!text) throw new Error('AI返回为空');
+        return text;
     }
 
     async function parseFileWithTextIn(file) {
@@ -3276,7 +3209,7 @@
         _diagTemplateMode = false;
         const container = document.getElementById('tab-create').querySelector('.fade-in') || document.getElementById('tab-create');
         container.dataset.formBackup = container.innerHTML;
-        container.innerHTML = `<div class="max-w-[640px] mx-auto py-6 px-4">
+        container.innerHTML = `<div class="max-w-[960px] mx-auto py-6 px-4">
             <div class="flex items-center gap-2 mb-5">
                 <button class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition" onclick="backToForm()">
                     <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
@@ -3284,7 +3217,7 @@
                 <h2 class="text-base font-semibold text-gray-800">选择简历模版</h2>
                 <span class="text-xs text-gray-400 ml-auto">选择风格后AI将重新排版生成</span>
             </div>
-            <div class="grid grid-cols-2 gap-4 mb-6" id="template-grid">
+            <div class="grid grid-cols-3 gap-4 mb-6" id="template-grid">
                 <!-- 模板1: 蓝色经典 - 单栏，蓝色竖条+图标 -->
                 <div class="template-card selected cursor-pointer rounded-xl border-2 border-blue-500 bg-blue-50 p-3 transition hover:shadow-md" onclick="selectTemplate('spring2024', this)">
                     <div class="h-[220px] rounded-lg overflow-hidden border border-gray-200 bg-white mb-2">
@@ -4413,7 +4346,8 @@
     async function generateMoreInterview() {
         const container = document.getElementById('interview-content');
         const btnArea = container.querySelector('.sticky');
-        if (btnArea) btnArea.innerHTML = '<div class="flex items-center justify-center py-2"><div class="w-5 h-5 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin" style="border-width:2px;"></div><span class="text-xs text-gray-500 ml-2">生成更多面试题...</span></div>';
+        const btn = btnArea ? btnArea.querySelector('button') : null;
+        if (btn) { btn.disabled = true; btn.innerHTML = '<div class="w-4 h-4 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin" style="border-width:2px;"></div><span>生成更多面试题...</span>'; }
         const md = resumeData.markdown || '';
         try {
             const raw = await callClaudeAPI(
@@ -4724,7 +4658,7 @@
         if (!md) return null;
         const lines = md.split('\n');
         const data = { name: '', subtitle: '', skills: [], sections: [] };
-        const notNameKeywords = ['求职','总结','简历','概述','个人概要','profile','summary','resume','objective','求职意向'];
+        const notNameKeywords = ['求职','总结','简历','概述','个人概要','profile','summary','resume','objective','求职意向','荣誉','奖项','经历','经验','技能','教育','工作','项目','评价','背景','成果','论文','发表','规培','清单','实习','培训','兴趣','爱好','自我','证书','资格','语言','活动','社会','志愿','科研','专利','出版','联系','个人信息','基本信息'];
         const nameMatch = md.match(/^#\s*(.+)/m);
         if (nameMatch) {
             const heading = nameMatch[1].trim();
