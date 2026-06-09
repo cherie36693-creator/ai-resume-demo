@@ -3433,7 +3433,10 @@
         const jobVal = document.getElementById('f-job')?.value.trim();
         if (!nameVal || !jobVal) { showToast('请至少填写姓名和求职意向'); return; }
         if (pendingResumeRaw.replace(/[：\n\s]/g,'').length < 10) { showToast('请至少填写部分信息'); return; }
-        showTemplateSelection();
+        // 弹出模板预览弹窗，选模板后生成
+        _tplPreviewFrom = 'create';
+        _tplPreviewMarkdown = pendingResumeRaw;
+        showTemplatePreviewModal();
     }
 
     let _diagTemplateMode = false;
@@ -3672,6 +3675,11 @@
             backToForm();
             showToast('生成失败: ' + err.message);
         }
+    }
+
+    async function doCreateResume() {
+        selectedTemplate = _selectedPCTemplate;
+        await doGenerateResume();
     }
 
     function saveGeneratedResume() {
@@ -4631,7 +4639,7 @@
                 </div>
             </div>
             <div class="px-6 py-3 border-t border-gray-100 flex items-center gap-3 flex-shrink-0">
-                <button class="flex-1 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm font-medium rounded-xl hover:from-indigo-600 hover:to-purple-600" onclick="confirmTemplatePreview()">保存为新简历</button>
+                <button class="flex-1 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm font-medium rounded-xl hover:from-indigo-600 hover:to-purple-600" onclick="confirmTemplatePreview()">${_tplPreviewFrom === 'create' ? '生成简历' : '保存为新简历'}</button>
                 <button class="px-5 py-2.5 bg-white border border-gray-200 text-gray-600 text-sm rounded-xl hover:bg-gray-50" onclick="hideTemplatePreviewModal()">取消</button>
             </div>
         </div>`;
@@ -5317,7 +5325,11 @@
     }
 
     function confirmTemplatePreview() {
-        if (_tplPreviewFrom === 'jd') {
+        if (_tplPreviewFrom === 'create') {
+            hideTemplatePreviewModal();
+            doCreateResume();
+            return;
+        } else if (_tplPreviewFrom === 'jd') {
             saveCustomResume();
         } else if (_tplPreviewFrom === 'translate') {
             saveTranslationAsResume();
