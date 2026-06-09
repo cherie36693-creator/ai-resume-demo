@@ -3129,15 +3129,16 @@
             const city = inputs[4]?.value || '';
             const school = inputs[5]?.value || '';
             const major = inputs[6]?.value || '';
-            const degree = inputs[7]?.value || '';
-            const eduTime = inputs[8]?.value || '';
-            const company = inputs[9]?.value || '';
-            const position = inputs[10]?.value || '';
-            const workTime = inputs[11]?.value || '';
+            const degreeSelect = page.querySelector('select');
+            const degree = degreeSelect?.value || '';
+            const eduTime = inputs[7]?.value || '';
+            const company = inputs[8]?.value || '';
+            const position = inputs[9]?.value || '';
+            const workTime = inputs[10]?.value || '';
             const workDesc = textareas[0]?.value || '';
-            const projectName = inputs[12]?.value || '';
-            const projectRole = inputs[13]?.value || '';
-            const projectTime = inputs[14]?.value || '';
+            const projectName = inputs[11]?.value || '';
+            const projectRole = inputs[12]?.value || '';
+            const projectTime = inputs[13]?.value || '';
             const projectDesc = textareas[1]?.value || '';
             const skillTags = page.querySelectorAll('#skillTagContainer span');
             const skills = Array.from(skillTags).map(s => s.textContent.replace('×', '').trim()).filter(Boolean);
@@ -4350,9 +4351,8 @@
         }
         // 证件照
         function getPhotoHtml(w, h, borderStyle) {
-            const ini = (window._currentRenderName||'?')[0];
-            if (window._resumePhotoBase64) return `<img src="${window._resumePhotoBase64}" style="width:${w}px;height:${h}px;object-fit:cover;display:block;margin:0 auto;${borderStyle||''}" />`;
-            return `<div style="width:${w}px;height:${h}px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;margin:0 auto;${borderStyle||''}"><span style="font-size:${Math.floor(h/3)}px;font-weight:700;color:#94a3b8;">${ini}</span></div>`;
+            if (!window._resumePhotoBase64) return '';
+            return `<img src="${window._resumePhotoBase64}" style="width:${w}px;height:${h}px;object-fit:cover;display:block;margin:0 auto;${borderStyle||''}" />`;
         }
 
         // 模板1: 简历本JLB-116风格 - 单栏，左侧蓝色竖条+蓝色图标段标题，右上角照片
@@ -5342,19 +5342,20 @@
             // 收集教育经历
             const school = inputs[5]?.value || '';
             const major = inputs[6]?.value || '';
-            const degree = inputs[7]?.value || '';
-            const eduTime = inputs[8]?.value || '';
+            const degreeSelect = page.querySelector('select');
+            const degree = degreeSelect?.value || '';
+            const eduTime = inputs[7]?.value || '';
 
             // 收集工作经历
-            const company = inputs[9]?.value || '';
-            const position = inputs[10]?.value || '';
-            const workTime = inputs[11]?.value || '';
+            const company = inputs[8]?.value || '';
+            const position = inputs[9]?.value || '';
+            const workTime = inputs[10]?.value || '';
             const workDesc = textareas[0]?.value || '';
 
             // 收集项目经历
-            const projectName = inputs[12]?.value || '';
-            const projectRole = inputs[13]?.value || '';
-            const projectTime = inputs[14]?.value || '';
+            const projectName = inputs[11]?.value || '';
+            const projectRole = inputs[12]?.value || '';
+            const projectTime = inputs[13]?.value || '';
             const projectDesc = textareas[1]?.value || '';
 
             // 收集技能
@@ -5488,8 +5489,9 @@ ${resume.selfEval || selfEval}`;
             const city = inputs[4]?.value || '';
             const school = inputs[5]?.value || '';
             const major = inputs[6]?.value || '';
-            const degree = inputs[7]?.value || '';
-            const eduTime = inputs[8]?.value || '';
+            const degreeSelect = page.querySelector('select');
+            const degree = degreeSelect?.value || '';
+            const eduTime = inputs[7]?.value || '';
             let workMd = '';
             page.querySelectorAll('.work-entry').forEach(entry => {
                 const co = entry.querySelector('.work-company')?.value || '';
