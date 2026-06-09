@@ -4689,10 +4689,32 @@
         const notNameKeywords = ['求职','总结','简历','概述','个人概要','profile','summary','resume','objective','求职意向','荣誉','奖项','经历','经验','技能','教育','工作','项目','评价','背景','成果','论文','发表','规培','清单','实习','培训','兴趣','爱好','自我','证书','资格','语言','活动','社会','志愿','科研','专利','出版','联系','个人信息','基本信息'];
         const nameMatch = md.match(/^#\s*(.+)/m);
         if (nameMatch) {
-            const heading = nameMatch[1].trim();
+            const heading = nameMatch[1].trim().replace(/\*\*/g, '');
             const isNotName = notNameKeywords.some(k => heading.toLowerCase().includes(k)) || heading.length > 8;
             if (!isNotName) data.name = heading;
-            else { const realName = md.match(/姓名[：:]\s*(.{2,4})/); if (realName) data.name = realName[1].trim(); }
+        }
+        // 多种方式尝试提取名字
+        if (!data.name) {
+            const patterns = [
+                /姓\s*名[：:\s]*([^\n,，]{2,5})/,
+                /^[#\s]*\*\*([^\n*]{2,5})\*\*/m,
+                /^([^\n#*|]{2,4})\s*$/m
+            ];
+            for (const p of patterns) {
+                const m = md.match(p);
+                if (m) {
+                    const candidate = m[1].trim();
+                    if (candidate.length >= 2 && candidate.length <= 5 && !notNameKeywords.some(k => candidate.includes(k))) {
+                        data.name = candidate;
+                        break;
+                    }
+                }
+            }
+        }
+        // 最终 fallback：从文件名提取
+        if (!data.name && resumeData.fileName) {
+            const fnMatch = resumeData.fileName.match(/^([^\-_.\d]{2,4})/);
+            if (fnMatch) data.name = fnMatch[1];
         }
         // Extract subtitle
         const phoneMatch = md.match(/(?:电话|手机|Tel)[：:\s]*([\d\-*]+)/i);
@@ -4735,8 +4757,8 @@
     }
 
     function getPhotoHtml(w, h, style) {
-        const ini = (window._currentRenderName || resumeData.fileName || '?')[0];
-        return `<div style="width:${w}px;height:${h}px;background:linear-gradient(135deg,#e8edf5,#dce4f0);display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #c8d4e3;${style||''}"><svg width="${Math.floor(w*0.5)}" height="${Math.floor(h*0.4)}" viewBox="0 0 24 24" fill="#8fa4bf"><circle cx="12" cy="8" r="4"/><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/></svg><span style="font-size:${Math.floor(h/6)}px;font-weight:600;color:#6b82a3;margin-top:2px;">${ini}</span></div>`;
+        if (!window._resumePhotoBase64) return '';
+        return `<img src="${window._resumePhotoBase64}" style="width:${w}px;height:${h}px;object-fit:cover;display:block;${style||''}" />`;
     }
 
     function renderA4Content(sec, opts) {
