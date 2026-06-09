@@ -844,7 +844,7 @@
                     <div class="flex items-center px-5 py-3">
                         <svg class="w-5 h-5 text-gray-600 cursor-pointer" onclick="goBack()" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                         <h1 class="flex-1 text-center text-[17px] font-semibold">AI生成简历</h1>
-                        <span class="text-xs text-blue-500 cursor-pointer" onclick="goTo('page-detail')">预览</span>
+                        <span class="text-xs text-blue-500 cursor-pointer" onclick="previewCreateForm()">预览</span>
                     </div>
 
                     <div class="px-5 fade-in" style="padding-bottom: 16px;">
@@ -5476,6 +5476,52 @@ ${resume.selfEval || selfEval}`;
                 `;
                 detailContent.appendChild(errDiv);
             }
+        }
+
+        function previewCreateForm() {
+            const page = document.getElementById('page-create');
+            const inputs = page.querySelectorAll('input[type="text"]');
+            const textareas = page.querySelectorAll('textarea');
+            const name = inputs[0]?.value || '姓名';
+            const jobIntent = inputs[1]?.value || '';
+            const phone = inputs[2]?.value || '';
+            const email = inputs[3]?.value || '';
+            const city = inputs[4]?.value || '';
+            const school = inputs[5]?.value || '';
+            const major = inputs[6]?.value || '';
+            const degree = inputs[7]?.value || '';
+            const eduTime = inputs[8]?.value || '';
+            const company = inputs[9]?.value || '';
+            const position = inputs[10]?.value || '';
+            const workTime = inputs[11]?.value || '';
+            const workDesc = textareas[0]?.value || '';
+            const projectName = inputs[12]?.value || '';
+            const projectRole = inputs[13]?.value || '';
+            const projectTime = inputs[14]?.value || '';
+            const projectDesc = textareas[1]?.value || '';
+            const skillTags = page.querySelectorAll('#skillTagContainer span');
+            const skills = Array.from(skillTags).map(s => s.textContent.replace('×', '').trim()).filter(Boolean);
+            const selfEval = textareas[2]?.value || '';
+            const md = `# ${name}
+${[jobIntent, city, phone, email].filter(Boolean).join(' | ')}
+
+## 教育经历
+${school} · ${major} · ${degree} · ${eduTime}
+
+## 工作经历
+**${company}** · ${position} · ${workTime}
+${workDesc}
+
+## 项目经历
+**${projectName}** · ${projectRole} · ${projectTime}
+${projectDesc}
+
+## 技能清单
+${skills.join(' / ')}
+
+## 自我评价
+${selfEval}`;
+            enterPreviewMode(md, 'page-create');
         }
 
         // ===== 岗位标签选择 =====
