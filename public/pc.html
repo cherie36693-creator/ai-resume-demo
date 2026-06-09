@@ -3531,6 +3531,8 @@
             if (bp) { bp.classList.remove('text-gray-800'); bp.classList.add('text-blue-700'); }
         }
         if (_diagTemplateMode) {
+            const modal = document.getElementById('template-modal-overlay');
+            if (modal) modal.remove();
             setTimeout(() => doDiagGenerateResume(), 300);
         }
     }
@@ -6024,21 +6026,22 @@ ${sectionSummary}`;
     }
 
     function showDiagTemplateSelection() {
-        // 从诊断完成进入：选模板后直接用已有markdown渲染（不做AI重写）
         _diagTemplateMode = true;
-        switchTab('tab-create');
-        setTimeout(() => {
-            const container = document.getElementById('tab-create').querySelector('.fade-in') || document.getElementById('tab-create');
-            if (!container.dataset.formBackup) container.dataset.formBackup = container.innerHTML;
-            container.innerHTML = `<div class="flex flex-col mx-auto px-4" style="max-width:900px;height:calc(100vh - 140px);">
-                <div class="flex items-center gap-2 py-4 flex-shrink-0">
-                    <button class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition" onclick="switchTab('tab-ai-diagnosis')">
-                        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                    </button>
-                    <h2 class="text-base font-semibold text-gray-800">选择简历模版</h2>
-                    <span class="text-xs text-gray-400 ml-auto">基于优化后的内容生成新简历</span>
-                </div>
-                <div class="flex-1 min-h-0 overflow-y-auto pb-4">
+        const existing = document.getElementById('template-modal-overlay');
+        if (existing) existing.remove();
+        const overlay = document.createElement('div');
+        overlay.id = 'template-modal-overlay';
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;';
+        overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+        overlay.innerHTML = `<div class="bg-white rounded-2xl shadow-2xl" style="width:720px;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
+                <h2 class="text-base font-semibold text-gray-800">选择简历模版</h2>
+                <span class="text-xs text-gray-400">基于优化后的内容生成新简历</span>
+                <button class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition ml-4" onclick="document.getElementById('template-modal-overlay').remove()">
+                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="flex-1 min-h-0 overflow-y-auto px-6 py-4">
                 <div class="grid grid-cols-3 gap-4" id="template-grid">
                     <div class="template-card selected cursor-pointer rounded-xl border-2 border-blue-500 overflow-hidden transition hover:shadow-md" onclick="selectTemplate('spring2024', this)">
                         <div class="h-[180px] bg-white p-2 border-b border-gray-100">
@@ -6135,12 +6138,12 @@ ${sectionSummary}`;
                         <div class="p-2 text-center"><p class="text-[11px] font-medium text-gray-800">樱花季</p></div>
                     </div>
                 </div>
-                </div>
-                <div class="flex-shrink-0 py-2 bg-white">
-                    <p class="text-center text-xs text-gray-400">点击模板即可生成简历</p>
-                </div>
-            </div>`;
-        }, 100);
+            </div>
+            <div class="flex-shrink-0 px-6 py-3 border-t border-gray-100 bg-gray-50 rounded-b-2xl">
+                <p class="text-center text-xs text-gray-400">点击模板即可生成简历</p>
+            </div>
+        </div>`;
+        document.body.appendChild(overlay);
     }
 
     function doDiagGenerateResume() {
