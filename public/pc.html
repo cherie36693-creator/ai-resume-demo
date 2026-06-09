@@ -4957,13 +4957,14 @@
             infoHtml += '</div>';
         }
 
-        // 头部：姓名左对齐 + 蓝色底线分隔 + 右侧照片位
+        // 头部：姓名左对齐 + 蓝色底线分隔 + 右侧照片位（仅有照片时显示）
+        const photoHtml = window._resumePhotoBase64 ? `<img src="${window._resumePhotoBase64}" style="width:48px;height:60px;object-fit:cover;border-radius:4px;flex-shrink:0;" />` : '';
         const header = `<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;padding-bottom:12px;border-bottom:3px solid #2576b9;">
             <div>
                 <p style="font-size:22px;font-weight:700;color:#1a1a1a;margin:0;letter-spacing:2px;">${data.name}</p>
                 <p style="font-size:10px;color:#666;margin:6px 0 0;">${[info['电话'],info['邮箱'],info['所在地']||info['现居']].filter(Boolean).join(' | ')}</p>
             </div>
-            <div style="width:48px;height:60px;background:#e5e7eb;border-radius:4px;flex-shrink:0;"></div>
+            ${photoHtml}
         </div>`;
 
         // 个人信息区
