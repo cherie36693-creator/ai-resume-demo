@@ -4123,12 +4123,23 @@
             }
             // Toast 提示
             showToast('定制简历已生成');
-            // 左侧：显示原始简历纯文本
+            // 左侧：显示原始简历PDF/图片预览
             const leftPanel = document.querySelector('#tab-jd > .flex > .flex-1.flex.flex-col');
             if (leftPanel) {
                 if (!window._jdLeftPanelBackup) window._jdLeftPanelBackup = leftPanel.innerHTML;
-                const originalMd = getJdResumeMarkdown();
-                const originalHtml = renderMarkdownToHtml(originalMd);
+                let previewHtml = '';
+                if (resumeData.fileDataUrl) {
+                    const type = resumeData.fileType || '';
+                    if (type.startsWith('image/')) {
+                        previewHtml = `<img src="${resumeData.fileDataUrl}" style="width:100%;height:auto;display:block;" alt="简历原件"/>`;
+                    } else if (type === 'application/pdf') {
+                        previewHtml = `<embed src="${resumeData.fileDataUrl}#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf" style="width:100%;height:100%;min-height:800px;border:none;" />`;
+                    }
+                }
+                if (!previewHtml) {
+                    const originalMd = getJdResumeMarkdown();
+                    previewHtml = `<div class="text-sm text-gray-700 leading-relaxed p-6">${renderMarkdownToHtml(originalMd)}</div>`;
+                }
                 leftPanel.innerHTML = `
                     <div class="flex items-center justify-between px-6 py-3 border-b border-gray-100 flex-shrink-0">
                         <div class="flex items-center gap-2">
@@ -4138,8 +4149,8 @@
                         </div>
                         <button class="px-3 py-1.5 text-xs text-gray-500 bg-gray-100 rounded-lg hover:bg-gray-200" onclick="restoreJdLeftPanel()">返回编辑JD</button>
                     </div>
-                    <div class="flex-1 overflow-y-auto p-6">
-                        <div class="text-sm text-gray-700 leading-relaxed">${originalHtml}</div>
+                    <div class="flex-1 overflow-y-auto">
+                        ${previewHtml}
                     </div>
                 `;
             }
