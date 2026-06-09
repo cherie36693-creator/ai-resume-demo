@@ -4226,12 +4226,12 @@
                     </div>
                 `;
             }
-            // 右侧：定制后简历渲染 + 操作按钮
+            // 右侧：定制后简历可编辑区域 + 操作按钮
             window._jdCustomResumeBody = resumeBody;
             const customRenderedHtml = renderMarkdownToHtml(resumeBody.replace(/==([^=]+)==/g, '<span style="background:#dbeafe;padding:1px 3px;border-radius:3px;color:#1d4ed8;">$1</span>'));
             const rightPanel = result.parentElement;
             result.innerHTML = `${aiNotesHtml}
-            <div class="flex-1 overflow-y-auto text-sm text-gray-700 leading-relaxed">${customRenderedHtml}</div>`;
+            <div class="flex-1 overflow-y-auto text-sm text-gray-700 leading-relaxed" id="jd-custom-editable" contenteditable="true" style="outline:none;cursor:text;">${customRenderedHtml}</div>`;
             result.className = 'flex-1 overflow-hidden p-5 flex flex-col';
             // 吸底按钮区域
             let bottomBar = rightPanel.querySelector('.jd-custom-bottom-bar');
@@ -4278,14 +4278,17 @@
     }
 
     function saveCustomResume() {
-        if (window._lastCustomResume) {
-            resumeData.markdown = window._lastCustomResume;
+        const editEl = document.getElementById('jd-custom-editable');
+        const editedText = editEl ? editEl.innerText.trim() : '';
+        const content = editedText || window._lastCustomResume;
+        if (content) {
+            resumeData.markdown = content;
             saveData();
             const baseName = (resumeData.fileName || '简历').replace(/\.(pdf|docx?)$/i, '');
-            try { addResumeToLibrary(baseName + '-定制版', window._lastCustomResume); } catch(e) { console.warn('addLibrary:', e); }
-            try { addRecentDoc(baseName + '-定制版', 'custom', window._lastCustomResume); } catch(e) { console.warn('addRecent:', e); }
+            try { addResumeToLibrary(baseName + '-定制版', content); } catch(e) { console.warn('addLibrary:', e); }
+            try { addRecentDoc(baseName + '-定制版', 'custom', content); } catch(e) { console.warn('addRecent:', e); }
             updateUIHasResume();
-            showToast('已应用到主简历');
+            showToast('已保存为新简历');
             goToMain('main-home');
         } else {
             showToast('请先生成定制简历');
@@ -4961,7 +4964,7 @@
 
         let sections = '';
         for (const sec of data.sections) {
-            if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
+            if (/^(个人简历|简历|基本信息|个人信息|resume|curriculum vitae|cv)$/i.test(sec.title.trim())) continue;
             const icon = sectionIcons[sec.title] || '📋';
             // 模块标题条
             sections += `<div style="margin-bottom:18px;">
@@ -5057,7 +5060,7 @@
         const secIcons = {'求职意向':'👤','教育经历':'🎓','教育背景':'🎓','在校经历':'🎓','工作经历':'💼','项目经历':'📁','相关技能':'💻','职业技能':'💻','专业技能':'💻','技能':'💻','奖项证书':'🏆','荣誉奖项':'🏆','自我评价':'⭐','发表论文':'📄','规培经历':'🏥','实习经历':'💼','科研经历':'🔬','培训经历':'📚','证书':'📜','语言能力':'🌐','兴趣爱好':'🎯'};
         let secs = '';
         for (const sec of data.sections) {
-            if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
+            if (/^(个人简历|简历|基本信息|个人信息|resume|curriculum vitae|cv)$/i.test(sec.title.trim())) continue;
             const icon = secIcons[sec.title] || '📋';
             secs += `<div style="margin-bottom:16px;padding-left:12px;border-left:3px solid #2576b9;">
                 <div style="margin-bottom:8px;display:flex;align-items:center;gap:6px;">
@@ -5077,7 +5080,7 @@
         const secColors = ['#43a5c4','#67b168','#e8a838','#c75c8a','#7c6dc4','#4a9aca'];
         let ci = 0, secs = '';
         for (const sec of data.sections) {
-            if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
+            if (/^(个人简历|简历|基本信息|个人信息|resume|curriculum vitae|cv)$/i.test(sec.title.trim())) continue;
             const color = secColors[ci % secColors.length]; ci++;
             secs += `<div style="margin-bottom:16px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid #eee;"><div style="width:22px;height:22px;background:${color};border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span style="color:#fff;font-size:10px;font-weight:700;">✦</span></div><span style="font-size:14px;font-weight:700;color:#333;">${sec.title}</span></div>${renderA4Content(sec, {dateColor:'#999'})}</div>`;
         }
@@ -5091,7 +5094,7 @@
         for (const k of ['电话','邮箱','学历','毕业院校','出生年月','所在地']) { if (info[k]) leftInfo+=`<div style="margin-bottom:8px;"><p style="font-size:10px;color:rgba(255,255,255,0.6);margin:0;">${k}</p><p style="font-size:12px;color:#fff;margin:2px 0 0;">${info[k]}</p></div>`; }
         let leftSecs = '', rightSecs = '';
         for (const sec of data.sections) {
-            if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
+            if (/^(个人简历|简历|基本信息|个人信息|resume|curriculum vitae|cv)$/i.test(sec.title.trim())) continue;
             if (/技能|证书|特长|语言|评价|自我|荣誉|奖|兴趣/.test(sec.title)) {
                 leftSecs += `<div style="margin-top:12px;"><p style="font-size:12px;color:#fff;font-weight:700;margin:0 0 5px;padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,0.2);">${sec.title}</p>`;
                 for (const item of (sec.content||[])) { if (!item || !item.text) continue; leftSecs += `<p style="font-size:11px;color:rgba(255,255,255,0.85);margin:4px 0;line-height:1.5;">• ${item.text.replace(/^[-•*→·]\s*/,'').replace(/\*\*/g,'')}</p>`; }
@@ -5112,7 +5115,7 @@
         for (const [k,icon] of leftItems) { if (info[k]) leftInfo+=`<div style="display:flex;align-items:center;gap:5px;margin-bottom:7px;"><span style="font-size:11px;">${icon}</span><p style="font-size:11px;color:rgba(255,255,255,0.9);margin:0;">${info[k]}</p></div>`; }
         let leftSecs = '', rightSecs = '';
         for (const sec of data.sections) {
-            if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
+            if (/^(个人简历|简历|基本信息|个人信息|resume|curriculum vitae|cv)$/i.test(sec.title.trim())) continue;
             if (/技能|证书|特长|语言|评价|自我|荣誉|奖|兴趣/.test(sec.title)) {
                 leftSecs += `<div style="margin-top:12px;"><p style="font-size:11px;color:#fff;font-weight:700;margin:0 0 5px;padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,0.15);">${sec.title}</p>`;
                 for (const item of (sec.content||[])) { if (!item || !item.text) continue; leftSecs += `<p style="font-size:10px;color:rgba(255,255,255,0.8);margin:3px 0;line-height:1.5;">• ${item.text.replace(/^[-•*→·]\s*/,'').replace(/\*\*/g,'')}</p>`; }
@@ -5132,7 +5135,7 @@
         const colors = ['#f43f5e','#ec4899','#a855f7','#6366f1','#0ea5e9','#14b8a6'];
         let ci = 0, secs = '';
         for (const sec of data.sections) {
-            if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
+            if (/^(个人简历|简历|基本信息|个人信息|resume|curriculum vitae|cv)$/i.test(sec.title.trim())) continue;
             const color = colors[ci % colors.length]; ci++;
             let content = '';
             for (const item of (sec.content||[])) {
@@ -5155,7 +5158,7 @@
         const accents = ['#818cf8','#34d399','#fbbf24','#f472b6','#22d3ee','#a78bfa'];
         let ai = 0, secs = '';
         for (const sec of data.sections) {
-            if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
+            if (/^(个人简历|简历|基本信息|个人信息|resume|curriculum vitae|cv)$/i.test(sec.title.trim())) continue;
             const accent = accents[ai % accents.length]; ai++;
             let content = '';
             for (const item of (sec.content||[])) {
@@ -5180,7 +5183,7 @@
         const skillColors = ['#fbbf24','#34d399','#60a5fa','#f472b6','#a78bfa'];
         let si = 0;
         for (const sec of data.sections) {
-            if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
+            if (/^(个人简历|简历|基本信息|个人信息|resume|curriculum vitae|cv)$/i.test(sec.title.trim())) continue;
             if (/技能|证书|特长|语言|评价|自我|荣誉|奖|兴趣/.test(sec.title)) {
                 leftSecs += `<div style="margin-top:10px;"><p style="font-size:11px;color:#fff;font-weight:700;margin:0 0 5px;padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,0.2);">${sec.title}</p>`;
                 for (const item of (sec.content||[])) {
@@ -5208,7 +5211,7 @@
         const colors = ['#10b981','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#f97316'];
         let ci = 0, sections = '';
         for (const sec of data.sections) {
-            if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
+            if (/^(个人简历|简历|基本信息|个人信息|resume|curriculum vitae|cv)$/i.test(sec.title.trim())) continue;
             const color = colors[ci % colors.length]; ci++;
             let content = '';
             for (const item of (sec.content||[])) {
@@ -5230,7 +5233,7 @@
         const photo = `<div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#e8d5b7,#c4a882);border:3px solid #d4a574;flex-shrink:0;display:flex;align-items:center;justify-content:center;"><span style="font-size:22px;color:#fff;font-weight:700;">${(data.name||'U')[0]}</span></div>`;
         let secs = '';
         for (const sec of data.sections) {
-            if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
+            if (/^(个人简历|简历|基本信息|个人信息|resume|curriculum vitae|cv)$/i.test(sec.title.trim())) continue;
             let content = '';
             for (const item of sec.content) {
                 const t = item.text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
@@ -5250,7 +5253,7 @@
         const tags = [info['学历'],info['求职意向']].filter(Boolean);
         let secs = '';
         for (const sec of data.sections) {
-            if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
+            if (/^(个人简历|简历|基本信息|个人信息|resume|curriculum vitae|cv)$/i.test(sec.title.trim())) continue;
             let content = '';
             for (const item of sec.content) {
                 const t = item.text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
@@ -5270,7 +5273,7 @@
         const photo = window._resumePhotoBase64 ? `<img src="${window._resumePhotoBase64}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:3px solid #fff;" />` : '';
         let secs = '';
         for (const sec of data.sections) {
-            if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
+            if (/^(个人简历|简历|基本信息|个人信息|resume|curriculum vitae|cv)$/i.test(sec.title.trim())) continue;
             let content = '';
             for (const item of sec.content) {
                 const t = item.text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
@@ -5290,7 +5293,7 @@
         const tags = [info['学历'],info['求职意向']].filter(Boolean);
         let secs = '';
         for (const sec of data.sections) {
-            if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
+            if (/^(个人简历|简历|基本信息|个人信息|resume|curriculum vitae|cv)$/i.test(sec.title.trim())) continue;
             let content = '';
             for (const item of sec.content) {
                 const t = item.text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
@@ -5310,7 +5313,7 @@
         const photo = window._resumePhotoBase64 ? `<img src="${window._resumePhotoBase64}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:3px solid #e9d5ff;" />` : '';
         let secs = '';
         for (const sec of data.sections) {
-            if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
+            if (/^(个人简历|简历|基本信息|个人信息|resume|curriculum vitae|cv)$/i.test(sec.title.trim())) continue;
             let content = '';
             for (const item of sec.content) {
                 const t = item.text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
@@ -5330,7 +5333,7 @@
         const tags = [info['学历'],info['求职意向']].filter(Boolean);
         let secs = '';
         for (const sec of data.sections) {
-            if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
+            if (/^(个人简历|简历|基本信息|个人信息|resume|curriculum vitae|cv)$/i.test(sec.title.trim())) continue;
             let content = '';
             for (const item of sec.content) {
                 const t = item.text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
@@ -5350,7 +5353,7 @@
         const photo = window._resumePhotoBase64 ? `<img src="${window._resumePhotoBase64}" style="width:48px;height:48px;border-radius:10px;object-fit:cover;border:2px solid #bef264;" />` : '';
         let secs = '';
         for (const sec of data.sections) {
-            if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
+            if (/^(个人简历|简历|基本信息|个人信息|resume|curriculum vitae|cv)$/i.test(sec.title.trim())) continue;
             let content = '';
             for (const item of sec.content) {
                 const t = item.text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
@@ -5369,7 +5372,7 @@
         const cp = [info['电话'],info['邮箱'],info['所在地']||info['现居']].filter(Boolean);
         let secs = '';
         for (const sec of data.sections) {
-            if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
+            if (/^(个人简历|简历|基本信息|个人信息|resume|curriculum vitae|cv)$/i.test(sec.title.trim())) continue;
             let content = '';
             for (const item of sec.content) {
                 const t = item.text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
