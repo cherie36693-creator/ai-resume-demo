@@ -1990,8 +1990,12 @@
         recentDocs = recentDocs.filter(d => d.name !== name);
         const now = new Date();
         const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
-        // 存储前10行预览文本
-        const md = markdown || resumeData.markdown || '';
+        // 存储前10行预览文本（跳过AI策略说明等非简历内容）
+        let md = markdown || resumeData.markdown || '';
+        const firstHeading = md.indexOf('\n#');
+        if (firstHeading > 0 && !md.trim().startsWith('#')) {
+            md = md.substring(firstHeading + 1);
+        }
         const preview = md.split('\n').filter(l => l.trim()).slice(0, 12).join('\n');
         recentDocs.unshift({ name, type, time, preview });
         if (recentDocs.length > 8) recentDocs = recentDocs.slice(0, 8);
@@ -2026,7 +2030,7 @@
                 const lines = md.split('\n').filter(l => l.trim()).slice(0, 10);
                 thumbHtml = '<div style="padding:8px 10px; overflow:hidden; height:100%;">';
                 lines.forEach(l => {
-                    const c = l.replace(/^#+\s*/, '').replace(/\*\*/g, '').replace(/^[-*]\s*/, '').trim().substring(0, 30);
+                    const c = l.replace(/^#+\s*/, '').replace(/\*\*/g, '').replace(/==([^=]+)==/g, '$1').replace(/^[-*]\s*/, '').trim().substring(0, 30);
                     if (l.startsWith('#')) thumbHtml += `<div style="font-size:7px;font-weight:bold;color:#1f2937;margin:2px 0 1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c}</div>`;
                     else thumbHtml += `<div style="font-size:6px;color:#6b7280;line-height:1.6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c}</div>`;
                 });
@@ -2370,6 +2374,7 @@
             html += `<p class="my-0.5">${trimmed.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</p>`;
         });
         if (inTable) flushTable();
+        html = html.replace(/==([^=]+)==/g, '<span style="background:#dbeafe;padding:1px 3px;border-radius:3px;color:#1d4ed8;">$1</span>');
         return html;
     }
 
