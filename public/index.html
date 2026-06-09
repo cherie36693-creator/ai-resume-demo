@@ -2384,7 +2384,18 @@
         ];
 
         function highlightXX(text) {
-            return (text || '').replace(/XX/g, '<span style="background:#fef3c7;color:#d97706;padding:0 2px;border-radius:2px;font-weight:600;">XX</span>');
+            return (text || '').replace(/XX/g, '<span class="xx-hl" style="background:#fef3c7;color:#d97706;padding:0 2px;border-radius:2px;font-weight:600;">XX</span>');
+        }
+        function clearResolvedHighlights(container) {
+            if (!container) return;
+            container.querySelectorAll('.xx-hl').forEach(span => {
+                if (span.textContent.trim() !== 'XX') {
+                    span.style.background = '';
+                    span.style.color = '';
+                    span.style.fontWeight = '';
+                    span.className = '';
+                }
+            });
         }
 
         function openDiagDrawer(idx) {
@@ -2428,7 +2439,7 @@
                     <p style="font-size:12px;color:#1f2937;font-weight:600;">✨ AI 改写</p>
                     <button style="font-size:11px;color:#6366f1;cursor:pointer;pointer-events:auto;padding:4px 12px;background:#eef2ff;border-radius:6px;border:1px solid #c7d2fe;" onclick="regenerateDiagContent(${idx})">换一种</button>
                 </div>
-                <div id="diagEditArea" contenteditable="true" spellcheck="false" style="width:100%;background:#fafafa;border-radius:10px;padding:12px 14px;border:1px solid #e5e7eb;font-size:12px;color:#1f2937;line-height:1.9;outline:none;pointer-events:auto;-webkit-user-select:text;user-select:text;transition:border-color 0.2s;min-height:80px;" onfocus="this.style.borderColor='#6366f1';this.style.background='#fff'" onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'">${highlightXX(rewriteText)}</div>
+                <div id="diagEditArea" contenteditable="true" spellcheck="false" style="width:100%;background:#fafafa;border-radius:10px;padding:12px 14px;border:1px solid #e5e7eb;font-size:12px;color:#1f2937;line-height:1.9;outline:none;pointer-events:auto;-webkit-user-select:text;user-select:text;transition:border-color 0.2s;min-height:80px;" onfocus="this.style.borderColor='#6366f1';this.style.background='#fff'" onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'" oninput="clearResolvedHighlights(this)">${highlightXX(rewriteText)}</div>
             `;
 
             document.getElementById('diagDrawerContent').innerHTML = html;
@@ -2483,7 +2494,7 @@
                         <p style="font-size:12px;color:#1f2937;font-weight:600;">✨ AI 改写</p>
                         <button style="font-size:11px;color:#6366f1;cursor:pointer;pointer-events:auto;padding:4px 12px;background:#eef2ff;border-radius:6px;border:1px solid #c7d2fe;" onclick="openModuleAiOptimize('${title.replace(/'/g, "\\'")}')">换一种</button>
                     </div>
-                    <div id="diagEditArea" contenteditable="true" spellcheck="false" style="width:100%;background:#fafafa;border-radius:10px;padding:12px 14px;border:1px solid #e5e7eb;font-size:12px;color:#1f2937;line-height:1.9;outline:none;pointer-events:auto;-webkit-user-select:text;user-select:text;min-height:80px;" onfocus="this.style.borderColor='#6366f1';this.style.background='#fff'" onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'">${highlightXX(rewriteText)}</div>
+                    <div id="diagEditArea" contenteditable="true" spellcheck="false" style="width:100%;background:#fafafa;border-radius:10px;padding:12px 14px;border:1px solid #e5e7eb;font-size:12px;color:#1f2937;line-height:1.9;outline:none;pointer-events:auto;-webkit-user-select:text;user-select:text;min-height:80px;" onfocus="this.style.borderColor='#6366f1';this.style.background='#fff'" onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'" oninput="clearResolvedHighlights(this)">${highlightXX(rewriteText)}</div>
                 `;
                 document.getElementById('diagDrawerBtns').innerHTML = `
                     <div style="display:flex;gap:10px;">
