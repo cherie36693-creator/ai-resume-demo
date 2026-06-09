@@ -4419,7 +4419,7 @@
         const container = document.getElementById('interview-content');
         const btnArea = container.querySelector('.sticky');
         const btn = btnArea ? btnArea.querySelector('button') : null;
-        if (btn) { btn.disabled = true; btn.innerHTML = '<div class="w-4 h-4 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin" style="border-width:2px;"></div><span>生成更多面试题...</span>'; }
+        if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; btn.innerHTML = '<span class="inline-flex items-center gap-1"><svg class="animate-spin w-3 h-3" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity=".3"></circle><path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path></svg>生成中...</span>'; }
         const md = resumeData.markdown || '';
         try {
             const raw = await callClaudeAPI(
@@ -5184,7 +5184,7 @@
     // 模板: 云朵蓝
     function renderTplAcademic(data, info) {
         const cp = [info['电话'],info['邮箱'],info['所在地']||info['现居'],info['学历']].filter(Boolean);
-        const photo = `<div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#93c5fd,#60a5fa);border:3px solid #fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;"><span style="font-size:20px;color:#fff;font-weight:700;">${(data.name||'U')[0]}</span></div>`;
+        const photo = window._resumePhotoBase64 ? `<img src="${window._resumePhotoBase64}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:3px solid #fff;" />` : '';
         let secs = '';
         for (const sec of data.sections) {
             if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
@@ -5198,7 +5198,7 @@
             }
             secs += `<div style="margin-bottom:16px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding-bottom:5px;border-bottom:2px solid #dbeafe;"><span style="font-size:14px;font-weight:700;color:#1d4ed8;">${sec.title}</span></div>${content}</div>`;
         }
-        return `<div style="font-family:'PingFang SC',-apple-system,sans-serif;display:flex;min-height:700px;font-size:11px;line-height:1.5;background:#f8faff;"><div style="width:34%;background:linear-gradient(180deg,#dbeafe,#eff6ff);padding:24px 14px;text-align:center;"><div style="margin-bottom:14px;">${photo}</div><p style="font-size:18px;font-weight:700;color:#1e40af;margin:0;">${data.name}</p>${info['求职意向']?`<p style="font-size:10px;color:#3b82f6;margin:6px 0;background:#eff6ff;padding:3px 8px;border-radius:10px;display:inline-block;">${info['求职意向']}</p>`:''}<div style="margin-top:14px;text-align:left;padding:0 6px;">${cp.map(c=>`<p style="font-size:9.5px;color:#1d4ed8;margin:5px 0;padding:4px 8px;background:rgba(255,255,255,0.7);border-radius:8px;">${c}</p>`).join('')}</div></div><div style="flex:1;padding:24px 18px;">${secs}</div></div>`;
+        return `<div style="font-family:'PingFang SC',-apple-system,sans-serif;display:flex;min-height:700px;font-size:11px;line-height:1.5;background:#f8faff;"><div style="width:34%;background:linear-gradient(180deg,#dbeafe,#eff6ff);padding:24px 14px;text-align:center;">${photo ? `<div style="margin-bottom:14px;">${photo}</div>` : ''}<p style="font-size:18px;font-weight:700;color:#1e40af;margin:0;">${data.name}</p>${info['求职意向']?`<p style="font-size:10px;color:#3b82f6;margin:6px 0;background:#eff6ff;padding:3px 8px;border-radius:10px;display:inline-block;">${info['求职意向']}</p>`:''}<div style="margin-top:14px;text-align:left;padding:0 6px;">${cp.map(c=>`<p style="font-size:9.5px;color:#1d4ed8;margin:5px 0;padding:4px 8px;background:rgba(255,255,255,0.7);border-radius:8px;">${c}</p>`).join('')}</div></div><div style="flex:1;padding:24px 18px;">${secs}</div></div>`;
     }
 
     // 模板: 蜜桃粉
@@ -5218,13 +5218,13 @@
             }
             secs += `<div style="background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(244,63,94,0.08);"><div style="margin-bottom:6px;"><span style="font-size:14px;font-weight:700;color:#9f1239;">${sec.title}</span></div>${content}</div>`;
         }
-        return `<div style="font-family:'PingFang SC',-apple-system,sans-serif;min-height:700px;background:linear-gradient(180deg,#fff5f5 0%,#fff1f2 30%,#fffbfb 100%);padding:24px 20px;font-size:11px;line-height:1.5;"><div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;padding-bottom:14px;border-bottom:2px solid #fecdd3;"><div style="width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#fda4af,#fb7185);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span style="font-size:22px;color:#fff;font-weight:700;">${(data.name||'U')[0]}</span></div><div><p style="font-size:20px;font-weight:700;color:#9f1239;margin:0;">${data.name}</p><p style="font-size:10px;color:#e11d48;margin:4px 0 0;">${cp.join(' · ')}</p></div></div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">${tags.map(t=>`<span style="font-size:10px;background:#ffe4e6;color:#be123c;padding:3px 10px;border-radius:12px;">${t}</span>`).join('')}</div>${secs}</div>`;
+        return `<div style="font-family:'PingFang SC',-apple-system,sans-serif;min-height:700px;background:linear-gradient(180deg,#fff5f5 0%,#fff1f2 30%,#fffbfb 100%);padding:24px 20px;font-size:11px;line-height:1.5;"><div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;padding-bottom:14px;border-bottom:2px solid #fecdd3;">${window._resumePhotoBase64 ? `<img src="${window._resumePhotoBase64}" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0;" />` : ''}<div><p style="font-size:20px;font-weight:700;color:#9f1239;margin:0;">${data.name}</p><p style="font-size:10px;color:#e11d48;margin:4px 0 0;">${cp.join(' · ')}</p></div></div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">${tags.map(t=>`<span style="font-size:10px;background:#ffe4e6;color:#be123c;padding:3px 10px;border-radius:12px;">${t}</span>`).join('')}</div>${secs}</div>`;
     }
 
     // 模板: 薰衣草
     function renderTplLavender(data, info) {
         const cp = [info['电话'],info['邮箱'],info['所在地']||info['现居']].filter(Boolean);
-        const photo = `<div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#c084fc,#a855f7);border:3px solid #e9d5ff;flex-shrink:0;display:flex;align-items:center;justify-content:center;"><span style="font-size:20px;color:#fff;font-weight:700;">${(data.name||'U')[0]}</span></div>`;
+        const photo = window._resumePhotoBase64 ? `<img src="${window._resumePhotoBase64}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:3px solid #e9d5ff;" />` : '';
         let secs = '';
         for (const sec of data.sections) {
             if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
@@ -5264,7 +5264,7 @@
     // 模板: 抹茶慕斯
     function renderTplMatcha(data, info) {
         const cp = [info['电话'],info['邮箱'],info['所在地']||info['现居']].filter(Boolean);
-        const photo = `<div style="width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#a3e635,#84cc16);border:2px solid #bef264;flex-shrink:0;display:flex;align-items:center;justify-content:center;"><span style="font-size:20px;color:#fff;font-weight:700;">${(data.name||'U')[0]}</span></div>`;
+        const photo = window._resumePhotoBase64 ? `<img src="${window._resumePhotoBase64}" style="width:48px;height:48px;border-radius:10px;object-fit:cover;border:2px solid #bef264;" />` : '';
         let secs = '';
         for (const sec of data.sections) {
             if (/个人简历|基本信息|个人信息/.test(sec.title)) continue;
