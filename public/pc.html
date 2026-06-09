@@ -3730,14 +3730,14 @@
         const modal = document.createElement('div');
         modal.id = 'jd-resume-modal';
         modal.className = 'modal-overlay show';
-        modal.innerHTML = `<div class="bg-white rounded-2xl w-[400px] max-h-[60vh] shadow-2xl flex flex-col overflow-hidden">
-            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-                <h3 class="text-base font-semibold text-gray-900">选择简历</h3>
+        modal.innerHTML = `<div class="bg-white rounded-2xl w-[360px] max-h-[420px] shadow-2xl flex flex-col overflow-hidden">
+            <div class="flex items-center justify-between px-5 py-3 border-b border-gray-100">
+                <h3 class="text-sm font-semibold text-gray-900">选择简历</h3>
                 <button class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100" onclick="document.getElementById('jd-resume-modal').remove()">
                     <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
-            <div class="flex-1 overflow-y-auto p-4 space-y-1">${listHtml}</div>
+            <div class="flex-1 overflow-y-auto px-3 py-2 space-y-0.5">${listHtml}</div>
         </div>`;
         modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
         document.body.appendChild(modal);
@@ -4006,9 +4006,10 @@
 1. 识别JD行业，选对应策略优化
 2. 植入JD关键词，空洞→量化
 3. 保持真实，只优化表达
-4. 输出完整Markdown简历
-5. AI修改内容用==修改文字==标记
-6. 末尾加"## AI改动说明"简述策略`,
+4. 先输出完整Markdown简历（以# 姓名开头）
+5. AI修改的内容用==修改文字==标记
+6. 简历末尾加"## AI改动说明"（只写3-5条简短策略说明，不要重复简历内容）
+7. 不要在简历前面写任何策略分析或说明文字`,
                     `## 原始简历\n${jdMd.substring(0,2000)}\n\n## 目标岗位JD\n${jd}`
                 );
             } catch(apiErr) { console.warn('JD customize API failed:', apiErr); }
@@ -4019,10 +4020,33 @@
             // 分离AI改动说明和简历正文
             let resumeBody = custom;
             let aiNotes = '';
+            // 尝试匹配末尾的AI改动说明
             const noteMatch = custom.match(/(?:^|\n)((?:#{1,3}\s*)?(?:AI改动说明|改动说明|优化说明|修改说明|简历优化分析|优化分析)[\s\S]*$)/mi);
             if (noteMatch) {
                 resumeBody = custom.substring(0, noteMatch.index).trim();
                 aiNotes = noteMatch[1].trim();
+            }
+            // 如果AI先输出策略说明再输出简历（以#开头），分割出来
+            if (!resumeBody || resumeBody.length < 100) {
+                const resumeStart = custom.match(/(?:^|\n)(#\s+[^\n]{2,20}\n)/m);
+                if (resumeStart) {
+                    aiNotes = custom.substring(0, resumeStart.index).trim();
+                    resumeBody = custom.substring(resumeStart.index).trim();
+                    // 如果resumeBody末尾还有改动说明，再切一次
+                    const tailNote = resumeBody.match(/(?:^|\n)((?:#{1,3}\s*)?(?:AI改动说明|改动说明|优化说明|修改说明)[\s\S]*$)/mi);
+                    if (tailNote) {
+                        aiNotes = (aiNotes ? aiNotes + '\n\n' : '') + tailNote[1].trim();
+                        resumeBody = resumeBody.substring(0, tailNote.index).trim();
+                    }
+                }
+            }
+            // 如果aiNotes中包含了"# 优化后简历"之类的标题后面跟着简历正文，把它提取出来
+            if (aiNotes) {
+                const resumeInNotes = aiNotes.match(/\n(#\s+(?!AI|改动|优化说明|修改说明)[^\n]{2,20}\n[\s\S]+)$/m);
+                if (resumeInNotes && resumeInNotes[1].length > 200) {
+                    resumeBody = resumeInNotes[1].trim();
+                    aiNotes = aiNotes.substring(0, resumeInNotes.index).trim();
+                }
             }
             // 保存定制结果（去除标记和AI添加的标题后缀）
             let cleanBody = resumeBody.replace(/==([^=]+)==/g, '$1');
@@ -4050,33 +4074,32 @@
             }
             // Toast 提示
             showToast('定制简历已生成');
-            // 左侧：显示原始简历样式
+            // 左侧：显示原始简历纯文本
             const leftPanel = document.querySelector('#tab-jd > .flex > .flex-1.flex.flex-col');
             if (leftPanel) {
                 if (!window._jdLeftPanelBackup) window._jdLeftPanelBackup = leftPanel.innerHTML;
                 const originalMd = getJdResumeMarkdown();
-                const originalHtml = renderTemplateByStyle(originalMd, _selectedPCTemplate);
+                const originalHtml = renderMarkdownToHtml(originalMd);
                 leftPanel.innerHTML = `
-                    <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center justify-between px-6 py-3 border-b border-gray-100 flex-shrink-0">
                         <div class="flex items-center gap-2">
-                            <div class="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center"><svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
-                            <div><h3 class="text-base font-semibold text-gray-800">原始简历</h3><p class="text-xs text-gray-400">定制前的简历内容</p></div>
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <h3 class="text-sm font-semibold text-gray-800">原始简历</h3>
+                            <span class="text-xs text-gray-400">定制前的简历内容</span>
                         </div>
                         <button class="px-3 py-1.5 text-xs text-gray-500 bg-gray-100 rounded-lg hover:bg-gray-200" onclick="restoreJdLeftPanel()">返回编辑JD</button>
                     </div>
-                    <div class="flex-1 overflow-y-auto bg-[#f5f5f5] rounded-xl p-4">
-                        <div class="bg-white shadow-lg rounded-lg max-w-[560px] mx-auto overflow-hidden">${originalHtml}</div>
+                    <div class="flex-1 overflow-y-auto p-6">
+                        <div class="text-sm text-gray-700 leading-relaxed">${originalHtml}</div>
                     </div>
                 `;
             }
-            // 右侧：定制后简历（模板渲染）+ 操作按钮
+            // 右侧：定制后简历渲染 + 操作按钮
             window._jdCustomResumeBody = resumeBody;
-            const customTemplateHtml = renderTemplateByStyle(cleanBody, _selectedPCTemplate);
-            const tplOptions = PC_TEMPLATES.map(t => `<option value="${t.id}" ${t.id === _selectedPCTemplate ? 'selected' : ''}>${t.name}</option>`).join('');
-            // 右侧：整体重构为可编辑简历 + 吸底按钮
+            const customRenderedHtml = renderMarkdownToHtml(resumeBody.replace(/==([^=]+)==/g, '<span style="background:#dbeafe;padding:1px 3px;border-radius:3px;color:#1d4ed8;">$1</span>'));
             const rightPanel = result.parentElement;
             result.innerHTML = `${aiNotesHtml}
-            <textarea id="jd-custom-editor" class="w-full flex-1 px-4 py-3 text-sm text-gray-700 leading-relaxed border border-gray-200 rounded-xl resize-none focus:outline-none focus:border-indigo-400 bg-gray-50 focus:bg-white transition font-mono" style="min-height:0;" oninput="window._lastCustomResume=this.value">${cleanBody.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea>`;
+            <div class="flex-1 overflow-y-auto text-sm text-gray-700 leading-relaxed">${customRenderedHtml}</div>`;
             result.className = 'flex-1 overflow-hidden p-5 flex flex-col';
             // 吸底按钮区域
             let bottomBar = rightPanel.querySelector('.jd-custom-bottom-bar');
@@ -4085,7 +4108,7 @@
                 bottomBar.className = 'jd-custom-bottom-bar px-5 py-3 border-t border-gray-100 flex-shrink-0';
                 rightPanel.appendChild(bottomBar);
             }
-            bottomBar.innerHTML = `<button class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm font-medium rounded-xl hover:from-indigo-600 hover:to-purple-600 shadow-sm flex items-center justify-center gap-1.5" onclick="saveCustomResume()"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>应用到主简历</button>`;
+            bottomBar.innerHTML = `<button class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm font-medium rounded-xl hover:from-indigo-600 hover:to-purple-600 shadow-sm flex items-center justify-center gap-1.5" onclick="saveCustomResume()"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>保存为新简历</button>`;
         } catch(err) { result.innerHTML = `<p class="text-sm text-red-500">生成失败: ${err.message}</p>`; }
     }
 
