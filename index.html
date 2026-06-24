@@ -183,7 +183,7 @@ body { font-family:-apple-system,'PingFang SC','Noto Sans SC',sans-serif; backgr
         </div>
         <div style="position:absolute;left:20px;top:50%;transform:translateY(-50%);max-width:56%;">
           <h3 style="font-size:17px;font-weight:800;color:var(--fg);line-height:1.4;">AI真假难辨？<br>一秒帮你鉴别</h3>
-          <p style="font-size:10px;color:var(--hint);margin-top:8px;">图片 / 视频 / 文本 全能检测</p>
+          <p style="font-size:10px;color:var(--hint);margin-top:8px;">图文 / 视频 / 文本 全能检测</p>
         </div>
       </div>
     </div>
@@ -203,7 +203,7 @@ body { font-family:-apple-system,'PingFang SC','Noto Sans SC',sans-serif; backgr
           <div style="width:40px;height:40px;border-radius:50%;background:var(--brand-light);display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
             <svg width="20" height="20" fill="none" stroke="var(--brand)" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
           </div>
-          <p style="font-size:13px;font-weight:600;color:var(--fg);margin-bottom:4px;">点击上传图片或文件</p>
+          <p style="font-size:13px;font-weight:600;color:var(--fg);margin-bottom:4px;">点击上传图文或文件</p>
           <p style="font-size:11px;color:var(--hint);">支持 JPG / PNG / PDF · 30MB以内</p>
         </div>
       </div>
@@ -328,68 +328,84 @@ body { font-family:-apple-system,'PingFang SC','Noto Sans SC',sans-serif; backgr
 <div class="page" id="p-about" style="display:flex;flex-direction:column;overflow:hidden;">
   <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:var(--bg);">
 
-    <!-- Hero -->
-    <div style="padding:24px 16px 20px;text-align:center;background:linear-gradient(180deg,#EEF9F5 0%,var(--bg) 100%);">
-      <div style="width:56px;height:56px;margin:0 auto 12px;border-radius:16px;background:var(--brand);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,189,146,0.25);">
-        <svg width="26" height="26" fill="none" stroke="#fff" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+    <!-- Hero 左文右图 -->
+    <div style="background:linear-gradient(180deg,#EEF9F5 0%,var(--bg) 100%);padding:28px 16px 20px;display:flex;align-items:center;gap:14px;">
+      <div style="flex:1;min-width:0;">
+        <h1 style="font-size:20px;font-weight:800;color:var(--fg);line-height:1.3;margin-bottom:8px;">AI鉴伪</h1>
+        <p style="font-size:12px;color:var(--sub);line-height:1.6;">图文·视频·文本<br>多模态真伪检测</p>
       </div>
-      <h1 style="font-size:18px;font-weight:800;color:var(--fg);margin-bottom:6px;">AI 多模态鉴伪</h1>
-      <p style="font-size:12px;color:var(--sub);line-height:1.5;">图片 · 视频 · 文本，一站式真伪检测</p>
-      <div style="display:flex;gap:8px;margin-top:16px;">
-        <div style="flex:1;background:var(--white);border-radius:10px;padding:12px 6px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
-          <div style="font-size:18px;font-weight:800;color:var(--brand);">90%+</div>
-          <p style="font-size:9px;color:var(--hint);margin-top:2px;">检测召回率</p>
+      <div style="width:148px;flex-shrink:0;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.08);background:#fff;padding:12px 10px 10px;">
+        <div style="text-align:center;margin-bottom:8px;">
+          <div style="position:relative;width:52px;height:52px;margin:0 auto;">
+            <svg width="52" height="52" viewBox="0 0 52 52"><circle cx="26" cy="26" r="22" fill="none" stroke="#eee" stroke-width="4"/><circle cx="26" cy="26" r="22" fill="none" stroke="#E74C3C" stroke-width="4" stroke-dasharray="110 138" stroke-linecap="round" transform="rotate(-90 26 26)"/></svg>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+              <span style="font-size:12px;font-weight:800;color:#E74C3C;">87%</span>
+              <span style="font-size:6px;color:#999;">AI可能性</span>
+            </div>
+          </div>
+          <div style="margin-top:6px;display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:8px;background:#FDECEC;">
+            <svg width="8" height="8" fill="none" stroke="#E74C3C" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+            <span style="font-size:7px;font-weight:600;color:#E74C3C;">疑似AI生成</span>
+          </div>
         </div>
-        <div style="flex:1;background:var(--white);border-radius:10px;padding:12px 6px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
-          <div style="font-size:18px;font-weight:800;color:var(--brand);">&lt;1s</div>
-          <p style="font-size:9px;color:var(--hint);margin-top:2px;">单次检测耗时</p>
-        </div>
-        <div style="flex:1;background:var(--white);border-radius:10px;padding:12px 6px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
-          <div style="font-size:18px;font-weight:800;color:var(--brand);">30+</div>
-          <p style="font-size:9px;color:var(--hint);margin-top:2px;">覆盖AI模型</p>
+        <div style="border-top:1px solid #f0f0f0;padding-top:7px;display:flex;flex-direction:column;gap:5px;">
+          <div style="display:flex;align-items:center;gap:5px;"><div style="width:5px;height:5px;border-radius:50%;background:#E74C3C;"></div><span style="font-size:7px;color:#333;flex:1;">AI生成可能性</span><span style="font-size:7px;font-weight:600;color:#E74C3C;">87%</span></div>
+          <div style="display:flex;align-items:center;gap:5px;"><div style="width:5px;height:5px;border-radius:50%;background:var(--brand);"></div><span style="font-size:7px;color:#333;flex:1;">内容来源验证</span><span style="font-size:7px;font-weight:600;color:var(--brand);">未发现</span></div>
+          <div style="display:flex;align-items:center;gap:5px;"><div style="width:5px;height:5px;border-radius:50%;background:var(--brand);"></div><span style="font-size:7px;color:#333;flex:1;">图片篡改检测</span><span style="font-size:7px;font-weight:600;color:var(--brand);">未发现</span></div>
         </div>
       </div>
     </div>
 
-    <!-- 检测能力 -->
+    <!-- 数据指标 -->
+    <div style="padding:0 12px 16px;">
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;background:var(--brand-light);border-radius:12px;padding:16px 8px;text-align:center;">
+          <div style="font-size:22px;font-weight:900;color:var(--brand);">90%+</div>
+          <p style="font-size:9px;color:var(--sub);margin-top:4px;">检测召回率</p>
+        </div>
+        <div style="flex:1;background:var(--brand-light);border-radius:12px;padding:16px 8px;text-align:center;">
+          <div style="font-size:22px;font-weight:900;color:var(--brand);">&lt;1s</div>
+          <p style="font-size:9px;color:var(--sub);margin-top:4px;">单次检测耗时</p>
+        </div>
+        <div style="flex:1;background:var(--brand-light);border-radius:12px;padding:16px 8px;text-align:center;">
+          <div style="font-size:22px;font-weight:900;color:var(--brand);">30+</div>
+          <p style="font-size:9px;color:var(--sub);margin-top:4px;">覆盖AI模型</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 核心功能 -->
     <div style="padding:20px 16px 16px;">
-      <h2 style="font-size:15px;font-weight:700;color:var(--fg);margin-bottom:12px;">检测能力</h2>
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <div style="background:var(--white);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,0.03);">
-          <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#E8F8F4,#D0F2EA);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <svg width="18" height="18" fill="none" stroke="var(--brand)" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+      <h2 style="font-size:16px;font-weight:700;color:var(--fg);margin-bottom:4px;">核心功能</h2>
+      <p style="font-size:11px;color:var(--hint);margin-bottom:14px;">四大检测能力，全方位真伪鉴别</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="background:var(--white);border-radius:12px;padding:16px 12px;border:1px solid var(--border);">
+          <div style="width:34px;height:34px;margin-bottom:10px;border-radius:10px;background:var(--bg);display:flex;align-items:center;justify-content:center;">
+            <svg width="16" height="16" fill="none" stroke="var(--brand)" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
           </div>
-          <div style="flex:1;min-width:0;">
-            <p style="font-size:13px;font-weight:600;color:var(--fg);">AI生成图片检测</p>
-            <p style="font-size:10px;color:var(--hint);margin-top:2px;">Midjourney · Stable Diffusion · DALL-E · Gemini</p>
-          </div>
+          <p style="font-size:12px;font-weight:600;color:var(--fg);margin-bottom:3px;">AI图片检测</p>
+          <p style="font-size:10px;color:var(--sub);line-height:1.4;">MJ、SD、Gemini等</p>
         </div>
-        <div style="background:var(--white);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,0.03);">
-          <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#E8F8F4,#D0F2EA);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <svg width="18" height="18" fill="none" stroke="var(--brand)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 15h6"/></svg>
+        <div style="background:var(--white);border-radius:12px;padding:16px 12px;border:1px solid var(--border);">
+          <div style="width:34px;height:34px;margin-bottom:10px;border-radius:10px;background:var(--bg);display:flex;align-items:center;justify-content:center;">
+            <svg width="16" height="16" fill="none" stroke="var(--brand)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 15h6"/></svg>
           </div>
-          <div style="flex:1;min-width:0;">
-            <p style="font-size:13px;font-weight:600;color:var(--fg);">图片篡改检测</p>
-            <p style="font-size:10px;color:var(--hint);margin-top:2px;">身份证 · 发票 · 合同 · 证照PS篡改</p>
-          </div>
+          <p style="font-size:12px;font-weight:600;color:var(--fg);margin-bottom:3px;">图片篡改检测</p>
+          <p style="font-size:10px;color:var(--sub);line-height:1.4;">身份证、发票等PS篡改</p>
         </div>
-        <div style="background:var(--white);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,0.03);">
-          <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#E8F8F4,#D0F2EA);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <svg width="18" height="18" fill="none" stroke="var(--brand)" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M10 9l5 3-5 3V9z"/></svg>
+        <div style="background:var(--white);border-radius:12px;padding:16px 12px;border:1px solid var(--border);">
+          <div style="width:34px;height:34px;margin-bottom:10px;border-radius:10px;background:var(--bg);display:flex;align-items:center;justify-content:center;">
+            <svg width="16" height="16" fill="none" stroke="var(--brand)" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M10 9l5 3-5 3V9z"/></svg>
           </div>
-          <div style="flex:1;min-width:0;">
-            <p style="font-size:13px;font-weight:600;color:var(--fg);">AI视频检测</p>
-            <p style="font-size:10px;color:var(--hint);margin-top:2px;">Sora · Runway · Kling · 换脸深伪</p>
-          </div>
+          <p style="font-size:12px;font-weight:600;color:var(--fg);margin-bottom:3px;">AI视频检测</p>
+          <p style="font-size:10px;color:var(--sub);line-height:1.4;">Sora、Runway、Kling等</p>
         </div>
-        <div style="background:var(--white);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,0.03);">
-          <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#E8F8F4,#D0F2EA);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <svg width="18" height="18" fill="none" stroke="var(--brand)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+        <div style="background:var(--white);border-radius:12px;padding:16px 12px;border:1px solid var(--border);">
+          <div style="width:34px;height:34px;margin-bottom:10px;border-radius:10px;background:var(--bg);display:flex;align-items:center;justify-content:center;">
+            <svg width="16" height="16" fill="none" stroke="var(--brand)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
           </div>
-          <div style="flex:1;min-width:0;">
-            <p style="font-size:13px;font-weight:600;color:var(--fg);">AI文本检测</p>
-            <p style="font-size:10px;color:var(--hint);margin-top:2px;">ChatGPT · Claude · 文心一言 · 通义千问</p>
-          </div>
+          <p style="font-size:12px;font-weight:600;color:var(--fg);margin-bottom:3px;">AI文本检测</p>
+          <p style="font-size:10px;color:var(--sub);line-height:1.4;">ChatGPT、Claude等LLM</p>
         </div>
       </div>
     </div>
@@ -673,7 +689,7 @@ function renderRecordList(){
   const list=document.getElementById('recentList');
   if(!list)return;
   if(detectHistory.length===0){
-    list.innerHTML='<div style="text-align:center;padding:40px 0 32px;"><div style="width:48px;height:48px;margin:0 auto 12px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;"><svg width="22" height="22" fill="none" stroke="#ccc" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div><p style="font-size:13px;color:var(--hint);">暂无检测记录</p><p style="font-size:11px;color:#ccc;margin-top:4px;">上传图片/视频/文本即可开始鉴定</p></div>';
+    list.innerHTML='<div style="text-align:center;padding:40px 0 32px;"><div style="width:48px;height:48px;margin:0 auto 12px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;"><svg width="22" height="22" fill="none" stroke="#ccc" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div><p style="font-size:13px;color:var(--hint);">暂无检测记录</p><p style="font-size:11px;color:#ccc;margin-top:4px;">上传图文/视频/文本即可开始鉴定</p></div>';
     return;
   }
   const items=detectHistory.slice(0,5);
@@ -682,7 +698,7 @@ function renderRecordList(){
     const icon=rec.type==='image'?'<svg width="16" height="16" fill="none" stroke="var(--brand)" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>'
       :rec.type==='video'?'<svg width="16" height="16" fill="none" stroke="var(--brand)" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M10 9l5 3-5 3V9z"/></svg>'
       :'<svg width="16" height="16" fill="none" stroke="var(--brand)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>';
-    const typeLabel=rec.type==='image'?'图片':rec.type==='video'?'视频':'文本';
+    const typeLabel=rec.type==='image'?'图文':rec.type==='video'?'视频':'文本';
     return`<div onclick="viewHistoryRecord(${i})" style="display:flex;align-items:center;gap:12px;padding:14px;margin-bottom:8px;background:var(--white);border-radius:12px;box-shadow:var(--shadow);cursor:pointer;">
       <div style="width:36px;height:36px;border-radius:10px;background:var(--brand-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;">${icon}</div>
       <div style="flex:1;min-width:0;">
@@ -832,8 +848,8 @@ function submitImageUrl(){
   if(!url)return;
   imgFile=null;
   go('p-scan');
-  document.getElementById('scanTitle').textContent='图片检测中...';
-  startScanSteps(['解析图片','检测内容来源','AI生成分析','篡改检测'],1800);
+  document.getElementById('scanTitle').textContent='图文检测中...';
+  startScanSteps(['解析图文','检测内容来源','AI生成分析','篡改检测'],1800);
   const r=mockImageResult();
   setTimeout(()=>{stack.pop();document.getElementById('p-scan').classList.remove('active');showImageResult(r);},1800);
 }
@@ -884,7 +900,7 @@ function showPreview(file,type){
     vid.style.display='block';
   }
   const tipHTML=type==='image'
-    ?'检测AI生成图及PS篡改。支持 <span class="tip-tag">GPT-Image</span> <span class="tip-tag">Gemini</span> <span class="tip-tag">Midjourney</span> <span class="tip-tag">SD</span> 等主流生成模型，可直接上传图片获得最佳效果。'
+    ?'检测AI生成图及PS篡改。支持 <span class="tip-tag">GPT-Image</span> <span class="tip-tag">Gemini</span> <span class="tip-tag">Midjourney</span> <span class="tip-tag">SD</span> 等主流生成模型，可直接上传图文获得最佳效果。'
     :'检测AI换脸及深度合成视频。支持 <span class="tip-tag">Sora</span> <span class="tip-tag">Kling</span> <span class="tip-tag">Runway</span> <span class="tip-tag">Seedance</span> 等主流AI视频生成模型。';
   document.getElementById('previewTipContent').innerHTML=tipHTML;
   const cur=stack[stack.length-1];
@@ -913,7 +929,7 @@ function onImagePicked(input){
 }
 async function detectImage(){
   go('p-scan');
-  document.getElementById('scanTitle').textContent='图片检测中...';
+  document.getElementById('scanTitle').textContent='图文检测中...';
   const t0=Date.now();
   startScanSteps(['检测内容来源','AI生成分析','篡改检测','生成报告'],3000);
   let r;
@@ -933,7 +949,7 @@ function showImageResult(r, skipSave){
   if(!skipSave){
     const now=new Date();
     const t=now.getFullYear()+'/'+String(now.getMonth()+1).padStart(2,'0')+'/'+String(now.getDate()).padStart(2,'0')+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-    const name=imgFile?imgFile.name:(document.getElementById('imageUrlInput').value.trim()||'图片检测');
+    const name=imgFile?imgFile.name:(document.getElementById('imageUrlInput').value.trim()||'图文检测');
     saveRecord({type:'image',name:name.length>20?name.slice(0,20)+'...':name,time:t,isFake:r.is_fake,result:r});
   }
   const conf=r.details&&r.details.aigc?Math.round(r.details.aigc.model.confidence*100):85;
@@ -953,8 +969,8 @@ function showImageResult(r, skipSave){
     verdict='检测到AI生成痕迹';verdictColor='var(--red)';verdictBg='var(--red-bg)';ringColor='#E74C3C';
   }
 
-  const c2paResult='未发现';
-  const psResult=fakeType==='ps_tampered'?'检出':'未发现';
+  const c2paResult='无来源标记';
+  const psResult=fakeType==='ps_tampered'?'疑似篡改':'正常';
   const imgUrl=imgFile?URL.createObjectURL(imgFile):'';
   const circumference=2*Math.PI*40;
   const dashOffset=circumference*(1-conf/100);
@@ -966,7 +982,7 @@ function showImageResult(r, skipSave){
 
         <!-- 报告头 -->
         <div style="padding:18px 18px 14px;background:linear-gradient(135deg,#fafbfc 0%,#f3f4f6 50%,#eef0f2 100%);border-bottom:0.5px solid var(--border);">
-          <h3 style="font-size:15px;font-weight:700;color:var(--fg);letter-spacing:0.5px;margin-bottom:6px;">图片鉴定报告</h3>
+          <h3 style="font-size:15px;font-weight:700;color:var(--fg);letter-spacing:0.5px;margin-bottom:6px;">图文鉴定报告</h3>
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="font-size:10px;color:var(--hint);">${timeStr}</span>
             <span style="font-size:10px;color:var(--hint);">·</span>
@@ -1350,7 +1366,7 @@ function demoHot(caseKey){
   document.getElementById('caseActions').innerHTML=`
     <button onclick="fabAction()" style="width:100%;padding:15px;background:var(--brand);color:#fff;border:none;border-radius:24px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
       <svg width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M12 16V8m0 0l-3 3m3-3l3 3"/><path d="M20 16.7V19a2 2 0 01-2 2H6a2 2 0 01-2-2v-2.3"/></svg>
-      上传你的图片试试
+      上传你的图文试试
     </button>`;
   go('p-case');
 }
@@ -1527,7 +1543,7 @@ function meNav(key){
           </div>
           <div style="padding:12px 0;border-bottom:0.5px solid var(--border);">
             <h4 style="font-size:14px;font-weight:600;color:var(--fg);margin-bottom:6px;">Q: 支持哪些格式？</h4>
-            <p style="font-size:12px;color:var(--sub);line-height:1.7;">图片支持 JPG/PNG/WebP/HEIC 等，视频支持 MP4/MOV，文本直接粘贴即可。图片最大30MB，视频最大200MB。</p>
+            <p style="font-size:12px;color:var(--sub);line-height:1.7;">图文支持 JPG/PNG/WebP/HEIC 等，视频支持 MP4/MOV，文本直接粘贴即可。图文最大30MB，视频最大200MB。</p>
           </div>
           <div style="padding:12px 0;border-bottom:0.5px solid var(--border);">
             <h4 style="font-size:14px;font-weight:600;color:var(--fg);margin-bottom:6px;">Q: 能检测哪些AI模型生成的内容？</h4>
@@ -1535,7 +1551,7 @@ function meNav(key){
           </div>
           <div style="padding:12px 0;">
             <h4 style="font-size:14px;font-weight:600;color:var(--fg);margin-bottom:6px;">Q: 上传的内容会被保存吗？</h4>
-            <p style="font-size:12px;color:var(--sub);line-height:1.7;">检测完成后图片/视频立即销毁，不做任何存储。文本仅用于实时分析，不留存。</p>
+            <p style="font-size:12px;color:var(--sub);line-height:1.7;">检测完成后图文/视频立即销毁，不做任何存储。文本仅用于实时分析，不留存。</p>
           </div>
         </div>
       </div>`);
@@ -1576,7 +1592,7 @@ function showRecordsPage(filter){
       const typeIcon=rec.type==='image'?'<svg width="16" height="16" fill="none" stroke="var(--brand)" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>'
         :rec.type==='video'?'<svg width="16" height="16" fill="none" stroke="var(--brand)" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M10 9l5 3-5 3V9z"/></svg>'
         :'<svg width="16" height="16" fill="none" stroke="var(--brand)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>';
-      const typeLabel=rec.type==='image'?'图片':rec.type==='video'?'视频':'文本';
+      const typeLabel=rec.type==='image'?'图文':rec.type==='video'?'视频':'文本';
       return'<div onclick="back();viewHistoryRecord('+realIdx+')" style="display:flex;align-items:center;gap:12px;padding:16px;margin-bottom:12px;background:var(--white);border-radius:12px;box-shadow:var(--shadow);cursor:pointer;"><div style="width:36px;height:36px;border-radius:10px;background:var(--brand-light);display:flex;align-items:center;justify-content:center;">'+typeIcon+'</div><div style="flex:1;min-width:0;"><p style="font-size:13px;font-weight:500;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+rec.name+'</p><p style="font-size:10px;color:var(--hint);margin-top:3px;">'+rec.time+' · '+typeLabel+'检测</p></div><span style="font-size:11px;font-weight:500;color:'+(rec.isFake?'var(--red)':'var(--brand)')+';">'+statusText+'</span></div>';
     }).join('');
   }
