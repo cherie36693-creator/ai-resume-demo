@@ -350,7 +350,7 @@ body { font-family:-apple-system,'PingFang SC','Noto Sans SC',sans-serif; backgr
         </div>
         <div style="border-top:1px solid #f0f0f0;padding-top:7px;display:flex;flex-direction:column;gap:5px;">
           <div style="display:flex;align-items:center;gap:5px;"><div style="width:5px;height:5px;border-radius:50%;background:#E74C3C;"></div><span style="font-size:7px;color:#333;flex:1;">AI生成可能性</span><span style="font-size:7px;font-weight:600;color:#E74C3C;">87%</span></div>
-          <div style="display:flex;align-items:center;gap:5px;"><div style="width:5px;height:5px;border-radius:50%;background:var(--brand);"></div><span style="font-size:7px;color:#333;flex:1;">内容来源验证</span><span style="font-size:7px;font-weight:600;color:var(--brand);">未发现</span></div>
+          <div style="display:flex;align-items:center;gap:5px;"><div style="width:5px;height:5px;border-radius:50%;background:var(--brand);"></div><span style="font-size:7px;color:#333;flex:1;">图片来源标记</span><span style="font-size:7px;font-weight:600;color:var(--brand);">无</span></div>
           <div style="display:flex;align-items:center;gap:5px;"><div style="width:5px;height:5px;border-radius:50%;background:var(--brand);"></div><span style="font-size:7px;color:#333;flex:1;">图片篡改检测</span><span style="font-size:7px;font-weight:600;color:var(--brand);">未发现</span></div>
         </div>
       </div>
@@ -676,7 +676,6 @@ function pickSource(type,label){
 }
 
 // ====== 检测记录系统 ======
-localStorage.removeItem('fidok_history');
 let detectHistory=JSON.parse(localStorage.getItem('fidok_history')||'[]');
 
 function saveRecord(record){
@@ -1023,8 +1022,8 @@ function showImageResult(r, skipSave){
         <div style="padding:0 18px 16px;">
           <div style="background:var(--bg);border-radius:10px;padding:2px 14px;">
             <div style="display:flex;align-items:center;padding:12px 0;border-bottom:0.5px solid var(--border);">
-              <span style="flex:1;font-size:13px;color:var(--text);">内容来源验证</span>
-              <span style="font-size:12px;color:var(--brand);font-weight:600;">${c2paResult}</span>
+              <span style="flex:1;font-size:13px;color:var(--text);">图片来源标记</span>
+              <span style="font-size:12px;color:var(--hint);font-weight:600;">${c2paResult}</span>
             </div>
             <div style="display:flex;align-items:center;padding:12px 0;border-bottom:0.5px solid var(--border);">
               <span style="flex:1;font-size:13px;color:var(--text);">AI生成可能性</span>
@@ -1114,7 +1113,8 @@ function showVideoResult(r, skipSave){
     const now=new Date();
     const t=now.getFullYear()+'/'+String(now.getMonth()+1).padStart(2,'0')+'/'+String(now.getDate()).padStart(2,'0')+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
     const name=vidFile?vidFile.name:(document.getElementById('videoUrlInput').value.trim()||'视频检测');
-    saveRecord({type:'video',name:name.length>20?name.slice(0,20)+'...':name,time:t,isFake:r.is_fake,result:r});
+    const videoUrl=vidFile?'':(document.getElementById('videoUrlInput')?document.getElementById('videoUrlInput').value.trim():'');
+    saveRecord({type:'video',name:name.length>20?name.slice(0,20)+'...':name,time:t,isFake:r.is_fake,result:r,videoUrl:videoUrl});
   }
   const conf=Math.round(r.confidence);
   const fake=r.is_fake;
@@ -1202,8 +1202,8 @@ function showVideoResult(r, skipSave){
           </div>
           ${r.has_face?'<div style="display:flex;align-items:center;padding:12px 0;border-bottom:0.5px solid var(--border);"><span style="flex:1;font-size:13px;color:var(--text);">视频换脸检测</span><span style="font-size:12px;color:'+(r.deepfake?'var(--red)':'var(--brand)')+';font-weight:600;">'+(r.deepfake?'疑似':'未发现')+'</span></div>':''}
           <div style="display:flex;align-items:center;padding:12px 0;">
-            <span style="flex:1;font-size:13px;color:var(--text);">内容来源验证</span>
-            <span style="font-size:12px;color:var(--brand);font-weight:600;">未发现</span>
+            <span style="flex:1;font-size:13px;color:var(--text);">视频来源标记</span>
+            <span style="font-size:12px;color:var(--hint);font-weight:600;">无</span>
           </div>
           </div>
         </div>
@@ -1407,7 +1407,7 @@ async function detectText(text){
       const aiVal=typeof data.ai_feature_value==='number'?data.ai_feature_value:(data.ai_prob||0);
       const totalChars=data.total_chars||text.length;
       const aiChars=data.ai_feature_chars||Math.round(aiVal*totalChars);
-      r={verdict:data.verdict||( aiVal>0.7?'fake':aiVal>0.4?'warning':'real'),ai_feature_value:aiVal,total_chars:totalChars,ai_feature_chars:aiChars,paragraphs:null,total_ms:data.timing_ms||data.total_ms||0};
+      r={verdict:data.verdict||( aiVal>0.7?'fake':aiVal>0.4?'warning':'real'),ai_feature_value:aiVal,total_chars:totalChars,ai_feature_chars:aiChars,paragraphs:data.paragraphs||null,total_ms:data.timing_ms||data.total_ms||0};
     }else{console.warn('Text API error:',await res.text());}
   }catch(e){console.warn('Network error:',e);}
   if(!r)r=mockTextResult();
@@ -1421,6 +1421,7 @@ function showTextResult(r, skipSave){
     const t=now.getFullYear()+'/'+String(now.getMonth()+1).padStart(2,'0')+'/'+String(now.getDate()).padStart(2,'0')+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
     const text=document.getElementById('mainInput')?document.getElementById('mainInput').value.trim():'';
     const name=text?text.slice(0,16)+'...' :'文本检测';
+    r._inputText=text;
     saveRecord({type:'text',name:name,time:t,isFake:r.verdict==='fake',result:r});
   }
   const pct=Math.round((r.ai_feature_value||0)*100);
@@ -1435,7 +1436,7 @@ function showTextResult(r, skipSave){
   const now=new Date();
   const timeStr=now.getFullYear()+'/'+String(now.getMonth()+1).padStart(2,'0')+'/'+String(now.getDate()).padStart(2,'0')+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
   const reportId='FDK'+Date.now().toString(36).toUpperCase().slice(-8);
-  const inputText=document.getElementById('mainInput')?document.getElementById('mainInput').value.trim():'';
+  const inputText=r._inputText||(document.getElementById('mainInput')?document.getElementById('mainInput').value.trim():'');
 
   document.getElementById('resultContent').innerHTML=`
     <div style="min-height:100%;padding:10px 12px 8px;">
