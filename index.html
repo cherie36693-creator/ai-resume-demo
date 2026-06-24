@@ -89,7 +89,7 @@ body { font-family:-apple-system,'PingFang SC','Noto Sans SC',sans-serif; backgr
 .panel-textarea::placeholder { color:#bbb; }
 
 /* 记录列表 */
-.record-list { background:var(--white); border-radius:12px; overflow:hidden; }
+.record-list { border-radius:12px; overflow:hidden; }
 .record-item { display:flex; align-items:flex-start; padding:14px 16px; border-bottom:1px solid var(--border); cursor:pointer; transition:background .15s; gap:12px; }
 .record-item:last-child { border-bottom:none; }
 .record-item:active { background:var(--brand-light); }
@@ -699,7 +699,7 @@ function renderRecordList(){
       :rec.type==='video'?'<svg width="16" height="16" fill="none" stroke="var(--brand)" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M10 9l5 3-5 3V9z"/></svg>'
       :'<svg width="16" height="16" fill="none" stroke="var(--brand)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>';
     const typeLabel=rec.type==='image'?'图文':rec.type==='video'?'视频':'文本';
-    return`<div onclick="viewHistoryRecord(${i})" style="display:flex;align-items:center;gap:12px;padding:14px;margin-bottom:8px;background:var(--white);border-radius:12px;box-shadow:var(--shadow);cursor:pointer;">
+    return`<div onclick="viewHistoryRecord(${i})" style="display:flex;align-items:center;gap:12px;padding:14px;margin-bottom:8px;background:var(--white);border-radius:12px;cursor:pointer;">
       <div style="width:36px;height:36px;border-radius:10px;background:var(--brand-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;">${icon}</div>
       <div style="flex:1;min-width:0;">
         <p style="font-size:13px;font-weight:500;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${rec.name}</p>
