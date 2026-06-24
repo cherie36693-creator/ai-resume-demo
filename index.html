@@ -676,6 +676,7 @@ function pickSource(type,label){
 }
 
 // ====== 检测记录系统 ======
+localStorage.removeItem('fidok_history');
 let detectHistory=JSON.parse(localStorage.getItem('fidok_history')||'[]');
 
 function saveRecord(record){
