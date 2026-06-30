@@ -208,7 +208,7 @@ body { font-family:-apple-system,'PingFang SC','Noto Sans SC',sans-serif; backgr
             <svg width="20" height="20" fill="none" stroke="var(--brand)" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
           </div>
           <p style="font-size:13px;font-weight:600;color:var(--fg);margin-bottom:4px;">点击上传图片或文件</p>
-          <p style="font-size:11px;color:var(--hint);">支持 JPG / PNG / PDF · 30MB以内</p>
+          <p style="font-size:11px;color:var(--hint);">支持 JPG / PNG / PDF 等常见格式 · 50MB以内</p>
         </div>
       </div>
       <!-- 视频面板 -->
@@ -219,14 +219,14 @@ body { font-family:-apple-system,'PingFang SC','Noto Sans SC',sans-serif; backgr
               <svg width="20" height="20" fill="none" stroke="var(--brand)" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M10 9l5 3-5 3V9z"/></svg>
             </div>
             <p style="font-size:13px;font-weight:600;color:var(--fg);margin-bottom:4px;">从相册中选择视频</p>
-            <p style="font-size:11px;color:var(--hint);">支持 MP4 / MOV · 100MB以内</p>
+            <p style="font-size:11px;color:var(--hint);">支持 MP4 / MOV / AVI 等常见格式 · 200MB以内</p>
           </div>
         </div>
       </div>
       <!-- 文本面板 -->
       <div class="tab-panel" id="panel-text">
         <div style="position:relative;height:100%;">
-          <textarea id="mainInput" class="panel-textarea" style="height:100%;min-height:auto;border:1.5px dashed rgba(0,189,146,0.4);border-radius:12px;background:rgba(0,189,146,0.02);padding:14px;font-size:13px;" placeholder="粘贴或输入待检测文本（至少20字）..." oninput="toggleTextGoBtn()"></textarea>
+          <textarea id="mainInput" class="panel-textarea" style="height:100%;min-height:auto;border:1.5px dashed rgba(0,189,146,0.4);border-radius:12px;background:rgba(0,189,146,0.02);padding:14px;font-size:13px;" placeholder="粘贴或输入待检测文本（建议250字以上）..." oninput="toggleTextGoBtn()"></textarea>
           <div id="textGoBtn" class="go-btn" style="position:absolute;right:10px;bottom:10px;" onclick="submitMain()"><svg width="16" height="16" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></div>
         </div>
       </div>
@@ -349,7 +349,6 @@ body { font-family:-apple-system,'PingFang SC','Noto Sans SC',sans-serif; backgr
         </div>
         <div style="border-top:1px solid #f0f0f0;padding-top:7px;display:flex;flex-direction:column;gap:5px;">
           <div style="display:flex;align-items:center;gap:5px;"><div style="width:5px;height:5px;border-radius:50%;background:#E74C3C;"></div><span style="font-size:7px;color:#333;flex:1;">AI生成可能性</span><span style="font-size:7px;font-weight:600;color:#E74C3C;">87%</span></div>
-          <div style="display:flex;align-items:center;gap:5px;"><div style="width:5px;height:5px;border-radius:50%;background:var(--brand);"></div><span style="font-size:7px;color:#333;flex:1;">图片来源标记</span><span style="font-size:7px;font-weight:600;color:var(--brand);">无</span></div>
           <div style="display:flex;align-items:center;gap:5px;"><div style="width:5px;height:5px;border-radius:50%;background:var(--brand);"></div><span style="font-size:7px;color:#333;flex:1;">图片篡改检测</span><span style="font-size:7px;font-weight:600;color:var(--brand);">未发现</span></div>
         </div>
       </div>
@@ -650,8 +649,7 @@ const sourcesConfig={
     {icon:'<svg width="22" height="22" fill="none" stroke="var(--brand)" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="15" rx="3"/><circle cx="8.5" cy="9.5" r="2"/><path d="M3 15l5-4 3 3 5-5 5 4"/></svg>',label:'系统相册',bg:'#E8F8F4'},
     {icon:'<svg width="22" height="22" fill="none" stroke="#1976D2" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 4h6l2 2h4a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z"/></svg>',label:'系统文件',bg:'#E3F2FD'},
     {icon:'<svg width="22" height="22" fill="none" stroke="#9C27B0" stroke-width="1.5" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>',label:'拍摄图片',bg:'#F3E5F5'},
-    {icon:'<svg width="22" height="22" fill="none" stroke="#4CAF50" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 13c0 0 1.5 2 4 2s4-2 4-2"/><circle cx="9" cy="10" r="1" fill="#4CAF50"/><circle cx="15" cy="10" r="1" fill="#4CAF50"/></svg>',label:'微信',bg:'#E8F5E9'},
-    {icon:'<svg width="22" height="22" fill="none" stroke="#FF9800" stroke-width="1.5" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="3"/><circle cx="12" cy="18" r="1" fill="#FF9800"/><path d="M9 6h6M9 9h4"/></svg>',label:'应用内图文',bg:'#FFF3E0'}
+    {icon:'<svg width="22" height="22" fill="none" stroke="#4CAF50" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 13c0 0 1.5 2 4 2s4-2 4-2"/><circle cx="9" cy="10" r="1" fill="#4CAF50"/><circle cx="15" cy="10" r="1" fill="#4CAF50"/></svg>',label:'微信',bg:'#E8F5E9'}
   ],
   video:[
     {icon:'<svg width="22" height="22" fill="none" stroke="var(--brand)" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="15" rx="3"/><circle cx="8.5" cy="9.5" r="2"/><path d="M3 15l5-4 3 3 5-5 5 4"/></svg>',label:'系统相册',bg:'#E8F8F4'},
@@ -863,7 +861,7 @@ function submitImageUrl(){
   imgFile=null;
   go('p-scan');
   document.getElementById('scanTitle').textContent='图文检测中...';
-  startScanSteps(['解析图文','检测内容来源','AI生成分析','篡改检测'],1800);
+  startScanSteps(['AI生成图像检测','AI编辑图像检测','PS局部伪造检测','模板图贴图检测','物理篡改检测'],1800);
   const r=mockImageResult();
   setTimeout(()=>{stack.pop();document.getElementById('p-scan').classList.remove('active');showImageResult(r);},1800);
 }
@@ -984,7 +982,6 @@ function showImageResult(r, skipSave){
     verdict='检测到AI生成痕迹';verdictColor='var(--red)';verdictBg='var(--red-bg)';ringColor='#E74C3C';stampText='AI生成';
   }
 
-  const c2paResult='无来源标记';
   const psResult=fakeType==='ps_tampered'?'疑似':'真实';
   const imgUrl=imgFile?URL.createObjectURL(imgFile):'';
   const circumference=2*Math.PI*40;
@@ -1037,10 +1034,6 @@ function showImageResult(r, skipSave){
         <div style="padding:0 18px 16px;">
           <div style="background:var(--bg);border-radius:10px;padding:2px 14px;">
             <div style="display:flex;align-items:center;padding:12px 0;border-bottom:0.5px solid var(--border);">
-              <span style="flex:1;font-size:13px;color:var(--text);">图片来源标记</span>
-              <span style="font-size:12px;color:var(--hint);font-weight:600;">${c2paResult}</span>
-            </div>
-            <div style="display:flex;align-items:center;padding:12px 0;border-bottom:0.5px solid var(--border);">
               <span style="flex:1;font-size:13px;color:var(--text);">AI生成可能性</span>
               <span style="font-size:12px;color:${conf>50?'var(--red)':'var(--brand)'};font-weight:700;">${conf}%</span>
             </div>
@@ -1054,7 +1047,6 @@ function showImageResult(r, skipSave){
         <!-- 报告底部 -->
         <div style="padding:12px 18px 16px;border-top:1px dashed var(--border);">
           <p style="font-size:10px;color:var(--hint);line-height:1.6;">检测引擎：FidOK AI多模态鉴伪</p>
-          <p style="font-size:10px;color:var(--hint);line-height:1.6;">本报告由AI模型自动生成，仅供参考</p>
         </div>
 
       </div>
@@ -1082,7 +1074,7 @@ async function detectVideo(){
   go('p-scan');
   document.getElementById('scanTitle').textContent='视频检测中...';
   const _vt0=Date.now();
-  startScanSteps(['上传视频','分析视频帧','AI生成检测','生成报告'],5000);
+  startScanSteps(['上传视频','分析视频帧','AI生成检测','Deepfake深度伪造检测'],5000);
   let r;
   let realDuration=4;
   let realWidth=1280,realHeight=720;
@@ -1218,17 +1210,12 @@ function showVideoResult(r, skipSave){
             <span style="font-size:12px;color:${conf>50?'var(--red)':'var(--brand)'};font-weight:700;">${conf}%</span>
           </div>
           ${r.has_face?'<div style="display:flex;align-items:center;padding:12px 0;border-bottom:0.5px solid var(--border);"><span style="flex:1;font-size:13px;color:var(--text);">视频换脸检测</span><span style="font-size:12px;color:'+(r.deepfake?'var(--red)':'var(--brand)')+';font-weight:600;">'+(r.deepfake?'疑似':'未发现')+'</span></div>':''}
-          <div style="display:flex;align-items:center;padding:12px 0;">
-            <span style="flex:1;font-size:13px;color:var(--text);">视频来源标记</span>
-            <span style="font-size:12px;color:var(--hint);font-weight:600;">无</span>
-          </div>
           </div>
         </div>
 
 
         <!-- 报告底部 -->
         <div style="padding:10px 18px 14px;background:var(--bg);text-align:center;">
-          <p style="font-size:10px;color:var(--hint);">本结论由AI模型多维度分析生成，仅供参考</p>
         </div>
 
       </div>
@@ -1531,7 +1518,6 @@ function showTextResult(r, skipSave){
         <!-- 报告签章 -->
         <div style="padding:12px 18px 16px;border-top:1px dashed var(--border);">
           <p style="font-size:10px;color:var(--hint);line-height:1.6;">检测引擎：FidOK AI多模态鉴伪</p>
-          <p style="font-size:10px;color:var(--hint);line-height:1.6;">本报告由AI模型自动生成，仅供参考</p>
         </div>
 
       </div>
