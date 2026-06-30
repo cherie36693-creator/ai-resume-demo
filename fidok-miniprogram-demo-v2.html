@@ -912,7 +912,7 @@ function showPreview(file,type){
     vid.style.display='block';
   }
   const tipHTML=type==='image'
-    ?'检测AI生成图及PS篡改。支持 <span class="tip-tag">GPT-Image</span> <span class="tip-tag">Gemini</span> <span class="tip-tag">Midjourney</span> <span class="tip-tag">SD</span> 等主流生成模型，可直接上传图文获得最佳效果。'
+    ?'上传图片后，系统将综合检测图像是否存在以下伪造情况—— <span class="tip-tag">AI生成图像</span> <span class="tip-tag">AI编辑图像</span> <span class="tip-tag">PS局部伪造</span> <span class="tip-tag">模板图贴图</span> <span class="tip-tag">物理篡改</span> 等。'
     :'检测AI换脸及深度合成视频。支持 <span class="tip-tag">Sora</span> <span class="tip-tag">Kling</span> <span class="tip-tag">Runway</span> <span class="tip-tag">Seedance</span> 等主流AI视频生成模型。';
   document.getElementById('previewTipContent').innerHTML=tipHTML;
   const cur=stack[stack.length-1];
