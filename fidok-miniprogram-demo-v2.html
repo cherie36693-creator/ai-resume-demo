@@ -1665,59 +1665,92 @@ function reDetect(){
 function shareReport(){
   const overlay=document.getElementById('sourceOverlay');
   const sheet=overlay.querySelector('.source-sheet');
-  // 获取当前报告结论
   const resultHtml=document.getElementById('resultContent').innerHTML;
   const verdictMatch=resultHtml.match(/font-weight:800;color:([^;]+).*?>(.*?)<\/h2>/);
   const verdictText=verdictMatch?verdictMatch[2]:'检测完成';
   const verdictColor=verdictMatch?verdictMatch[1]:'var(--brand)';
   const isFakeReport=(verdictText.includes('检测到')&&!verdictText.includes('未检测到'))||verdictText.includes('疑似');
+  const previewImg=document.getElementById('previewImg');
+  const thumbSrc=previewImg&&previewImg.src?previewImg.src:'';
+
+  sheet.style.padding='0';
   sheet.innerHTML=`
-    <div style="padding:0;">
-      <div style="background:var(--white);border-radius:16px 16px 0 0;padding:18px 16px 0;box-shadow:0 -4px 24px rgba(0,0,0,0.08);">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
-          <div style="width:24px;height:24px;border-radius:6px;background:var(--brand);display:flex;align-items:center;justify-content:center;">
-            <svg width="12" height="12" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          </div>
-          <span style="font-size:14px;font-weight:600;color:var(--fg);">扫描全能王 · AI鉴伪报告</span>
+    <div style="padding:16px 24px 20px;">
+      <!-- 标题栏带关闭 -->
+      <div style="display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:14px;">
+        <span style="font-size:15px;font-weight:600;color:var(--fg);">分享报告</span>
+        <div onclick="hideShareSheet()" style="position:absolute;right:0;width:24px;height:24px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+          <svg width="10" height="10" fill="none" stroke="var(--hint)" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 10 10"><path d="M1 1l8 8M9 1l-8 8"/></svg>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg);border-radius:10px;margin-bottom:18px;">
-          <span style="font-size:13px;font-weight:700;color:${verdictColor};">${verdictText}</span>
-          <span style="font-size:10px;padding:3px 8px;border-radius:4px;background:${isFakeReport?'var(--red-bg)':'var(--brand-light)'};color:${verdictColor};font-weight:600;">${isFakeReport?'异常':'正常'}</span>
-        </div>
-        <div style="display:flex;justify-content:space-around;padding-bottom:16px;">
-          <div onclick="hideShareSheet();alert('已发送至微信好友')" style="text-align:center;cursor:pointer;">
-            <div style="width:48px;height:48px;border-radius:14px;background:#07C160;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;">
-              <svg width="24" height="24" fill="#fff" viewBox="0 0 24 24"><path d="M8.5 11a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm7 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM12 2C6.477 2 2 5.813 2 10.5c0 2.61 1.407 4.946 3.613 6.52L5 20l3.177-1.664A11.19 11.19 0 0012 19c5.523 0 10-3.813 10-8.5S17.523 2 12 2z"/></svg>
-            </div>
-            <span style="font-size:11px;color:var(--sub);">微信好友</span>
-          </div>
-          <div onclick="hideShareSheet();alert('已分享到朋友圈')" style="text-align:center;cursor:pointer;">
-            <div style="width:48px;height:48px;border-radius:14px;background:#07C160;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;">
-              <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#fff"/><path d="M8 12h8M12 8v8" stroke="#07C160" stroke-width="2.5" stroke-linecap="round"/></svg>
-            </div>
-            <span style="font-size:11px;color:var(--sub);">朋友圈</span>
-          </div>
-          <div onclick="hideShareSheet();alert('报告图片已保存到相册')" style="text-align:center;cursor:pointer;">
-            <div style="width:48px;height:48px;border-radius:14px;background:var(--bg);display:flex;align-items:center;justify-content:center;margin:0 auto 6px;">
-              <svg width="20" height="20" fill="none" stroke="var(--fg)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 3v12M8 11l4 4 4-4"/></svg>
-            </div>
-            <span style="font-size:11px;color:var(--sub);">保存图片</span>
-          </div>
-          <div onclick="hideShareSheet();navigator.clipboard&&navigator.clipboard.writeText(location.href);alert('链接已复制')" style="text-align:center;cursor:pointer;">
-            <div style="width:48px;height:48px;border-radius:14px;background:var(--bg);display:flex;align-items:center;justify-content:center;margin:0 auto 6px;">
-              <svg width="20" height="20" fill="none" stroke="var(--fg)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
-            </div>
-            <span style="font-size:11px;color:var(--sub);">复制链接</span>
-          </div>
-        </div>
-        <div onclick="hideShareSheet()" style="border-top:0.5px solid var(--border);padding:14px 0 16px;text-align:center;font-size:15px;font-weight:500;color:var(--hint);cursor:pointer;">取消</div>
       </div>
+
+      <!-- 报告卡片：缩略图+信息横排 -->
+      <div style="display:flex;gap:12px;padding:12px;background:var(--bg);border-radius:12px;">
+        <div style="width:72px;height:102px;background:#fff;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.08);flex-shrink:0;overflow:hidden;display:flex;flex-direction:column;">
+          ${thumbSrc?`<img src="${thumbSrc}" style="width:100%;height:48px;object-fit:cover;">`:`<div style="width:100%;height:48px;background:linear-gradient(135deg,#f8f9fa,#e9ecef);display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" fill="none" stroke="#ccc" stroke-width="1.2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>`}
+          <div style="flex:1;padding:4px 6px;display:flex;flex-direction:column;justify-content:space-between;">
+            <div style="font-size:5.5px;color:var(--fg);font-weight:700;">AI鉴伪检测报告</div>
+            <div style="display:flex;align-items:center;gap:2px;">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="#07C160" stroke-width="1.5"/><circle cx="12" cy="12" r="3" fill="#07C160"/></svg>
+              <span style="font-size:4.5px;color:var(--hint);">扫码查看</span>
+            </div>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:6px;">
+          <div style="font-size:13px;font-weight:600;color:var(--fg);">扫描全能王 · AI鉴伪报告</div>
+          <div style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;background:${isFakeReport?'var(--red-bg)':'var(--brand-light)'};border-radius:6px;align-self:flex-start;">
+            <svg width="12" height="12" fill="none" stroke="${verdictColor}" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24">${isFakeReport?'<path d="M12 9v4M12 17h.01"/>':'<path d="M5 13l4 4L19 7"/>'}</svg>
+            <span style="font-size:12px;font-weight:600;color:${verdictColor};">${verdictText}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 分享按钮 -->
+      <div style="display:flex;justify-content:center;gap:44px;padding:16px 0 20px;border-top:0.5px solid var(--border);margin-top:16px;">
+        <div onclick="shareToWechat()" style="text-align:center;cursor:pointer;">
+          <div style="width:48px;height:48px;border-radius:50%;background:#07C160;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;box-shadow:0 3px 10px rgba(7,193,96,0.25);">
+            <svg width="22" height="22" fill="#fff" viewBox="0 0 24 24"><path d="M8.5 11a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm7 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM12 2C6.477 2 2 5.813 2 10.5c0 2.61 1.407 4.946 3.613 6.52L5 20l3.177-1.664A11.19 11.19 0 0012 19c5.523 0 10-3.813 10-8.5S17.523 2 12 2z"/></svg>
+          </div>
+          <span style="font-size:11px;color:var(--sub);">微信好友</span>
+        </div>
+        <div onclick="saveReportImage()" style="text-align:center;cursor:pointer;">
+          <div style="width:48px;height:48px;border-radius:50%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;">
+            <svg width="20" height="20" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/><path d="M12 3v13"/><path d="M8 12l4 4 4-4"/></svg>
+          </div>
+          <span style="font-size:11px;color:var(--sub);">保存图片</span>
+        </div>
+      </div>
+
+      <!-- 取消 -->
+      <div onclick="hideShareSheet()" style="padding:12px 0 4px;text-align:center;font-size:14px;color:var(--hint);cursor:pointer;">取消</div>
     </div>
   `;
   overlay.classList.add('show');
 }
+
+function shareToWechat(){
+  hideShareSheet();
+  const toast=document.createElement('div');
+  toast.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.75);color:#fff;padding:16px 24px;border-radius:12px;font-size:13px;text-align:center;z-index:9999;';
+  toast.innerHTML=`<svg width="32" height="32" fill="#07C160" viewBox="0 0 24 24" style="display:block;margin:0 auto 8px;"><path d="M8.5 11a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm7 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM12 2C6.477 2 2 5.813 2 10.5c0 2.61 1.407 4.946 3.613 6.52L5 20l3.177-1.664A11.19 11.19 0 0012 19c5.523 0 10-3.813 10-8.5S17.523 2 12 2z"/></svg>已分享至微信好友`;
+  document.querySelector('.device').appendChild(toast);
+  setTimeout(()=>toast.remove(),2000);
+}
+
+function saveReportImage(){
+  hideShareSheet();
+  const toast=document.createElement('div');
+  toast.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.75);color:#fff;padding:16px 24px;border-radius:12px;font-size:13px;text-align:center;z-index:9999;';
+  toast.innerHTML=`<svg width="32" height="32" fill="none" stroke="#fff" stroke-width="1.5" viewBox="0 0 24 24" style="display:block;margin:0 auto 8px;"><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 3v12M8 11l4 4 4-4"/></svg>已保存至相册`;
+  document.querySelector('.device').appendChild(toast);
+  setTimeout(()=>toast.remove(),2000);
+}
+
 function hideShareSheet(){
-  document.getElementById('sourceOverlay').classList.remove('show');
+  const overlay=document.getElementById('sourceOverlay');
+  const sheet=overlay.querySelector('.source-sheet');
+  sheet.style.padding='';
+  overlay.classList.remove('show');
 }
 function seekVideoTo(time){
   const vid=document.getElementById('reportVideo');
