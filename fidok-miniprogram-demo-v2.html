@@ -818,7 +818,7 @@ function showTextPreview(text){
   textWrap.style.display='block';
   document.getElementById('previewTextContent').textContent=text;
   document.getElementById('previewTextCount').textContent=text.length+'字';
-  document.getElementById('previewTipContent').innerHTML='检测AI生成文本。支持 <span class="tip-tag">ChatGPT</span> <span class="tip-tag">Claude</span> <span class="tip-tag">文心一言</span> <span class="tip-tag">通义千问</span> 等主流大语言模型生成内容检测。';
+  document.getElementById('previewTipContent').innerHTML='识别文本是否由AI生成，统计AI生成字符占比，并对每一段落标注其AIGC生成可能性。';
   go('p-preview');
 }
 
@@ -1529,6 +1529,14 @@ function showTextResult(r, skipSave){
               <span style="flex:1;font-size:13px;color:var(--text);">疑似AI生成字数</span>
               <span style="font-size:12px;color:${isFake?'var(--red)':'var(--fg)'};font-weight:600;">${r.ai_feature_chars||0} 字</span>
             </div>
+          </div>
+        </div>
+
+        <!-- 检测说明 -->
+        <div style="padding:14px 18px;border-top:0.5px solid var(--border);">
+          <h4 style="font-size:13px;font-weight:600;color:var(--fg);margin-bottom:8px;">检测说明</h4>
+          <div style="font-size:11px;color:var(--sub);line-height:1.8;">
+            <p><b style="color:var(--fg);">AI特征字符占比：</b>通过分析文本的用词习惯、句式结构、表达是否过于"标准化"，以及是否带有AI常见的写作套路和固定搭配，逐段判断每段文字的AI生成可能性，并统计全文中具有AI写作特征的字符占比。</p>
           </div>
         </div>
 
