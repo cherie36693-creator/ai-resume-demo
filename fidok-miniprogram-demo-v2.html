@@ -913,7 +913,7 @@ function showPreview(file,type){
   }
   const tipHTML=type==='image'
     ?'上传图片后，系统将综合检测图像是否存在以下伪造情况—— <span class="tip-tag">AI生成图像</span> <span class="tip-tag">AI编辑图像</span> <span class="tip-tag">PS局部伪造</span> <span class="tip-tag">模板图贴图</span> <span class="tip-tag">物理篡改</span> 等。'
-    :'检测AI换脸及深度合成视频。支持 <span class="tip-tag">Sora</span> <span class="tip-tag">Kling</span> <span class="tip-tag">Runway</span> <span class="tip-tag">Seedance</span> 等主流AI视频生成模型。';
+    :'识别视频是否为AI生成，以及是否存在Deepfake等深度伪造痕迹。';
   document.getElementById('previewTipContent').innerHTML=tipHTML;
   const cur=stack[stack.length-1];
   if(cur!=='p-preview')go('p-preview');
@@ -1048,8 +1048,8 @@ function showImageResult(r, skipSave){
         <div style="padding:14px 18px;border-top:0.5px solid var(--border);">
           <h4 style="font-size:13px;font-weight:600;color:var(--fg);margin-bottom:8px;">检测说明</h4>
           <div style="font-size:11px;color:var(--sub);line-height:1.8;">
-            <p style="margin-bottom:4px;"><b style="color:var(--fg);">AI生成检测：</b>综合来源标记（C2PA内容凭证、平台水印）、频谱伪影与噪声异常、像素与JPEG统计特性、以及光影透视与结构等语义缺陷，判定图像是否由AI整体生成或经AI编辑。</p>
-            <p><b style="color:var(--fg);">图片篡改检测：</b>检测图像是否存在PS局部伪造、模板贴图、物理篡改等人为修改痕迹。</p>
+            <p style="margin-bottom:4px;"><b style="color:var(--fg);">AI生成检测：</b>通过检查图片是否携带AI工具的来源标记、画面细节是否存在不自然的痕迹（如纹理异常、光影矛盾等），综合判断图像是否由AI生成或经AI编辑。</p>
+            <p><b style="color:var(--fg);">图片篡改：</b>检测图片是否被人为修改过，包括PS拼接、局部涂改、模板贴图、翻拍等常见伪造手段。</p>
           </div>
         </div>
 
@@ -1222,6 +1222,14 @@ function showVideoResult(r, skipSave){
           </div>
         </div>
 
+
+        <!-- 检测说明 -->
+        <div style="padding:14px 18px;border-top:0.5px solid var(--border);">
+          <h4 style="font-size:13px;font-weight:600;color:var(--fg);margin-bottom:8px;">检测说明</h4>
+          <div style="font-size:11px;color:var(--sub);line-height:1.8;">
+            <p><b style="color:var(--fg);">AI生成检测：</b>通过分析视频画面是否流畅自然、动作与光影是否合理、以及是否存在AI工具留下的生成痕迹，综合判断视频是否为AI生成。</p>
+          </div>
+        </div>
 
         <!-- 报告底部 -->
         <div style="padding:10px 18px 14px;background:var(--bg);text-align:center;">
